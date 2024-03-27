@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Booking</title>
+</head>
+<body>
+    <h1>Add Booking</h1>
+    <form id="bookingForm" method="POST" action="{{ url_for('add_booking') }}">
+        <label for="start_date">Дата бронирования (ДД.ММ.ГГГГ):</label>
+        <input type="text" id="start_date" name="start_date" placeholder="дд.мм.гггг" required>
+        <label for="end_date">Дата окончания бронирования (ДД.ММ.ГГГГ):</label>
+        <input type="text" id="end_date" name="end_date" placeholder="дд.мм.гггг" required>
+        <label for="car_id">ID автомобиля:</label>
+        <input type="text" id="car_id" name="car_id" placeholder="ID автомобиля" required>
+        <label for="description">Описание бронирования:</label>
+        <textarea id="description" name="description" placeholder="Введите описание бронирования" required></textarea>
+        <label for="extension">Возможность продления (true или false):</label>
+        <input type="text" id="extension" name="extension" placeholder="true или false" required>
+        <button type="submit">Добавить бронирование</button>
+    </form>
+
+    <script>
+        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('{{ url_for("add_booking") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+    </script>
+</body>
+</html>
+

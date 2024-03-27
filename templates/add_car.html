@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Car</title>
+</head>
+<body>
+    <h1>Add Car</h1>
+    <form method="POST" action="/add_car">
+        <div>
+            <label for="brand">Марка автомобиля:</label>
+            <input type="text" id="brand" name="brand" required>
+        </div>
+        <div>
+            <label for="car_number">Номер автомобиля:</label>
+            <input type="text" id="car_number" name="car_number" required>
+        </div>
+        <button type="submit">Добавить автомобиль</button>
+    </form>
+</body>
+</html>
