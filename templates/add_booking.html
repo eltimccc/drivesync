@@ -7,25 +7,29 @@
 </head>
 <body>
     <h1>Add Booking</h1>
-    <form id="bookingForm" method="POST" action="{{ url_for('add_booking') }}">
-        <label for="start_date">Дата бронирования (ДД.ММ.ГГГГ):</label>
-        <input type="text" id="start_date" name="start_date" placeholder="дд.мм.гггг" required>
-        <label for="end_date">Дата окончания бронирования (ДД.ММ.ГГГГ):</label>
-        <input type="text" id="end_date" name="end_date" placeholder="дд.мм.гггг" required>
-        <label for="car_id">ID автомобиля:</label>
-        <input type="text" id="car_id" name="car_id" placeholder="ID автомобиля" required>
-        <label for="description">Описание бронирования:</label>
-        <textarea id="description" name="description" placeholder="Введите описание бронирования" required></textarea>
-        <label for="extension">Возможность продления (true или false):</label>
-        <input type="text" id="extension" name="extension" placeholder="true или false" required>
-        <button type="submit">Добавить бронирование</button>
+
+    <form id="bookingForm" method="POST" action="/add_booking">
+        <label for="start_datetime">Start Date and Time:</label>
+<input type="datetime-local" id="start_datetime" name="start_datetime" required><br><br>
+
+<label for="end_datetime">End Date and Time:</label>
+<input type="datetime-local" id="end_datetime" name="end_datetime" required><br><br>
+
+
+        <label for="car_id">Car ID:</label>
+        <input type="text" id="car_id" name="car_id" required><br><br>
+
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description"><br><br>
+
+        <button type="submit">Add Booking</button>
     </form>
 
     <script>
-        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+        document.querySelector('#bookingForm').addEventListener('submit', function(event) {
             event.preventDefault();
             var formData = new FormData(this);
-            fetch('{{ url_for("add_booking") }}', {
+            fetch('/add_booking', {
                 method: 'POST',
                 body: formData
             })
@@ -42,4 +46,3 @@
     </script>
 </body>
 </html>
-

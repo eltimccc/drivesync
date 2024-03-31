@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+
+        .modal-dialog {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Booking Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> {{ booking.id }}</p>
+                <p><strong>Car Brand:</strong> {{ booking.car.brand }}</p>
+                <p><strong>Car Number:</strong> {{ booking.car.car_number }}</p>
+                <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
+                <p><strong>End Date:</strong> {{ booking.end_date }}</p>
+                <p><strong>Description:</strong> {{ booking.description }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

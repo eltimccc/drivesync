@@ -5,47 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Booking Calendar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
     <style>
         #calendar {
             width: 100%;
-            height: 80vh; /* Высота календаря */
-            margin-top: 20px; /* Отступ сверху */
+            height: 80vh;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="mt-5">Car Booking Calendar</h1>
-        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
+        <button class="btn btn-primary mt-3" onclick="window.location.href='/add_booking'">Добавить бронь</button>
         <div id="calendar"></div>
     </div>
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- Здесь будет загружено содержимое страницы бронирования -->
+            </div>
+        </div>
+    </div>
 
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                events: [
-                    {% for booking in bookings %}
-                        {
-                            title: 'Booking',
-                            start: '{{ booking.date.strftime("%Y-%m-%d") }}'
-                        },
-                    {% endfor %}
-                ],
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek' // Добавляем кнопку для просмотра по неделям
-                }
-            });
-
-            calendar.render();
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: [
+                {% for booking in bookings %}
+                {
+                    title: '{{ booking.car }}',
+                    start: '{{ booking.start }}',
+                    end: '{{ booking.end }}',
+                    url: '{{ url_for("view_booking", booking_id=booking.id) }}'
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek'
+            },
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
+            }
         });
 
-    </script>
+        calendar.render();
+    });
+</script>
+
 </body>
 </html>
