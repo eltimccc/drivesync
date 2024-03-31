@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 db = SQLAlchemy(app)
 
-# Импортируем и зарегистрируем маршруты из routes.py
+
 from routes import *
 
 with app.app_context():
