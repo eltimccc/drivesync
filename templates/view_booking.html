@@ -27,10 +27,15 @@
                 <p><strong>End Date:</strong> {{ booking.end_date }}</p>
                 <p><strong>Description:</strong> {{ booking.description }}</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
+
+        <!-- Заголовок и содержимое модального окна -->
+<div class="modal-footer">
+    <!-- Кнопка удаления бронирования -->
+    <form method="post" action="{{ url_for('delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');">
+        <button type="submit" class="btn btn-danger">Удалить</button>
+    </form>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
