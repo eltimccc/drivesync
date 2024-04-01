@@ -19,8 +19,18 @@
 <body>
     <div class="container">
         <h1 class="mt-5">Car Booking Calendar</h1>
-        <button class="btn btn-primary mt-3" onclick="window.location.href='/add_booking'">Добавить бронь</button>
+        <!-- Изменение кнопки на открытие модального окна -->
+        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
         <div id="calendar"></div>
+    </div>
+    <div class="modal fade" id="addBookingModal" tabindex="-1" aria-labelledby="addBookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="addBookingModalContent"></div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -30,36 +40,52 @@
         </div>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
 
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            events: [
-                {% for booking in bookings %}
-                {
-                    title: '{{ booking.car }}',
-                    start: '{{ booking.start }}',
-                    end: '{{ booking.end }}',
-                    url: '{{ url_for("view_booking", booking_id=booking.id) }}'
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ],
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek'
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: [
+            {% for booking in bookings %}
+            {
+                title: '{{ booking.car }}',
+                start: '{{ booking.start }}',
+                end: '{{ booking.end }}',
+                url: '{{ url_for("view_booking", booking_id=booking.id) }}'
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ],
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek'
+        },
+        eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
+        }
+    });
+
+    calendar.render();
+
+    // Обработчик события клика на кнопке "Добавить бронь"
+    $('button[data-bs-target="#addBookingModal"]').on('click', function() {
+        $.ajax({
+            url: '/add_booking',
+            type: 'GET',
+            success: function(response) {
+                $('#addBookingModalContent').html(response);
+                $('#addBookingModal').modal('show');
             },
-            eventClick: function(info) {
-                info.jsEvent.preventDefault();
-                $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
             }
         });
-
-        calendar.render();
     });
-</script>
+});
+    </script>
 
 </body>
 </html>
