@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, redirect, url_for
+from flask import current_app, flash, render_template, request, jsonify, redirect, url_for
 from datetime import datetime
 from app import app, db
 from forms import EditBookingForm
@@ -62,17 +62,18 @@ def delete_booking(booking_id):
     return redirect(url_for('get_bookings'))
 
 
-@app.route('/edit_booking/<int:booking_id>/', methods=['GET', 'POST'])
+@app.route('/booking/<int:booking_id>/edit', methods=['GET', 'POST'])
 def edit_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
-    form = EditBookingForm(obj=booking)
-    if form.validate_on_submit():
-        # Обработка данных формы
-        form.populate_obj(booking)  # Обновление объекта бронирования данными из формы
-        db.session.commit()  # Сохранение изменений в базе данных
-        return redirect(url_for('get_bookings'))  # Перенаправление после успешного обновления бронирования
-    return render_template('edit_booking.html', form=form, booking=booking)
 
+    if request.method == 'POST':
+        booking.description = request.form['description']
+        booking.start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%dT%H:%M')
+        booking.end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%dT%H:%M')
+        db.session.commit()
+        return redirect(url_for('get_bookings', booking_id=booking.id))
+
+    return render_template('edit_booking.html', booking=booking)
 
 
 @app.route('/add_car', methods=['GET', 'POST'])
@@ -93,11 +94,10 @@ def add_car():
         return render_template('add_car.html')
 
 
-@app.route('/booking/<int:booking_id>')
+@app.route('/booking/<int:booking_id>', methods=['GET', 'POST'])
 def view_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     return render_template('view_booking.html', booking=booking)
-
 
 
 @app.route('/me', methods=['GET'])

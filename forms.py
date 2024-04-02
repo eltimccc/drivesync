@@ -9,4 +9,3 @@ class EditBookingForm(FlaskForm):
     description = StringField('Description')
 
 
-
