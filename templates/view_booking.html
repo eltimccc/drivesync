@@ -30,7 +30,10 @@
 
         <!-- Заголовок и содержимое модального окна -->
 <div class="modal-footer">
-    <!-- Кнопка удаления бронирования -->
+    <!-- Кнопка редактирования бронирования -->
+    <form method="get" action="{{ url_for('edit_booking', booking_id=booking.id) }}">
+        <button type="submit" class="btn btn-primary">Редактировать</button>
+    </form>
     <form method="post" action="{{ url_for('delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');">
         <button type="submit" class="btn btn-danger">Удалить</button>
     </form>
