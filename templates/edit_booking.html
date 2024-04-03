@@ -4,20 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Booking</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Edit Booking</h1>
-    <form method="POST">
-        <label for="description">Description:</label><br>
-        <textarea id="description" name="description" rows="4" cols="50">{{ booking.description }}</textarea><br><br>
-        
-        <label for="start_date">Start Date:</label><br>
-        <input type="datetime-local" id="start_date" name="start_date" value="{{ booking.start_date.strftime('%Y-%m-%dT%H:%M') }}" required><br><br>
-        
-        <label for="end_date">End Date:</label><br>
-        <input type="datetime-local" id="end_date" name="end_date" value="{{ booking.end_date.strftime('%Y-%m-%dT%H:%M') }}" required><br><br>
-        
-        <input type="submit" value="Save Changes">
-    </form>
+    <div class="container">
+        <h1>Edit Booking</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea class="form-control" id="description" name="description" rows="4" cols="50">{{ booking.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="start_date">Start Date:</label>
+                <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ booking.start_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+            </div>
+            <div class="form-group">
+                <label for="end_date">End Date:</label>
+                <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ booking.end_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
