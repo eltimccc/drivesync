@@ -19,13 +19,18 @@
 <body>
     <div class="container">
         <h1 class="mt-5">Car Booking Calendar</h1>
-        <!-- Изменение кнопки на открытие модального окна -->
-        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
+        <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
+        <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addCarModal">Добавить машину</button>
+        <button class="btn btn-info mt-3"><a href="/cars" style="color: white; text-decoration: none;">Список машин</a></button>
+
         <div id="calendar"></div>
     </div>
     <div class="modal fade" id="addBookingModal" tabindex="-1" aria-labelledby="addBookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="addCarModalLabel">Добавить бронирование</h4>
+                    </div>
                 <div class="modal-body">
                     <div id="addBookingModalContent"></div>
                 </div>
@@ -39,7 +44,19 @@
             </div>
         </div>
     </div>
-
+    <div class="modal fade" id="addCarModal" tabindex="-1" aria-labelledby="addCarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="addCarModalLabel">Добавить машину</h4>
+                
+            </div>
+            <div class="modal-body">
+                <div id="addCarModalContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
@@ -84,6 +101,21 @@
             }
         });
     });
+    // Обработчик события клика на кнопке "Добавить машину"
+    $('button[data-bs-target="#addCarModal"]').on('click', function() {
+    $.ajax({
+        url: '/add_car',
+        type: 'GET',
+        success: function(response) {
+            $('#addCarModalContent').html(response);
+            $('#addCarModal').modal('show');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        }
+    });
+});
 });
     </script>
 

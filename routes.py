@@ -47,7 +47,7 @@ def add_booking():
             new_booking = Booking(start_date=start_datetime, end_date=end_datetime, car=car, description=description)
             db.session.add(new_booking)
             db.session.commit()
-            return jsonify({'message': 'Booking added successfully'}), 200
+            return redirect(url_for('get_bookings'))
         except Exception as e:
             return jsonify({'error': str(e)}), 500
     else:
@@ -92,6 +92,12 @@ def add_car():
             return jsonify({'error': str(e)}), 500
     else:
         return render_template('add_car.html')
+
+
+@app.route('/cars')
+def view_cars():
+    cars = Car.query.all()
+    return render_template('cars.html', cars=cars)
 
 
 @app.route('/booking/<int:booking_id>', methods=['GET', 'POST'])
