@@ -36,7 +36,7 @@ def add_booking():
             end_datetime = request.form.get('end_datetime')
             end_datetime = datetime.strptime(end_datetime, '%Y-%m-%dT%H:%M')
 
-            car_id = request.form.get('car_id')
+            car_id = request.form.get('car')  # Переименовываем поле car_id на car
             description = request.form.get('description')
 
             car = Car.query.get(car_id)
@@ -51,7 +51,8 @@ def add_booking():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
     else:
-        return render_template('add_booking.html')
+        cars = Car.query.all()  # Получаем список всех автомобилей из базы данных
+        return render_template('add_booking.html', cars=cars)  # Передаем список автомобилей в шаблон
     
 
 @app.route('/delete_booking/<int:booking_id>/', methods=['POST'])
@@ -65,16 +66,31 @@ def delete_booking(booking_id):
 @app.route('/booking/<int:booking_id>/edit', methods=['GET', 'POST'])
 def edit_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
+    cars = Car.query.all()
 
     if request.method == 'POST':
         booking.description = request.form['description']
         booking.start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%dT%H:%M')
         booking.end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%dT%H:%M')
+        car_id = request.form.get('car')
+        booking.car = Car.query.get(car_id)
         db.session.commit()
         return redirect(url_for('get_bookings', booking_id=booking.id))
 
-    return render_template('edit_booking.html', booking=booking)
+    return render_template('edit_booking.html', booking=booking, cars=cars)
 
+
+# @app.route('/booking/<int:booking_id>/edit', methods=['GET', 'POST'])
+# def edit_booking(booking_id):
+#     booking = Booking.query.get_or_404(booking_id)
+#     form = EditBookingForm(obj=booking)
+
+#     if request.method == 'POST':
+#         form.populate_obj(booking)
+#         db.session.commit()
+#         return redirect(url_for('get_bookings', booking_id=booking.id))
+
+    return render_template('edit_booking.html', form=form, booking=booking)
 
 @app.route('/add_car', methods=['GET', 'POST'])
 def add_car():

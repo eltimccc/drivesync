@@ -22,12 +22,16 @@
                 <label for="end_date">End Date:</label>
                 <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ booking.end_date.strftime('%Y-%m-%dT%H:%M') }}" required>
             </div>
+            <div class="form-group">
+                <label for="car">Автомобиль:</label>
+                <select class="form-control" id="car" name="car" required>
+                    {% for car in cars %}
+                    <option value="{{ car.id }}" {% if car.id == booking.car.id %} selected {% endif %}>{{ car.brand }} {{ car.car_number }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary">Save Changes</button>
         </form>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-
