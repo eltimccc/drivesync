@@ -18,7 +18,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="mt-5">Car Booking Calendar</h1>
+        <h1 class="mt-5">Календарь бронирований</h1>
         <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
         <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addCarModal">Добавить машину</button>
         <button class="btn btn-info mt-3"><a href="/cars" style="color: white; text-decoration: none;">Список машин</a></button>
@@ -81,9 +81,26 @@
         eventClick: function(info) {
             info.jsEvent.preventDefault();
             $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
+        },
+        dateClick: function(info) {
+            calendar.gotoDate(info.date);
+            calendar.changeView('dayGridDay');
+        },
+        locale: 'ru', // Устанавливаем локаль на русский язык
+        monthNames: [ // Переименовываем месяцы на русский язык
+            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+        ],
+        buttonText: { // Переопределяем текст кнопок
+            month: 'Месяц',
+            week: 'Неделя',
+            year: 'Год',
+            day: 'День',
         }
     });
 
+
+  
     calendar.render();
 
     // Обработчик события клика на кнопке "Добавить бронь"
