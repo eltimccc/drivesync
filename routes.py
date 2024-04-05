@@ -1,7 +1,7 @@
 from flask import current_app, flash, render_template, request, jsonify, redirect, url_for
 from datetime import datetime
 from app import app, db
-from forms import EditBookingForm
+from forms import BookingForm, EditBookingForm
 from models import Booking, Car
 
 
@@ -24,7 +24,9 @@ def get_bookings():
         formatted_bookings.append(formatted_booking)
 
     return render_template('calendar_with_bookings.html', bookings=formatted_bookings)
-    
+
+
+
 
 @app.route('/add_booking', methods=['GET', 'POST'])
 def add_booking():
@@ -79,19 +81,6 @@ def edit_booking(booking_id):
 
     return render_template('edit_booking.html', booking=booking, cars=cars)
 
-
-# @app.route('/booking/<int:booking_id>/edit', methods=['GET', 'POST'])
-# def edit_booking(booking_id):
-#     booking = Booking.query.get_or_404(booking_id)
-#     form = EditBookingForm(obj=booking)
-
-#     if request.method == 'POST':
-#         form.populate_obj(booking)
-#         db.session.commit()
-#         return redirect(url_for('get_bookings', booking_id=booking.id))
-
-    return render_template('edit_booking.html', form=form, booking=booking)
-
 @app.route('/add_car', methods=['GET', 'POST'])
 def add_car():
     if request.method == 'POST':
@@ -125,3 +114,5 @@ def view_booking(booking_id):
 @app.route('/me', methods=['GET'])
 def get_me():
     return render_template('index.html') 
+
+
