@@ -23,8 +23,12 @@
                     <tbody>
                         {% for car in cars %}
                         <tr>
+                        
                             <td>{{ car.id }}</td>
-                            <td>{{ car.brand }}</td>
+                            <td>
+                            
+                            <a href="{{ url_for('car_detail', car_id=car.id) }}">{{ car.brand }}</a>
+                            </td>
                             <td>{{ car.car_number }}</td>
                         </tr>
                         {% endfor %}
