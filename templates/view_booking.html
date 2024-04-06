@@ -21,7 +21,8 @@
             </div>
             <div class="modal-body">
                 <p><strong>ID:</strong> {{ booking.id }}</p>
-                <p><strong>Car Brand:</strong> {{ booking.car.brand }}</p>
+                <p><strong>Car Brand:</strong> <a href="{{ url_for('car_detail', car_id=booking.car.id) }}">{{ booking.car.brand }}</a>
+                </p>
                 <p><strong>Car Number:</strong> {{ booking.car.car_number }}</p>
                 <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
                 <p><strong>End Date:</strong> {{ booking.end_date }}</p>
@@ -29,17 +30,16 @@
             </div>
 
         <!-- Заголовок и содержимое модального окна -->
-<div class="modal-footer">
-    <!-- Кнопка редактирования бронирования -->
-    <form method="get" action="{{ url_for('edit_booking', booking_id=booking.id) }}">
-        <button type="submit" class="btn btn-primary">Редактировать</button>
-    </form>
-    <form method="post" action="{{ url_for('delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');">
-        <button type="submit" class="btn btn-danger">Удалить</button>
-    </form>
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-</div>
+            <div class="modal-footer">
+                <form method="get" action="{{ url_for('edit_booking', booking_id=booking.id) }}">
+                    <button type="submit" class="btn btn-primary">Редактировать</button>
+                </form>
+                <form method="post" action="{{ url_for('delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
