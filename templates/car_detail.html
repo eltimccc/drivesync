@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Details</title>
+    <title>Бронирования автомобиля</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -25,12 +25,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>Car Details</h1>
+    <a href="/" class="btn btn-dark">Домой</a>
+        <h3>Информация по автомобилю</h3>
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body car-info">
-                        <h5 class="card-title">Информация по автомобилю</h5>
+                        
                         <p class="card-text"><strong>Марка машины:</strong> {{ car.brand }}</p>
                         <p class="card-text"><strong>Гос. номер:</strong> {{ car.car_number }}</p>
                     </div>
@@ -39,11 +40,11 @@
         </div>
         <div class="row">
         <div class="col-md-12">
-            <h2>Bookings</h2>
+            <h3>Список бронирований</h3>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Booking ID</th> <!-- Новый столбец для ID бронирований -->
+                        <th>Booking ID</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Description</th>
@@ -52,7 +53,7 @@
                 <tbody>
                     {% for booking in bookings %}
                     <tr>
-                        <td><a href="{{ url_for('view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td> <!-- Ссылка на информацию о бронировании -->
+                        <td><a href="{{ url_for('view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
                         <td>{{ booking.start_date }}</td>
                         <td>{{ booking.end_date }}</td>
                         <td>{{ booking.description }}</td>
