@@ -32,6 +32,40 @@ def get_bookings():
     return render_template("calendar_with_bookings.html", bookings=formatted_bookings)
 
 
+# @app.route("/add_booking", methods=["GET", "POST"])
+# def add_booking():
+#     if request.method == "POST":
+#         try:
+#             start_datetime = request.form.get("start_datetime")
+#             start_datetime = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M")
+
+#             end_datetime = request.form.get("end_datetime")
+#             end_datetime = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M")
+
+#             car_id = request.form.get("car")
+#             description = request.form.get("description")
+
+#             car = Car.query.get(car_id)
+
+#             if car is None:
+#                 raise ValueError("Car not found")
+
+#             new_booking = Booking(
+#                 start_date=start_datetime,
+#                 end_date=end_datetime,
+#                 car=car,
+#                 description=description,
+#             )
+#             db.session.add(new_booking)
+#             db.session.commit()
+#             return redirect(url_for("get_bookings"))
+#         except Exception as e:
+#             return jsonify({"error": str(e)}), 500
+#     else:
+#         cars = Car.query.all()
+#         return render_template(
+#             "add_booking.html", cars=cars
+#         ) 
 @app.route("/add_booking", methods=["GET", "POST"])
 def add_booking():
     if request.method == "POST":
@@ -62,10 +96,14 @@ def add_booking():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
     else:
-        cars = Car.query.all()
-        return render_template(
-            "add_booking.html", cars=cars
-        ) 
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # Если запрос был выполнен через AJAX (модальное окно), вернуть только данные без отображения шаблона
+            cars = Car.query.all()
+            return render_template("add_booking_modal.html", cars=cars)
+        else:
+            # Если запрос был выполнен напрямую через ссылку, подключить стили Bootstrap
+            cars = Car.query.all()
+            return render_template("add_booking.html", cars=cars, bootstrap=True)
 
 
 @app.route("/delete_booking/<int:booking_id>/", methods=["POST"])
@@ -110,7 +148,12 @@ def add_car():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
     else:
-        return render_template("add_car.html")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # Если запрос был выполнен через AJAX (модальное окно), вернуть только данные без отображения шаблона
+            return render_template("add_car_modal.html")
+        else:
+            # Если запрос был выполнен напрямую через ссылку, подключить стили Bootstrap
+            return render_template("add_car.html", bootstrap=True)
 
 
 @app.route("/cars")
