@@ -8,51 +8,46 @@
     <style>
         /* Стили для навигационной панели */
         .navbar {
-            background-color: #343a40; /* Цвет фона */
-            padding: 5px 0; /* Внутренние отступы */
+            background-color: #f8f9fa; /* Светло-серый цвет фона */
+            padding: 10px 0; /* Внутренние отступы */
             border-radius: 0; /* Скругление углов */
-            
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Тень */
         }
 
         .navbar-brand {
             font-family: 'Roboto', sans-serif; /* Шрифт */
-            font-size: 20px; /* Размер шрифта */
-            color: #ffffff; /* Цвет текста */
-            
+            font-size: 24px; /* Размер шрифта */
+            color: #007bff; /* Синий цвет текста */
         }
 
         .navbar-toggler-icon {
-            background-color: #ffffff; /* Цвет иконки бургера */
+            background-color: #007bff; /* Цвет иконки бургера */
         }
 
         .navbar-nav .nav-link {
             font-family: 'Roboto', sans-serif; /* Шрифт */
-            font-size: 18px; /* Размер шрифта */
-            color: #ffffff !important; /* Цвет текста */
+            font-size: 20px; /* Размер шрифта */
+            color: #343a40 !important; /* Цвет текста */
             margin-right: 20px; /* Отступ справа между ссылками */
         }
 
         .navbar-nav .nav-link:hover {
             color: #007bff !important; /* Цвет текста при наведении */
         }
-
-        
     </style>
 </head>
 
 
-    <div class="container">
-        <a class="navbar-brand" href="/">Бронирования</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/cars">Автомобили</a>
-                </li>
-            </ul>
-        </div>
+<div class="container">
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav" style="text-align: left;">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Бронирования</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/cars">Автомобили</a>
+            </li>
+        </ul>
     </div>
+</div>
 
