@@ -17,6 +17,11 @@ class Booking(db.Model):
     description = db.Column(db.Text, nullable=True)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(50), nullable=False, default='Аренда')
+
+    def update_status(self, new_status):
+        self.status = new_status
 
     def __repr__(self):
-        return f"'{self.start_date}', '{self.end_date}'"
+        return f"'{self.start_date}', '{self.end_date}', '{self.status}'"
+

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь бронирований</title>
+    <style>
+        .container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent line breaks */
+        }
+        table {
+            width: auto; /* Set width to auto */
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+            min-width: 80px; /* Minimum width for cells */
+            min-height: 35px; /* Minimum height for cells */
+            width: 80px; /* Set width to 200px */
+            height: 35px; /* Set height to 150px */
+            overflow: hidden; /* Hide overflow */
+            white-space: nowrap; /* Prevent text wrapping */
+            text-overflow: ellipsis; /* Add ellipsis for overflowed text */
+        }
+        .fixed-column {
+            position: sticky; /* Keep the column fixed */
+            left: 0; /* Stick to the left side */
+            background-color: white; /* Optional: match background */
+            z-index: 1; /* Ensure it's above other elements */
+        }
+        .blue-cell {
+            background-color: blue; /* Цвет фона синий */
+            color: white; /* Цвет текста белый */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <table>
+            <thead>
+            
+
+                <tr>
+                    <th class="fixed-column">Марка</th>
+                    
+                    {% for month in months %}
+                        <th colspan="{{ month['days']|length }}">{{ month['name'] }}</th>
+                    {% endfor %}
+                </tr>
+                <tr>
+    <th class="fixed-column"></th>
+    {% for _ in range(10) %}
+        <th>Пн</th>
+        <th>Вт</th>
+        <th>Ср</th>
+        <th>Чт</th>
+        <th>Пт</th>
+        <th>Сб</th>
+        <th>Вс</th>
+    {% endfor %}
+</tr>
+                <tr>
+                    
+                    <th class="fixed-column"></th>
+                    {% for month in months %}
+                        {% for day in month['days'] %}
+                            <th>{{ day }}</th>
+                        {% endfor %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for car in cars %}
+                    <tr>
+                        <td class="fixed-column">{{ car.brand }}</td>
+                        
+                        {% for month in months %}
+                            {% for day in month['days'] %}
+                                <td>
+                                    {% for booking in car.bookings %}
+                                        {% if booking.start_date.year == month['year'] and booking.start_date.month == month['month'] and booking.start_date.day <= day <= booking.end_date.day %}
+                                            {{ booking.status }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
