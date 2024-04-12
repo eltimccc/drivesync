@@ -6,7 +6,7 @@ from flask import (
     redirect,
     url_for,
 )
-from datetime import datetime
+from datetime import datetime, timedelta
 from app import app, db
 from forms import BookingForm, EditBookingForm
 from models import Booking, Car
@@ -247,5 +247,3 @@ def booking_calendar():
         months.append({'year': year, 'month': month, 'days': range(1, days_in_month + 1), 'name': month_name(month)})
 
     return render_template('booking_table.html', cars=cars, bookings=bookings, months=months)
-
-
