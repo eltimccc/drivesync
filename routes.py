@@ -13,26 +13,7 @@ from models import Booking, Car
 from utils import BOOKING_STATUSES
 
 
-# @app.route("/", methods=["GET"])
-# def get_bookings():
-#     bookings = Booking.query.all()
-#     formatted_bookings = []
-
-#     for booking in bookings:
-#         car_brand = booking.car.brand
-#         car_number = booking.car.car_number
-
-#         formatted_booking = {
-#             "id": booking.id,
-#             "car": f"{car_brand}: {car_number}",
-#             "start": booking.start_date,
-#             "end": booking.end_date,
-#             "url": url_for("view_booking", booking_id=booking.id),
-#         }
-#         formatted_bookings.append(formatted_booking)
-
-#     return render_template("calendar_with_bookings.html", bookings=formatted_bookings)
-@app.route("/", methods=["GET"])
+@app.route("/t", methods=["GET"])
 def get_bookings():
     bookings = Booking.query.all()
     formatted_bookings = []
@@ -47,7 +28,7 @@ def get_bookings():
             "start": booking.start_date,
             "end": booking.end_date,
             "url": url_for("view_booking", booking_id=booking.id),
-            "status_color": BOOKING_STATUSES.get(booking.status, '#007bff')  # Получение цвета статуса
+            "status_color": BOOKING_STATUSES.get(booking.status, '#007bff')
         }
         formatted_bookings.append(formatted_booking)
 
@@ -98,40 +79,14 @@ def delete_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     db.session.delete(booking)
     db.session.commit()
-    return redirect(url_for("get_bookings"))
+    return redirect(url_for("booking_calendar"))
 
 
-# @app.route("/booking/<int:booking_id>/edit", methods=["GET", "POST"])
-# def edit_booking(booking_id):
-#     booking = Booking.query.get_or_404(booking_id)
-#     cars = Car.query.all()
-#     new_status = None  # Инициализация переменной
-
-#     if request.method == "POST":
-#         booking.description = request.form["description"]
-#         booking.start_date = datetime.strptime(
-#             request.form["start_date"], "%Y-%m-%dT%H:%M"
-#         )
-#         booking.end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%dT%H:%M")
-#         car_id = request.form.get("car")
-#         booking.car = Car.query.get(car_id)
-
-#         new_status = request.form.get("status")
-        
-#         print(new_status)
-#         if new_status in BOOKING_STATUSES.values():
-#             booking.status = new_status
-#             print(new_status)
-        
-#         db.session.commit()
-#         return redirect(url_for("get_bookings", booking_id=booking.id))
-
-#     return render_template("edit_booking.html", booking=booking, cars=cars, status=new_status, booking_statuses=BOOKING_STATUSES)
 @app.route("/booking/<int:booking_id>/edit", methods=["GET", "POST"])
 def edit_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     cars = Car.query.all()
-    status_choices = list(BOOKING_STATUSES.keys())  # Получение списка ключей (статусов) из словаря
+    status_choices = list(BOOKING_STATUSES.keys())
 
     if request.method == "POST":
         booking.description = request.form["description"]
@@ -144,13 +99,13 @@ def edit_booking(booking_id):
 
         new_status = request.form.get("status")
         
-        if new_status in status_choices:  # Проверка, что новый статус является допустимым выбором
+        if new_status in status_choices:
             booking.status = new_status
             # Обновление цвета статуса
             booking.color = BOOKING_STATUSES[new_status]
         
         db.session.commit()
-        return redirect(url_for("get_bookings", booking_id=booking.id))
+        return redirect(url_for("booking_calendar", booking_id=booking.id))
 
     return render_template("edit_booking.html", booking=booking, cars=cars, status_choices=status_choices, booking_statuses=BOOKING_STATUSES)
 
@@ -165,7 +120,7 @@ def add_car():
             db.session.add(new_car)
             db.session.commit()
 
-            return redirect(url_for("get_bookings"))
+            return redirect(url_for("booking_calendar"))
         except Exception as e:
             return jsonify({"error": str(e)}), 500
     else:
@@ -203,47 +158,28 @@ def get_me():
 from datetime import date
 
 
-# @app.route('/t')
-# def booking_calendar():
-#     # Получаем список всех автомобилей из базы данных
-#     cars = Car.query.all()
-#     # Получаем список всех бронирований из базы данных
-#     bookings = Booking.query.all()
 
-#     # Создаем список месяцев, которые будем отображать в календаре (например, 6 месяцев)
-#     num_months = 6
-#     today = date.today()
-#     current_year = today.year
-#     current_month = today.month
-#     months = []
-#     for i in range(num_months):
-#         year = current_year + (current_month + i - 1) // 12
-#         month = (current_month + i) % 12 or 12
-#         days_in_month = calendar.monthrange(year, month)[1]  # Используем правильный модуль
-#         months.append({'year': year, 'month': month, 'days': range(1, days_in_month + 1)})
-
-#     return render_template('booking_table.html', cars=cars, bookings=bookings, months=months)
 @app.template_filter('month_name')
 def month_name(month_number):
     return calendar.month_name[month_number]
 
-@app.route('/t')
+
+@app.route('/')
 def booking_calendar():
-    # Получаем список всех автомобилей из базы данных
     cars = Car.query.all()
-    # Получаем список всех бронирований из базы данных
     bookings = Booking.query.all()
 
-    # Создаем список месяцев, которые будем отображать в календаре (например, 6 месяцев)
-    num_months = 6
-    today = date.today()
-    current_year = today.year
-    current_month = today.month
+    current_date = datetime.now()
+
+    num_months = 12
     months = []
     for i in range(num_months):
-        year = current_year + (current_month + i - 1) // 12
-        month = (current_month + i) % 12 or 12
-        days_in_month = calendar.monthrange(year, month)[1]  # Используем правильный модуль
-        months.append({'year': year, 'month': month, 'days': range(1, days_in_month + 1), 'name': month_name(month)})
-
-    return render_template('booking_table.html', cars=cars, bookings=bookings, months=months)
+        year = current_date.year
+        month = current_date.month + i
+        if month > 12:
+            month -= 12
+            year += 1
+        days_in_month = calendar.monthrange(year, month)[1]
+        months.append({'year': year, 'month': month, 'days': range(1, days_in_month + 1), 'name': calendar.month_name[month]})
+    
+    return render_template('booking_table.html', cars=cars, bookings=bookings, months=months, num_months=num_months, booking_statuses_colors=BOOKING_STATUSES)

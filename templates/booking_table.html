@@ -4,6 +4,16 @@
 
 {% block additional_styles %}
     <style>
+
+.booking-status {
+        cursor: pointer; /* Установка стиля указателя при наведении на элемент */
+        transition: transform 0.3s; /* Добавление плавной анимации */
+    }
+
+    .booking-status:hover {
+        text-decoration: underline; /* Добавление подчеркивания при наведении на элемент */
+        transform: scale(1.1); /* Увеличение размера элемента на 10% */
+    }
         /* Add your custom CSS styles here */
         .fixed-column {
             position: sticky;
@@ -24,12 +34,58 @@
             margin-left: 110px;
             vertical-align: top;
         }
+        /* Стилизация полосы прокрутки */
+::-webkit-scrollbar {
+    width: 15px; /* Ширина полосы прокрутки */
+}
+
+/* Стилизация ползунка прокрутки */
+::-webkit-scrollbar-thumb {
+    background-color: #6c757d; /* Цвет ползунка прокрутки */
+    border-radius: 1px; /* Скругление углов ползунка */
+    border: none; /* Обводка ползунка */
+}
+    /* Минимальная высота для ячеек таблицы */
+    .table-bordered th,
+    .table-bordered td {
+        min-height: 90px !important; /* Минимальная высота ячейки таблицы */
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        vertical-align: middle;
+    }
+        .fixed-height-cell {
+        height: 70px; /* Задаем желаемую высоту */
+    }
+
+    /* Стилизация кастомного скроллбара */
+#custom-scrollbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10px; /* Высота полосы прокрутки */
+    background-color: #f1f1f1; /* Цвет фона полосы прокрутки */
+    z-index: 999; /* Поверх всех других элементов */
+    pointer-events: none; /* Игнорирование событий мыши для прозрачного элемента */
+}
+/* Стилизация кастомного скроллбара */
+#custom-scrollbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10px; /* Высота полосы прокрутки */
+    background-color: #f1f1f1; /* Цвет фона полосы прокрутки */
+    z-index: 999; /* Поверх всех других элементов */
+    pointer-events: none; /* Игнорирование событий мыши для прозрачного элемента */
+}
+
+
     </style>
 {% endblock %}
 
 {% block content %}
 <div class="mb-5">
-        <h1 class="mt-5">Календарь бронирований</h1>
         <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
         <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addCarModal">Добавить машину</button>
         <button class="btn btn-info mt-3"><a href="/cars" style="color: white; text-decoration: none;">Список машин</a></button>
@@ -68,38 +124,45 @@
         </div>
     </div>
 </div>
-    <h1 class="mt-5">Календарь бронирований</h1>
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th class="fixed-month" rowspan="2">Автомобили</th> <!-- Added rowspan attribute -->
+                    <th class="fixed-month" rowspan="3" style="padding-bottom: 10px;">Автомобили</th> <!-- Added rowspan attribute -->
                     {% for month in months %}
                         <th class="fixed-month" colspan="{{ month['days']|length }}" data-month-name="{{ month['name'] }}">
                             <h2>{{ month['name'] }}</h2>
                         </th>
                     {% endfor %}
                 </tr>
-                <tr>  
-                    {% for month in months %}
-                        {% for day in month['days'] %}
-                            <th>{{ day }}</th>
-                        {% endfor %}
-                    {% endfor %}
-                </tr>
+<tr>
+    {% for _ in range(num_months) %}
+        {% set weekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] %}
+        {% for i in range(28) %}
+            <th style="font-weight: normal; text-align: center; line-height: 0;">{{ weekdays[i % 7] }}</th>
+        {% endfor %}
+    {% endfor %}
+</tr>
+<tr>
+    {% for month in months %}
+        {% for day in month['days'] %}
+            <th style="font-weight: normal; text-align: center; line-height: 0;">{{ day }}</th>
+        {% endfor %}
+    {% endfor %}
+</tr>
             </thead>
             <tbody>
                 {% for car in cars %}
                     <tr>
-                        <td class="fixed-column">{{ car.brand }}</td> <!-- New row for the car name -->
+                        <td class="fixed-column">{{ car.brand }}</td>
                         {% for month in months %}
                             {% for day in month['days'] %}
-                                <td>
+                                <td class="fixed-height-cell" >
                                     {% for booking in car.bookings %}
-                                        {% if booking.start_date.year == month['year'] and booking.start_date.month == month['month'] and booking.start_date.day <= day <= booking.end_date.day %}
-                                            <span class="badge badge-primary">{{ booking.status }}</span>
-                                        {% endif %}
-                                    {% endfor %}
+    {% if booking.start_date.year == month['year'] and booking.start_date.month == month['month'] and booking.start_date.day <= day <= booking.end_date.day %}
+        <span class="badge booking-status" style="background-color: {{ booking_statuses_colors[booking.status] }};" data-booking-id="{{ booking.id }}">{{ booking.status }}</span>
+    {% endif %}
+{% endfor %}
                                 </td>
                             {% endfor %}
                         {% endfor %}
@@ -107,5 +170,87 @@
                 {% endfor %}
             </tbody>
         </table>
+        
+        <!-- Кнопки прокрутки -->
+    <button style="position: absolute; top: 50%; transform: translateY(-50%); left: 0;" onmousedown="startScroll(-1)" onmouseup="stopScroll()" onmouseleave="stopScroll()" ontouchstart="startScroll(-1)" ontouchend="stopScroll()">◀</button>
+    <button style="position: absolute; top: 50%; transform: translateY(-50%); right: 0;" onmousedown="startScroll(1)" onmouseup="stopScroll()" onmouseleave="stopScroll()" ontouchstart="startScroll(1)" ontouchend="stopScroll()">▶</button>
     </div>
 {% endblock %}
+{% block additional_scripts %}
+    <!-- Add Bootstrap JavaScript library -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Add jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Обработчик события клика на кнопке "Добавить бронь"
+            $('button[data-bs-target="#addBookingModal"]').on('click', function() {
+                $.ajax({
+                    url: '/add_booking',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#addBookingModalContent').html(response);
+                        $('#addBookingModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            });
+            
+            // Обработчик события клика на кнопке "Добавить машину"
+            $('button[data-bs-target="#addCarModal"]').on('click', function() {
+                $.ajax({
+                    url: '/add_car',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#addCarModalContent').html(response);
+                        $('#addCarModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            });
+        });
+
+// Обработчик события нажатия на элемент статуса бронирования
+    document.querySelectorAll('.booking-status').forEach(function(bookingStatus) {
+        bookingStatus.addEventListener('click', function() {
+            var bookingId = this.getAttribute('data-booking-id');
+            fetch('/booking/' + bookingId)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('bookingModal').querySelector('.modal-content').innerHTML = data;
+                    $('#bookingModal').modal('show');
+                })
+                .catch(error => console.error('Ошибка:', error));
+        });
+    });
+
+    let scrollInterval;
+
+    function startScroll(direction) {
+        const container = document.querySelector('.table-responsive');
+        const scrollStep = 20; // Шаг прокрутки
+        scrollInterval = setInterval(() => {
+            container.scrollLeft += direction * scrollStep;
+        }, 100); // Интервал для плавной прокрутки
+    }
+
+    function stopScroll() {
+        clearInterval(scrollInterval);
+    }
+    // Связывание прокрутки таблицы с кастомным скроллбаром
+document.querySelector('.table-wrapper').addEventListener('scroll', function() {
+    const scrollbar = document.querySelector('.table-container::after');
+    const tableWrapper = document.querySelector('.table-wrapper');
+    const scrollPercentage = (tableWrapper.scrollLeft / (tableWrapper.scrollWidth - tableWrapper.clientWidth)) * 100;
+    scrollbar.style.left = scrollPercentage + '%';
+});
+    </script>
+{% endblock %}
+
