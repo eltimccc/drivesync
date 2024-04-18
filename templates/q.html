@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Горизонтальная таблица с фиксированным скролл-баром</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Стиль для привязки к низу */
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 80vh; /* Опционально, чтобы не занимала весь экран */
+        }
+        .today {
+            background-color: #ffff99; /* Цвет фона для текущей даты */
+        }
+        .year {
+            font-size: larger;
+            font-weight: bold;
+            text-align: center;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .month {
+            font-size: larger;
+            font-weight: bold;
+            text-align: center;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="year">
+        {{ current_year }}
+    </div>
+    <div class="month">
+        {{ current_month }}
+    </div>
+    <div class="table-wrapper" id="table-wrapper">
+        <table class="table table-striped">
+            <thead>
+            <tr id="calendar-header">
+                
+                {% for date in dates %}
+    <th {% if date == today.strftime("%a, %d, %Y ") %}class="today"{% endif %}>{{ date }}</th>
+{% endfor %}
+                
+            </tr>
+            </thead>
+            <tbody id="table-body">
+            <!-- Здесь будет содержимое ячеек -->
+            </tbody>
+        </table>
+    </div>
+    <th><button onclick="scrollBack()">Назад</button></th>
+    
+    <th><button onclick="scrollForward()">Вперед</button></th>
+</div>
+
+<!-- Скрипт Bootstrap и jQuery для взаимодействия с прокруткой -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Наш кастомный скрипт для прокрутки -->
+<script>
+    function scrollBack() {
+        document.getElementById('table-wrapper').scrollLeft -= 100; // Изменяем значение в соответствии с вашими потребностями
+    }
+    
+    function scrollForward() {
+        document.getElementById('table-wrapper').scrollLeft += 100; // Изменяем значение в соответствии с вашими потребностями
+    }
+
+    // Функция для нахождения текущей даты в таблице и прокрутки к ней
+    function scrollToCurrentDate() {
+        var currentDateCell = document.querySelector('th.today');
+        if (currentDateCell) {
+            var tableWrapper = document.getElementById('table-wrapper');
+            tableWrapper.scrollLeft = currentDateCell.offsetLeft - tableWrapper.clientWidth / 2; // Центрируем текущую дату по горизонтали
+        }
+    }
+
+    // Вызываем функцию при загрузке страницы
+    window.onload = function() {
+        scrollToCurrentDate();
+    };
+</script>
+
+
+</body>
+</html>

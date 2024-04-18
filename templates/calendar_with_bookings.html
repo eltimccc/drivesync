@@ -20,11 +20,11 @@
 <body>
 {% extends 'base.html' %}
 {% block content %}
-<div class="mb-5">
-        <h1 class="mt-5">Календарь бронирований</h1>
-        <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
-        <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addCarModal">Добавить машину</button>
-        <button class="btn btn-info mt-3"><a href="/cars" style="color: white; text-decoration: none;">Список машин</a></button>
+<div class="mt-4">
+        <h2 class="text-center mb-3">Календарь бронирований</h1>
+        <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
+        <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#addCarModal">Добавить машину</button>
+        <a href="/cars" class="btn btn-info mt-2" style="color: white; text-decoration: none; display: inline-block;">Список машин</a>
 
         <div id="calendar"></div>
     </div>
@@ -65,7 +65,7 @@
         var calendarEl = document.getElementById('calendar');
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
+            initialView: 'dayGridWeek',
             events: [
                 {% for booking in bookings %}
                 {
@@ -73,7 +73,7 @@
                     start: '{{ booking.start }}',
                     end: '{{ booking.end }}',
                     url: '{{ url_for("view_booking", booking_id=booking.id) }}',
-                    color: '{{ booking.status_color }}'  // Использование цвета статуса
+                    color: '{{ booking.status_color }}'
                 }{% if not loop.last %},{% endif %}
                 {% endfor %}
             ],
