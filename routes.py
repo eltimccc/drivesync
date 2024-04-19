@@ -48,7 +48,7 @@ def add_booking():
 
             car_id = request.form.get("car")
             description = request.form.get("description")
-
+            phone = request.form.get("phone")
             car = Car.query.get(car_id)
 
             if car is None:
@@ -58,6 +58,7 @@ def add_booking():
                 start_date=start_datetime,
                 end_date=end_datetime,
                 car=car,
+                phone=phone,
                 description=description,
             )
             db.session.add(new_booking)
@@ -90,6 +91,7 @@ def edit_booking(booking_id):
 
     if request.method == "POST":
         booking.description = request.form["description"]
+        booking.phone = request.form["phone"]
         booking.start_date = datetime.strptime(
             request.form["start_date"], "%Y-%m-%dT%H:%M"
         )
