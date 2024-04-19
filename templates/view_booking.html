@@ -6,12 +6,13 @@
             </div>
             <div class="modal-body">
                 <p><strong>ID:</strong> {{ booking.id }}</p>
-                <p><strong>Car Brand:</strong> <a href="{{ url_for('car_detail', car_id=booking.car.id) }}">{{ booking.car.brand }}</a>
+                <p><strong>Автомобиль:</strong> <a href="{{ url_for('car_detail', car_id=booking.car.id) }}">{{ booking.car.brand }}</a>
                 </p>
-                <p><strong>Car Number:</strong> {{ booking.car.car_number }}</p>
-                <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
-                <p><strong>End Date:</strong> {{ booking.end_date }}</p>
-                <p><strong>Description:</strong> {{ booking.description }}</p>
+                <p><strong>Номер авто:</strong> {{ booking.car.car_number }}</p>
+                <p><strong>Начало проката:</strong> {{ booking.start_date }}</p>
+                <p><strong>Конец проката:</strong> {{ booking.end_date }}</p>
+                <p><strong>Телефон:</strong> {{ booking.phone }}</p>
+                <p><strong>Заметка:</strong> {{ booking.description }}</p>
                 <p><strong>Статус:</strong> {{ booking.status }}</p>
             </div>
 

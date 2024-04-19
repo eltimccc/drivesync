@@ -23,6 +23,7 @@
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Status</th>
+                        <th>Телефон клиента</th>
                         <th>Description</th>
                     </tr>
                 </thead>
@@ -33,6 +34,7 @@
                         <td>{{ booking.start_date }}</td>
                         <td>{{ booking.end_date }}</td>
                         <td>{{ booking.status }}</td>
+                        <td>{{ booking.phone }}</td>
                         <td>{{ booking.description }}</td>
                     </tr>
                     {% endfor %}
@@ -41,4 +43,3 @@
         </div>
     </div>
     {% endblock %}
-

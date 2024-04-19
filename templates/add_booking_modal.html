@@ -1,5 +1,3 @@
-        <h6>Add Booking</h6>
-
         <form id="bookingForm" method="POST" action="/add_booking">
             <div class="form-group">
                 <label for="start_datetime">Дата и время начала:</label>
@@ -19,6 +17,12 @@
                     {% endfor %}
                 </select>
             </div>
+
+            <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="text" class="form-control" id="phone" name="phone">
+            </div>
+
 
             <div class="form-group">
                 <label for="description">Заметка:</label>
