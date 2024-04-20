@@ -1,28 +1,53 @@
+{% extends 'base.html' %}
 
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Booking Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>ID:</strong> {{ booking.id }}</p>
-                <p><strong>Автомобиль:</strong> <a href="{{ url_for('car_detail', car_id=booking.car.id) }}">{{ booking.car.brand }}</a>
-                </p>
-                <p><strong>Номер авто:</strong> {{ booking.car.car_number }}</p>
-                <p><strong>Начало проката:</strong> {{ booking.start_date }}</p>
-                <p><strong>Конец проката:</strong> {{ booking.end_date }}</p>
-                <p><strong>Телефон:</strong> {{ booking.phone }}</p>
-                <p><strong>Заметка:</strong> {{ booking.description }}</p>
-                <p><strong>Статус:</strong> {{ booking.status }}</p>
-            </div>
+{% block additional_styles %}
+<style>
 
-        <!-- Заголовок и содержимое модального окна -->
-            <div class="modal-footer">
-                <form method="get" action="{{ url_for('edit_booking', booking_id=booking.id) }}">
-                    <button type="submit" class="btn btn-primary">Редактировать</button>
-                </form>
-                <form method="post" action="{{ url_for('delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');">
-                    <button type="submit" class="btn btn-danger">Удалить</button>
-                </form>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+  .booking-details {
+    font-size: 1.1em;
+  }
+  .status {
+    font-size: 0.9em;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title mb-0">Бронирование № {{ booking.id }}</h2>
+          <p style="background-color: {{ status_color }}; padding: 5px;">Статус: {{ booking.status }}</p>
+        </div>
+        <div class="card-body">
+          <h5><strong>Автомобиль:</strong> {{ booking.car.brand }} {{ booking.car.car_number }}</h5>
+          <div class="booking-details">
+            <div class="row">
+              <div class="col">
+                <p><strong>Начало:</strong> {{ booking.start_date }}</p>
+              </div>
+              <div class="col">
+                <p><strong>Окончание:</strong> {{ booking.end_date }}</p>
+              </div>
             </div>
+            <p><strong>Телефон:</strong> {{ booking.phone }}</p>
+            <p><strong>Заметка:</strong> {{ booking.description }}</p>
+          </div>
+          <div class="buttons">
+            <form method="get" action="{{ url_for('edit_booking', booking_id=booking.id) }}">
+              <button type="submit" class="btn btn-primary mr-2">Редактировать</button>
+            <form method="post" action="{{ url_for('delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');">
+              <button type="submit" class="btn btn-danger">Удалить</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+

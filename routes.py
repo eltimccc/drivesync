@@ -149,10 +149,15 @@ def car_detail(car_id):
     return render_template('car_detail.html', car=car, bookings=bookings)
 
 
-@app.route("/booking/<int:booking_id>", methods=["GET", "POST"])
+@app.route("/booking/<int:booking_id>", methods=["GET"])
 def view_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
-    return render_template("view_booking.html", booking=booking)
+    status_color = BOOKING_STATUSES.get(booking.status, '#ffffff')
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render_template("view_booking_modal.html", booking=booking, status_color=status_color)
+    else:
+        return render_template("view_booking.html", booking=booking, status_color=status_color)
+
 
 
 @app.route("/me", methods=["GET"])

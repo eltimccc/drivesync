@@ -1,11 +1,3 @@
-# BOOKING_STATUSES = {
-#     'Rent': 'Аренда',
-#     'Completed': 'Завершено',
-#     'Cancelled': 'Отказ',
-#     'Pending': 'Ожидание'
-# }
-
-
 BOOKING_STATUSES = {
     'Аренда': '#007bff',     # Синий цвет
     'Завершено': '#28a745',  # Зеленый цвет
