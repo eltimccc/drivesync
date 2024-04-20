@@ -47,7 +47,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="addCarModal" tabindex="-1" aria-labelledby="addCarModalLabel" aria-hidden="true">
+<div class="modal fade" id="addCarModal" tabindex="-1" aria-labelledby="addCarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -105,7 +105,7 @@
 
         calendar.render();
 
-        // Обработчик события клика на кнопке "Добавить бронь"
+
         $('button[data-bs-target="#addBookingModal"]').on('click', function() {
             $.ajax({
                 url: '/add_booking',
@@ -121,7 +121,7 @@
             });
         });
         
-        // Обработчик события клика на кнопке "Добавить машину"
+
         $('button[data-bs-target="#addCarModal"]').on('click', function() {
             $.ajax({
                 url: '/add_car',
