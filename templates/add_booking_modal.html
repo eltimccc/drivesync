@@ -1,46 +1,4 @@
-<style>
-    .modal-content {
-       width: 80%;
-        max-height: 60%;
-        overflow: auto;
-    }
-    .car_modal-content {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 30%;
-        max-height: 60%;
-        overflow: auto;
-    }
-
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 48px;
-        font-weight: bold;
-    }
-
-    #carTable {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    #carTable th, #carTable td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    #carTable th {
-        background-color: #f2f2f2;
-        width: 10%;
-    }
-
-    #carTable tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/car_input_styles.css') }}">
         <form id="bookingForm" method="POST" action="/add_booking">
             <div class="form-group">
                 <label for="start_datetime">Дата и время начала:</label>
@@ -95,30 +53,4 @@
     </div>
 </div>
 
-
-
-<script>   
-function openCarModal() {
-    var modal = document.getElementById("carModal");
-    modal.style.display = "block";
-}
-
-function closeCarModal() {
-    var modal = document.getElementById("carModal");
-    modal.style.display = "none";
-}
-
-function selectCar(carId, carName) {
-    console.log("Выбран автомобиль:", carId, carName);
-    document.getElementById("selectedCar").value = carName;
-    document.getElementById("selectedCarId").value = carId;
-    closeCarModal();
-}
-
-function closeIfOutside(event) {
-    var modal = document.getElementById('carModal');
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
-</script>
+<script src="{{ url_for('static', filename='js/car_input.js') }}"></script>

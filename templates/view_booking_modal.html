@@ -7,9 +7,10 @@
 </style>
 
 <div class="modal-header">
-  <h5 class="modal-title">Бронирование №{{ booking.id }}</h5>
-  <p style="background-color: {{ status_color }}; padding: 5px;">Статус: {{ booking.status }}</p>
-
+  <h5 class="modal-title">Резерв №{{ booking.id }}</h5>
+  <p style="background-color: {{ status_color }}; padding: 5px;">
+    Статус: {{ booking.status }}
+  </p>
 </div>
 <div class="modal-body">
   <p>
@@ -18,8 +19,12 @@
       >{{ booking.car.brand }} {{ booking.car.car_number }}</a
     >
   </p>
-  <p><strong>Начало:</strong> {{ booking.start_date }}</p>
-  <p><strong>Возврат:</strong> {{ booking.end_date }}</p>
+  <p>
+    <strong>Начало:</strong> {{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}
+  </p>
+  <p>
+    <strong>Возврат:</strong> {{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}
+  </p>
   <p><strong>Телефон:</strong> {{ booking.phone }}</p>
   <p><strong>Заметка:</strong> {{ booking.description }}</p>
   <p><strong>Статус:</strong> {{ booking.status }}</p>
