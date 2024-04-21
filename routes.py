@@ -28,12 +28,15 @@ def get_bookings():
             "start": booking.start_date,
             "end": booking.end_date,
             "url": url_for("view_booking", booking_id=booking.id),
-            "status_color": BOOKING_STATUSES.get(booking.status, '#007bff')
+            "status_color": BOOKING_STATUSES.get(booking.status, "#007bff"),
         }
         formatted_bookings.append(formatted_booking)
 
-    return render_template("calendar_with_bookings.html", bookings=formatted_bookings, BOOKING_STATUSES=BOOKING_STATUSES)
-
+    return render_template(
+        "calendar_with_bookings.html",
+        bookings=formatted_bookings,
+        BOOKING_STATUSES=BOOKING_STATUSES,
+    )
 
 
 @app.route("/add_booking", methods=["GET", "POST"])
@@ -67,7 +70,7 @@ def add_booking():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
     else:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             cars = Car.query.all()
             return render_template("add_booking_modal.html", cars=cars)
         else:
@@ -100,18 +103,24 @@ def edit_booking(booking_id):
         booking.car = Car.query.get(car_id)
 
         new_status = request.form.get("status")
-        
+
         if new_status in status_choices:
             booking.status = new_status
             booking.color = BOOKING_STATUSES[new_status]
-            if booking.color == BOOKING_STATUSES['Отказ']:
+            if booking.color == BOOKING_STATUSES["Отказ"]:
                 booking.end_date = booking.start_date
 
-        
         db.session.commit()
         return redirect(url_for("get_bookings", booking_id=booking.id))
 
-    return render_template("edit_booking.html", booking=booking, cars=cars, status_choices=status_choices, booking_statuses=BOOKING_STATUSES)
+    return render_template(
+        "edit_booking.html",
+        booking=booking,
+        cars=cars,
+        status_choices=status_choices,
+        booking_statuses=BOOKING_STATUSES,
+    )
+
 
 @app.route("/add_car", methods=["GET", "POST"])
 def add_car():
@@ -128,7 +137,7 @@ def add_car():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
     else:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return render_template("add_car_modal.html")
         else:
             return render_template("add_car.html", bootstrap=True)
@@ -140,40 +149,43 @@ def view_cars():
     return render_template("cars.html", cars=cars)
 
 
-@app.route('/car/<int:car_id>')
+@app.route("/car/<int:car_id>")
 def car_detail(car_id):
     car = Car.query.get(car_id)
 
     bookings = Booking.query.filter_by(car_id=car_id).all()
 
-    return render_template('car_detail.html', car=car, bookings=bookings)
+    return render_template("car_detail.html", car=car, bookings=bookings)
 
 
 @app.route("/booking/<int:booking_id>", methods=["GET"])
 def view_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
-    status_color = BOOKING_STATUSES.get(booking.status, '#ffffff')
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return render_template("view_booking_modal.html", booking=booking, status_color=status_color)
+    status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return render_template(
+            "view_booking_modal.html", booking=booking, status_color=status_color
+        )
     else:
-        return render_template("view_booking.html", booking=booking, status_color=status_color)
-
+        return render_template(
+            "view_booking.html", booking=booking, status_color=status_color
+        )
 
 
 @app.route("/me", methods=["GET"])
 def get_me():
     return render_template("index.html")
 
+
 from datetime import date
 
 
-
-@app.template_filter('month_name')
+@app.template_filter("month_name")
 def month_name(month_number):
     return calendar.month_name[month_number]
 
 
-@app.route('/c')
+@app.route("/c")
 def booking_calendar():
     cars = Car.query.all()
     bookings = Booking.query.all()
@@ -189,10 +201,23 @@ def booking_calendar():
             month -= 12
             year += 1
         days_in_month = calendar.monthrange(year, month)[1]
-        months.append({'year': year, 'month': month, 'days': range(1, days_in_month + 1), 'name': calendar.month_name[month]})
-    
-    return render_template('booking_table.html', cars=cars, bookings=bookings, months=months, num_months=num_months, booking_statuses_colors=BOOKING_STATUSES)
+        months.append(
+            {
+                "year": year,
+                "month": month,
+                "days": range(1, days_in_month + 1),
+                "name": calendar.month_name[month],
+            }
+        )
 
+    return render_template(
+        "booking_table.html",
+        cars=cars,
+        bookings=bookings,
+        months=months,
+        num_months=num_months,
+        booking_statuses_colors=BOOKING_STATUSES,
+    )
 
 
 def generate_dates():
@@ -201,18 +226,18 @@ def generate_dates():
     end_date_future = today + timedelta(days=183)  # Полгода вперед от текущей даты
 
     dates = []
-    
+
     # Добавляем даты до текущей даты на год
     while start_date_past < today:
         dates.append(start_date_past.strftime("%a, %d, %Y "))
 
         start_date_past += timedelta(days=1)
-    
+
     # Добавляем даты после текущей даты на полгода
     while today < end_date_future:
         dates.append(today.strftime("%a, %d, %Y"))
         today += timedelta(days=1)
-    
+
     return dates
 
 
@@ -223,5 +248,10 @@ def q():
     current_year = today.year
     current_month = today.strftime("%B")
 
-    return render_template('q.html', dates=dates, today=today, current_year=current_year, current_month=current_month)
-
+    return render_template(
+        "q.html",
+        dates=dates,
+        today=today,
+        current_year=current_year,
+        current_month=current_month,
+    )

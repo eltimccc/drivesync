@@ -19,20 +19,21 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Booking ID</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Status</th>
+                        <th>Номер</th>
+                        <th>Начало</th>
+                        <th>Окончание</th>
+                        <th>Статус</th>
                         <th>Телефон клиента</th>
-                        <th>Description</th>
+                        <th>Заметка</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
                     <tr>
                         <td><a href="{{ url_for('view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
-                        <td>{{ booking.start_date }}</td>
-                        <td>{{ booking.end_date }}</td>
+                        <td><a href="{{ url_for('view_booking', booking_id=booking.id) }}">{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
+                       
+                        <td><a href="{{ url_for('view_booking', booking_id=booking.id) }}">{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
                         <td>{{ booking.status }}</td>
                         <td>{{ booking.phone }}</td>
                         <td>{{ booking.description }}</td>

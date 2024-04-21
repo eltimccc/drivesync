@@ -1,6 +1,7 @@
 from app import app, db  # Импортируем объект app из вашего модуля app.py
 from models import Car
 
+
 def add_cars():
     with app.app_context():
         cars_data = [
@@ -40,6 +41,7 @@ def add_cars():
 
         db.session.commit()
         print("Автомобили успешно добавлены.")
+
 
 if __name__ == "__main__":
     add_cars()
