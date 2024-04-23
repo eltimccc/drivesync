@@ -8,9 +8,8 @@ from flask import (
 )
 from datetime import datetime, timedelta
 from app import app, db
-from forms import BookingForm, EditBookingForm
 from models import Booking, Car
-from utils import BOOKING_STATUSES
+from utils import BOOKING_STATUSES, add_booking_get, add_booking_post
 
 
 @app.route("/", methods=["GET"])
@@ -41,41 +40,12 @@ def get_bookings():
 
 @app.route("/add_booking", methods=["GET", "POST"])
 def add_booking():
+    cars = Car.query.all()
+
     if request.method == "POST":
-        try:
-            start_datetime = request.form.get("start_datetime")
-            start_datetime = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M")
-
-            end_datetime = request.form.get("end_datetime")
-            end_datetime = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M")
-
-            car_id = request.form.get("car")
-            description = request.form.get("description")
-            phone = request.form.get("phone")
-            car = Car.query.get(car_id)
-
-            if car is None:
-                raise ValueError("Car not found")
-
-            new_booking = Booking(
-                start_date=start_datetime,
-                end_date=end_datetime,
-                car=car,
-                phone=phone,
-                description=description,
-            )
-            db.session.add(new_booking)
-            db.session.commit()
-            return redirect(url_for("get_bookings"))
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
+        return add_booking_post()
     else:
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            cars = Car.query.all()
-            return render_template("add_booking_modal.html", cars=cars)
-        else:
-            cars = Car.query.all()
-            return render_template("add_booking.html", cars=cars, bootstrap=True)
+        return add_booking_get()
 
 
 @app.route("/delete_booking/<int:booking_id>/", methods=["POST"])
@@ -144,8 +114,14 @@ def add_car():
 
 
 @app.route("/cars")
-def view_cars():
-    cars = Car.query.all()
+def get_cars():
+    is_deleted_param = request.args.get('is_deleted')
+
+    if is_deleted_param == 'true':
+        cars = Car.query.filter_by(is_deleted=True).all()
+    else:
+        cars = Car.query.filter_by(is_deleted=False).all()
+
     return render_template("cars.html", cars=cars)
 
 
@@ -156,6 +132,31 @@ def car_detail(car_id):
     bookings = Booking.query.filter_by(car_id=car_id).all()
 
     return render_template("car_detail.html", car=car, bookings=bookings)
+
+
+
+@app.route('/cars/<int:car_id>/edit', methods=['GET', 'POST'])
+def edit_car(car_id):
+    car = Car.query.get_or_404(car_id)
+    if request.method == 'POST':
+        car.brand = request.form['brand']
+        car.car_number = request.form['car_number']
+        
+        # Преобразуем значение is_deleted в булево
+        is_deleted = request.form.get('is_deleted', '0')  # По умолчанию '0', если значение не указано
+        car.is_deleted = is_deleted == '1'
+        
+        db.session.commit()
+        return redirect(url_for('get_cars'))
+    return render_template('edit_car.html', car=car)
+
+
+@app.route('/cars/<int:car_id>/delete', methods=['POST'])
+def delete_car(car_id):
+    car = Car.query.get_or_404(car_id)
+    car.is_deleted = True
+    db.session.commit()
+    return redirect(url_for('get_cars'))
 
 
 @app.route("/booking/<int:booking_id>", methods=["GET"])
@@ -222,18 +223,16 @@ def booking_calendar():
 
 def generate_dates():
     today = datetime.today()
-    start_date_past = today - timedelta(days=365)  # 1 год назад от текущей даты
-    end_date_future = today + timedelta(days=183)  # Полгода вперед от текущей даты
+    start_date_past = today - timedelta(days=365)
+    end_date_future = today + timedelta(days=183)
 
     dates = []
 
-    # Добавляем даты до текущей даты на год
     while start_date_past < today:
         dates.append(start_date_past.strftime("%a, %d, %Y "))
 
         start_date_past += timedelta(days=1)
 
-    # Добавляем даты после текущей даты на полгода
     while today < end_date_future:
         dates.append(today.strftime("%a, %d, %Y"))
         today += timedelta(days=1)

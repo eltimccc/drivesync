@@ -19,5 +19,5 @@ with app.app_context():
     db.create_all()
 
 if __name__ == "__main__":
-    extra_files = ["./templates/index.html"]  # Указываем путь к папке с шаблонами
+    extra_files = ["./templates/"]
     app.run(debug=True, extra_files=extra_files)

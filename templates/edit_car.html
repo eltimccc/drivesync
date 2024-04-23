@@ -1,0 +1,54 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h4 class="text-center mb-3">
+        Редактирование информации о машине №{{ car.id }}
+      </h4>
+      <form method="POST">
+        <div class="form-group">
+          <label for="brand">Марка:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="brand"
+            name="brand"
+            value="{{ car.brand }}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="car_number">Номер машины:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="car_number"
+            name="car_number"
+            value="{{ car.car_number }}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="is_deleted">Удалена:</label>
+          <select class="form-control" id="is_deleted" name="is_deleted">
+            <option value="0" {% if not car.is_deleted %}selected{% endif %}>
+              Нет
+            </option>
+            <option value="1" {% if car.is_deleted %}selected{% endif %}>
+              Да
+            </option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
+      </form>
+      <form
+        method="post"
+        action="{{ url_for('delete_car', car_id=car.id) }}"
+        onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');"
+      >
+        <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
