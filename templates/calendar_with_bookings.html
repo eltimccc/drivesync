@@ -1,143 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendar</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
     <style>
-        #calendar {
-            width: 100%;
-            height: 80vh;
-            margin-top: 20px;
-        }
-        
+      #calendar {
+        width: 100%;
+        height: 80vh;
+        margin-top: 20px;
+      }
     </style>
-</head>
-<body>
-{% extends 'base.html' %}
-{% block content %}
-<div class="mt-4">
-        <h4 class="text-center mb-3">Календарь бронирований</h4>
-        <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#addBookingModal">Добавить бронь</button>
-        <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#addCarModal">Добавить машину</button>
-        <a href="/cars" class="btn btn-info mt-2" style="color: white; text-decoration: none; display: inline-block;">Список машин</a>
+  </head>
+  <body>
+    {% extends 'base.html' %} {% block content %}
+    <div class="mt-4">
+      <h4 class="text-center mb-3">Календарь бронирований</h4>
+      <button
+        class="btn btn-success btn-sm mt-2"
+        data-bs-toggle="modal"
+        data-bs-target="#addBookingModal"
+      >
+        Добавить бронь
+      </button>
+      <button
+        class="btn btn-success btn-sm mt-2"
+        data-bs-toggle="modal"
+        data-bs-target="#addCarModal"
+      >
+        Добавить машину
+      </button>
+      <a
+        href="/cars"
+        class="btn btn-info btn-sm mt-2"
+        style="color: white; text-decoration: none; display: inline-block"
+        >Список машин</a
+      >
 
-        <div id="calendar"></div>
+      <div id="calendar"></div>
     </div>
-    <div class="modal fade" id="addBookingModal" tabindex="-1" aria-labelledby="addBookingModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="addCarModalLabel">Добавить бронирование</h4>
-                    </div>
-                <div class="modal-body">
-                    <div id="addBookingModalContent"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div
+      class="modal fade"
+      id="addBookingModal"
+      tabindex="-1"
+      aria-labelledby="addBookingModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <!-- Здесь будет загружено содержимое страницы бронирования -->
+          <div class="modal-header">
+            <h4 class="modal-title" id="addCarModalLabel">
+              Добавить бронирование
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div id="addBookingModalContent"></div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-<div class="modal fade" id="addCarModal" tabindex="-1" aria-labelledby="addCarModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div
+      class="modal fade"
+      id="bookingModal"
+      tabindex="-1"
+      aria-labelledby="bookingModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="addCarModalLabel">Добавить машину</h4>
-                
-            </div>
-            <div class="modal-body">
-                <div id="addCarModalContent"></div>
-            </div>
+          <!-- содержимое страницы бронирования -->
         </div>
+      </div>
     </div>
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
+    <div
+      class="modal fade"
+      id="addCarModal"
+      tabindex="-1"
+      aria-labelledby="addCarModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="addCarModalLabel">Добавить машину</h4>
+          </div>
+          <div class="modal-body">
+            <div id="addCarModalContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var calendarEl = document.getElementById('calendar');
 
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridWeek',
-            events: [
-                {% for booking in bookings %}
-                {
-                    title: '{{ booking.car }}',
-                    start: '{{ booking.start }}',
-                    end: '{{ booking.end }}',
-                    url: '{{ url_for("view_booking", booking_id=booking.id) }}',
-                    color: '{{ booking.status_color }}'
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ],
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek'
-            },
-            eventClick: function(info) {
-                info.jsEvent.preventDefault();
-                $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
-            },
-            dateClick: function(info) {
-                calendar.gotoDate(info.date);
-                calendar.changeView('dayGridDay');
-            },
-            locale: 'ru',
-            monthNames: [
-                'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-                'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-            ],
-            buttonText: {
-                month: 'Месяц',
-                week: 'Неделя',
-                year: 'Год',
-                day: 'День',
-            }
-        });
+          var calendar = new FullCalendar.Calendar(calendarEl, {
+              initialView: 'dayGridWeek',
+              events: [
+                  {% for booking in bookings %}
+                  {
+                      title: '{{ booking.car }}',
+                      start: '{{ booking.start }}',
+                      end: '{{ booking.end }}',
+                      url: '{{ url_for("view_booking", booking_id=booking.id) }}',
+                      color: '{{ booking.status_color }}'
+                  }{% if not loop.last %},{% endif %}
+                  {% endfor %}
+              ],
+              headerToolbar: {
+                  left: 'prev,next today',
+                  center: 'title',
+                  right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek'
+              },
+              eventClick: function(info) {
+                  info.jsEvent.preventDefault();
+                  $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
+              },
+              dateClick: function(info) {
+                  calendar.gotoDate(info.date);
+                  calendar.changeView('dayGridDay');
+              },
+              locale: 'ru',
+              monthNames: [
+                  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+              ],
+              buttonText: {
+                  month: 'Месяц',
+                  week: 'Неделя',
+                  year: 'Год',
+                  day: 'День',
+              }
+          });
 
-        calendar.render();
+          calendar.render();
 
 
-        $('button[data-bs-target="#addBookingModal"]').on('click', function() {
-            $.ajax({
-                url: '/add_booking',
-                type: 'GET',
-                success: function(response) {
-                    $('#addBookingModalContent').html(response);
-                    $('#addBookingModal').modal('show');
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                }
-            });
-        });
-        
+          $('button[data-bs-target="#addBookingModal"]').on('click', function() {
+              $.ajax({
+                  url: '/add_booking',
+                  type: 'GET',
+                  success: function(response) {
+                      $('#addBookingModalContent').html(response);
+                      $('#addBookingModal').modal('show');
+                  },
+                  error: function(xhr, status, error) {
+                      console.error('Error:', error);
+                      alert('An error occurred. Please try again.');
+                  }
+              });
+          });
 
-        $('button[data-bs-target="#addCarModal"]').on('click', function() {
-            $.ajax({
-                url: '/add_car',
-                type: 'GET',
-                success: function(response) {
-                    $('#addCarModalContent').html(response);
-                    $('#addCarModal').modal('show');
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                }
-            });
-        });
-    });
-</script>
-{% endblock %}
-</body>
+
+          $('button[data-bs-target="#addCarModal"]').on('click', function() {
+              $.ajax({
+                  url: '/add_car',
+                  type: 'GET',
+                  success: function(response) {
+                      $('#addCarModalContent').html(response);
+                      $('#addCarModal').modal('show');
+                  },
+                  error: function(xhr, status, error) {
+                      console.error('Error:', error);
+                      alert('An error occurred. Please try again.');
+                  }
+              });
+          });
+      });
+    </script>
+    {% endblock %}
+  </body>
 </html>
