@@ -1,21 +1,23 @@
-<body>
-    <div class="container">
-        <h6>Add Car</h6>
-        <form method="POST" action="/add_car">
-            <div class="form-group">
-                <label for="brand">Марка автомобиля:</label>
-                <input type="text" class="form-control" id="brand" name="brand" required>
-            </div>
-            <div class="form-group">
-                <label for="car_number">Номер автомобиля:</label>
-                <input type="text" class="form-control" id="car_number" name="car_number" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Добавить автомобиль</button>
-        </form>
+<div class="container mt-4">
+  <h4>Добавить автомобиль</h4>
+  <form id="addCarForm" method="POST" action="/add_car" novalidate>
+    {{ form.csrf_token }}
+    <div class="form-group">
+      {{ form.brand(class="form-control", placeholder=form.brand.label.text) }}
+      {% if form.brand.errors %} {% for error in form.brand.errors %}
+      <span style="color: red">{{ error }}</span>
+      {% endfor %} {% endif %}
     </div>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-
+    <div class="form-group">
+      {{ form.car_number(class="form-control",
+      placeholder=form.car_number.label.text) }} {% if form.car_number.errors %}
+      {% for error in form.car_number.errors %}
+      <span style="color: red">{{ error }}</span>
+      {% endfor %} {% endif %}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+  {% if error %}
+  <div class="alert alert-danger mt-3">{{ error }}</div>
+  {% endif %}
+</div>

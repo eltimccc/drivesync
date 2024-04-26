@@ -1,5 +1,6 @@
 import calendar
 from flask import (
+    flash,
     render_template,
     request,
     jsonify,
@@ -8,6 +9,7 @@ from flask import (
 )
 from datetime import datetime, timedelta
 from app import app, db
+from forms import CarForm
 from models import Booking, Car
 from utils import BOOKING_STATUSES, add_booking_get, add_booking_post
 
@@ -94,23 +96,30 @@ def edit_booking(booking_id):
 
 @app.route("/add_car", methods=["GET", "POST"])
 def add_car():
-    if request.method == "POST":
+    form = CarForm()
+    if form.validate_on_submit() and request.method == "POST":
         try:
-            brand = request.form["brand"]
-            car_number = request.form["car_number"]
-
-            new_car = Car(brand=brand, car_number=car_number)
+            new_car = Car(
+                brand=form.brand.data,
+                car_number=form.car_number.data,
+            )
             db.session.add(new_car)
             db.session.commit()
-
-            return redirect(url_for("get_bookings"))
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify({'message': 'Машина успешно добавлена!'})
+            else:
+                return redirect(url_for("get_cars"))
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify({"error": str(e)}), 500
+            else:
+                return redirect(url_for("get_cars"))
     else:
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return render_template("add_car_modal.html")
+            return render_template("add_car_modal.html", form=form)
         else:
-            return render_template("add_car.html", bootstrap=True)
+            return render_template("add_car.html", form=form)
+
 
 
 @app.route("/cars")
