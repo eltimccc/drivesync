@@ -36,3 +36,17 @@ class CarForm(FlaskForm):
             raise ValidationError('Машина с таким номером уже существует.')
 
     submit = SubmitField('Добавить')
+
+
+class BookingForm(FlaskForm):
+    car_id = StringField('Car ID', validators=[DataRequired()])
+    start_datetime = DateTimeField('Start Date and Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
+    end_datetime = DateTimeField('End Date and Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
+    phone = StringField('Phone')
+    description = TextAreaField('Description')
+    submit = SubmitField('Submit')
+
+    def validate_start_datetime(self, start_datetime):
+        current_datetime = datetime.now()
+        if start_datetime.data < current_datetime:
+            raise ValidationError('Start date should be in the future.')

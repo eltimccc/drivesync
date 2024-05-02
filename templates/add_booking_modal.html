@@ -3,8 +3,9 @@
             <div class="form-group">
                 <label for="start_datetime">Дата и время начала:</label>
                 <input type="datetime-local" class="form-control" id="start_datetime" name="start_datetime" required>
+                
             </div>
-
+                
             <div class="form-group">
                 <label for="end_datetime">Дата и время окончания:</label>
                 <input type="datetime-local" class="form-control" id="end_datetime" name="end_datetime" required>
@@ -15,6 +16,8 @@
                 <input type="text" class="form-control" id="selectedCar" name="selectedCar" readonly style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 6px; border-bottom-right-radius: 6px;">
                 <input type="hidden" id="selectedCarId" name="car" readonly>
             </div>
+            
+            <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
 
             <div class="form-group">
                 <label for="phone">Телефон:</label>
@@ -53,4 +56,24 @@
     </div>
 </div>
 
+
+</div>
+<script>
+$('#bookingForm').submit(function(event) {
+    event.preventDefault();
+    var formData = $(this).serialize();
+    $.ajax({
+        url: '/add_booking',
+        type: 'POST',
+        data: formData,
+        success: function(response) {
+            window.location.href = '/';
+        },
+        error: function(xhr, status, error) {
+            var errorMessage = xhr.responseJSON.error;
+            $('#errorMessage').html(errorMessage).show();
+        }
+    });
+});
+</script>
 <script src="{{ url_for('static', filename='js/car_input.js') }}"></script>

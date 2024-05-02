@@ -9,7 +9,7 @@ from flask import (
 )
 from datetime import datetime, timedelta
 from app import app, db
-from forms import CarForm
+from forms import BookingForm, CarForm
 from models import Booking, Car
 from utils import BOOKING_STATUSES, add_booking_get, add_booking_post
 
@@ -42,8 +42,6 @@ def get_bookings():
 
 @app.route("/add_booking", methods=["GET", "POST"])
 def add_booking():
-    cars = Car.query.all()
-
     if request.method == "POST":
         return add_booking_post()
     else:
@@ -151,8 +149,7 @@ def edit_car(car_id):
         car.brand = request.form['brand']
         car.car_number = request.form['car_number']
         
-        # Преобразуем значение is_deleted в булево
-        is_deleted = request.form.get('is_deleted', '0')  # По умолчанию '0', если значение не указано
+        is_deleted = request.form.get('is_deleted', '0')
         car.is_deleted = is_deleted == '1'
         
         db.session.commit()
