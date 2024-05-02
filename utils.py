@@ -12,6 +12,35 @@ BOOKING_STATUSES = {
     "Ожидание": "#ffc107",  # Желтый цвет
 }
 
+# def add_booking_post():
+#     try:
+#         start_datetime = request.form.get("start_datetime")
+#         start_datetime = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M")
+
+#         end_datetime = request.form.get("end_datetime")
+#         end_datetime = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M")
+
+#         car_id = request.form.get("car")
+#         description = request.form.get("description")
+#         phone = request.form.get("phone")
+#         car = Car.query.get(car_id)
+
+#         if car is None:
+#             raise ValueError("Car not found")
+
+#         new_booking = Booking(
+#             start_date=start_datetime,
+#             end_date=end_datetime,
+#             car=car,
+#             phone=phone,
+#             description=description,
+#         )
+#         db.session.add(new_booking)
+#         db.session.commit()
+#         return redirect(url_for("get_bookings"))
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
 def add_booking_post():
     try:
         start_datetime = request.form.get("start_datetime")
@@ -20,13 +49,22 @@ def add_booking_post():
         end_datetime = request.form.get("end_datetime")
         end_datetime = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M")
 
+        current_datetime = datetime.now()
+        current_datetime = current_datetime.replace(second=0, microsecond=0, minute=0, hour=0)
+
+        if start_datetime < current_datetime:
+            raise ValueError("Дата начала бронирования не может быть раньше текущей даты")
+        
+        if start_datetime >= end_datetime:
+            raise ValueError("Дата начала не может быть больше даты окончания бронирования ")
+
         car_id = request.form.get("car")
         description = request.form.get("description")
         phone = request.form.get("phone")
         car = Car.query.get(car_id)
 
         if car is None:
-            raise ValueError("Car not found")
+            raise ValueError("Нужно выбрать машину")
 
         new_booking = Booking(
             start_date=start_datetime,
@@ -38,8 +76,11 @@ def add_booking_post():
         db.session.add(new_booking)
         db.session.commit()
         return redirect(url_for("get_bookings"))
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "An error occurred"}), 500
+
 
 
 def add_booking_get():
