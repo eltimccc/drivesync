@@ -44,7 +44,7 @@
       <form
         method="post"
         action="{{ url_for('delete_car', car_id=car.id) }}"
-        onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');"
+        onsubmit="return confirm('Вы точно уверены, что хотите удалить этот автомобиль?');"
       >
         <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
       </form>
