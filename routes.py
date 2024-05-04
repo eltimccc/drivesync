@@ -104,7 +104,7 @@ def add_car():
             db.session.add(new_car)
             db.session.commit()
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify({'message': 'Машина успешно добавлена!'})
+                return jsonify({"message": "Машина успешно добавлена!"})
             else:
                 return redirect(url_for("get_cars"))
         except Exception as e:
@@ -119,12 +119,11 @@ def add_car():
             return render_template("add_car.html", form=form)
 
 
-
 @app.route("/cars")
 def get_cars():
-    is_deleted_param = request.args.get('is_deleted')
+    is_deleted_param = request.args.get("is_deleted")
 
-    if is_deleted_param == 'true':
+    if is_deleted_param == "true":
         cars = Car.query.filter_by(is_deleted=True).all()
     else:
         cars = Car.query.filter_by(is_deleted=False).all()
@@ -141,28 +140,27 @@ def car_detail(car_id):
     return render_template("car_detail.html", car=car, bookings=bookings)
 
 
-
-@app.route('/cars/<int:car_id>/edit', methods=['GET', 'POST'])
+@app.route("/cars/<int:car_id>/edit", methods=["GET", "POST"])
 def edit_car(car_id):
     car = Car.query.get_or_404(car_id)
-    if request.method == 'POST':
-        car.brand = request.form['brand']
-        car.car_number = request.form['car_number']
-        
-        is_deleted = request.form.get('is_deleted', '0')
-        car.is_deleted = is_deleted == '1'
-        
+    if request.method == "POST":
+        car.brand = request.form["brand"]
+        car.car_number = request.form["car_number"]
+
+        is_deleted = request.form.get("is_deleted", "0")
+        car.is_deleted = is_deleted == "1"
+
         db.session.commit()
-        return redirect(url_for('get_cars'))
-    return render_template('edit_car.html', car=car)
+        return redirect(url_for("get_cars"))
+    return render_template("edit_car.html", car=car)
 
 
-@app.route('/cars/<int:car_id>/delete', methods=['POST'])
+@app.route("/cars/<int:car_id>/delete", methods=["POST"])
 def delete_car(car_id):
     car = Car.query.get_or_404(car_id)
     car.is_deleted = True
     db.session.commit()
-    return redirect(url_for('get_cars'))
+    return redirect(url_for("get_cars"))
 
 
 @app.route("/booking/<int:booking_id>", methods=["GET"])
