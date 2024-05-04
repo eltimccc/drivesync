@@ -23,19 +23,25 @@ def add_booking_post():
         end_datetime = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M")
 
         current_datetime = datetime.now()
-        current_datetime = current_datetime.replace(second=0, microsecond=0, minute=0, hour=0)
+        current_datetime = current_datetime.replace(
+            second=0, microsecond=0, minute=0, hour=0
+        )
 
         if start_datetime < current_datetime:
-            raise ValueError("Дата начала бронирования не может быть раньше текущей даты")
-        
+            raise ValueError(
+                "Дата начала бронирования не может быть раньше текущей даты"
+            )
+
         if start_datetime >= end_datetime:
-            raise ValueError("Дата начала не может быть больше даты окончания бронирования ")
+            raise ValueError(
+                "Дата начала не может быть больше даты окончания бронирования "
+            )
 
         car_id = request.form.get("car")
         description = request.form.get("description")
         phone = request.form.get("phone")
         car = Car.query.get(car_id)
-       
+
         if car is None:
             raise ValueError("Нужно выбрать машину")
 
@@ -53,7 +59,8 @@ def add_booking_post():
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "An error occurred"}), 500
-    
+
+
 # def add_booking_post():
 #     form = BookingForm()
 #     if form.validate_on_submit():
@@ -76,7 +83,6 @@ def add_booking_post():
 #         return jsonify({"errors": errors}), 400
 
 
-
 def add_booking_get():
     car_id = request.args.get("car_id")
     start_datetime = request.args.get("start_datetime")
@@ -84,7 +90,13 @@ def add_booking_get():
     cars = Car.query.filter_by(is_deleted=False).all()
 
     if car_id and start_datetime and end_datetime:
-        return render_template("add_booking.html", cars=cars, car_id=car_id, start_datetime=start_datetime, end_datetime=end_datetime)
+        return render_template(
+            "add_booking.html",
+            cars=cars,
+            car_id=car_id,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
+        )
     elif request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return render_template("add_booking_modal.html", cars=cars)
     else:
