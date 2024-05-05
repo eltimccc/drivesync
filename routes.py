@@ -12,6 +12,7 @@ from app import app, db
 from forms import BookingForm, CarForm
 from models import Booking, Car
 from utils import BOOKING_STATUSES, add_booking_get, add_booking_post
+from validators import validate_booking_data
 
 
 @app.route("/", methods=["GET"])
@@ -56,32 +57,89 @@ def delete_booking(booking_id):
     return redirect(url_for("get_bookings"))
 
 
+# @app.route("/booking/<int:booking_id>/edit", methods=["GET", "POST"])
+# def edit_booking(booking_id):
+#     booking = Booking.query.get_or_404(booking_id)
+#     cars = Car.query.all()
+#     status_choices = list(BOOKING_STATUSES.keys())
+
+#     if request.method == "POST":
+#         try:
+#             description = request.form["description"]
+#             phone = request.form["phone"]
+#             start_date = datetime.strptime(request.form["start_date"], "%Y-%m-%dT%H:%M")
+#             end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%dT%H:%M")
+#             car_id = request.form.get("car")
+#             car = Car.query.get(car_id)
+#             new_status = request.form.get("status")
+
+#             validate_booking_data(start_date, end_date, car)
+
+#             booking.description = description
+#             booking.phone = phone
+#             booking.start_date = start_date
+#             booking.end_date = end_date
+#             booking.car = car
+
+#             if new_status in status_choices:
+#                 booking.status = new_status
+#                 booking.color = BOOKING_STATUSES[new_status]
+#                 if booking.color == BOOKING_STATUSES["Отказ"]:
+#                     booking.end_date = booking.start_date
+
+#             db.session.commit()
+#             flash("Бронирование успешно обновлено", "success")
+#             return redirect(url_for("get_bookings", booking_id=booking.id))
+
+#         except ValueError as e:
+#             flash(str(e), "error")
+#             return redirect(url_for("edit_booking", booking_id=booking_id))
+
+
+#     return render_template(
+#         "edit_booking.html",
+#         booking=booking,
+#         cars=cars,
+#         status_choices=status_choices,
+#         booking_statuses=BOOKING_STATUSES,
+#     )
 @app.route("/booking/<int:booking_id>/edit", methods=["GET", "POST"])
 def edit_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
-    cars = Car.query.all()
+    cars = Car.query.filter_by(is_deleted=False).all()
     status_choices = list(BOOKING_STATUSES.keys())
+    errors = {}
 
     if request.method == "POST":
-        booking.description = request.form["description"]
-        booking.phone = request.form["phone"]
-        booking.start_date = datetime.strptime(
-            request.form["start_date"], "%Y-%m-%dT%H:%M"
-        )
-        booking.end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%dT%H:%M")
-        car_id = request.form.get("car")
-        booking.car = Car.query.get(car_id)
+        try:
+            description = request.form["description"]
+            phone = request.form["phone"]
+            start_date = datetime.strptime(request.form["start_date"], "%Y-%m-%dT%H:%M")
+            end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%dT%H:%M")
+            car_id = request.form.get("car")
+            car = Car.query.get(car_id)
+            new_status = request.form.get("status")
 
-        new_status = request.form.get("status")
+            validate_booking_data(start_date, end_date, car)
 
-        if new_status in status_choices:
-            booking.status = new_status
-            booking.color = BOOKING_STATUSES[new_status]
-            if booking.color == BOOKING_STATUSES["Отказ"]:
-                booking.end_date = booking.start_date
+            booking.description = description
+            booking.phone = phone
+            booking.start_date = start_date
+            booking.end_date = end_date
+            booking.car = car
 
-        db.session.commit()
-        return redirect(url_for("get_bookings", booking_id=booking.id))
+            if new_status in status_choices:
+                booking.status = new_status
+                booking.color = BOOKING_STATUSES[new_status]
+                if booking.color == BOOKING_STATUSES["Отказ"]:
+                    booking.end_date = booking.start_date
+
+            db.session.commit()
+            flash("Бронирование успешно обновлено", "success")
+            return redirect(url_for("get_bookings", booking_id=booking.id))
+
+        except ValueError as e:
+            errors["validation_error"] = str(e)
 
     return render_template(
         "edit_booking.html",
@@ -89,6 +147,7 @@ def edit_booking(booking_id):
         cars=cars,
         status_choices=status_choices,
         booking_statuses=BOOKING_STATUSES,
+        errors=errors,
     )
 
 

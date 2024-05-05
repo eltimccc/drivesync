@@ -1,10 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from flask import jsonify, redirect, render_template, request, url_for
 
 from forms import BookingForm
 from models import Booking, Car
 from app import db
+from validators import validate_booking_data
 
 BOOKING_STATUSES = {
     "Аренда": "#007bff",  # Синий цвет
@@ -22,28 +23,12 @@ def add_booking_post():
         end_datetime = request.form.get("end_datetime")
         end_datetime = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M")
 
-        current_datetime = datetime.now()
-        current_datetime = current_datetime.replace(
-            second=0, microsecond=0, minute=0, hour=0
-        )
-
-        if start_datetime < current_datetime:
-            raise ValueError(
-                "Дата начала бронирования не может быть раньше текущей даты"
-            )
-
-        if start_datetime >= end_datetime:
-            raise ValueError(
-                "Дата начала не может быть больше даты окончания бронирования "
-            )
-
         car_id = request.form.get("car")
+        car = Car.query.get(car_id)
         description = request.form.get("description")
         phone = request.form.get("phone")
-        car = Car.query.get(car_id)
 
-        if car is None:
-            raise ValueError("Нужно выбрать машину")
+        validate_booking_data(start_datetime, end_datetime, car)
 
         new_booking = Booking(
             start_date=start_datetime,
@@ -54,33 +39,21 @@ def add_booking_post():
         )
         db.session.add(new_booking)
         db.session.commit()
-        return redirect(url_for("get_bookings"))
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"success": "Booking added successfully"})
+        else:
+            return redirect(url_for("get_bookings"))
     except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"error": str(e)}), 400
+        else:
+            return render_template("add_booking.html", error=str(e)), 400
     except Exception as e:
-        return jsonify({"error": "An error occurred"}), 500
-
-
-# def add_booking_post():
-#     form = BookingForm()
-#     if form.validate_on_submit():
-#         try:
-#             new_booking = Booking(
-#                 start_date=form.start_datetime.data,
-#                 end_date=form.end_datetime.data,
-#                 car_id=form.car_id.data,
-#                 phone=form.phone.data,
-#                 description=form.description.data
-#             )
-#             db.session.add(new_booking)
-#             db.session.commit()
-#             return jsonify({"success": "Booking added successfully"}), 200
-#         except Exception as e:
-#             db.session.rollback()
-#             return jsonify({"error": "An error occurred"}), 500
-#     else:
-#         errors = {field: error[0] for field, error in form.errors.items()}
-#         return jsonify({"errors": errors}), 400
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"error": "An error occurred"}), 500
+        else:
+            return render_template("add_booking.html", error="An error occurred"), 500
 
 
 def add_booking_get():

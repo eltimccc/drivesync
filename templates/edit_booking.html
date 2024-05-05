@@ -1,46 +1,93 @@
-{% extends 'base.html' %} 
-{% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/car_input_styles.css') }}">
+{% extends 'base.html' %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/car_input_styles.css') }}"
+/>
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <h4 class="text-center mb-3">Редактирование бронирования №{{ booking.id }}</h4>
+      <h4 class="text-center mb-3">
+        Редактирование бронирования №{{ booking.id }}
+      </h4>
+      {% if errors.validation_error %}
+      <div class="alert alert-danger">{{ errors.validation_error }}</div>
+      {% endif %}
       <form method="POST">
         <div class="form-group">
           <label for="start_date">Дата и время начала:</label>
-          <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ booking.start_date.strftime('%Y-%m-%dT%H:%M') }}" required />
+          <input
+            type="datetime-local"
+            class="form-control"
+            id="start_date"
+            name="start_date"
+            value="{{ booking.start_date.strftime('%Y-%m-%dT%H:%M') }}"
+            required
+          />
         </div>
         <div class="form-group">
           <label for="end_date">Дата и время окончания:</label>
-          <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ booking.end_date.strftime('%Y-%m-%dT%H:%M') }}" required />
+          <input
+            type="datetime-local"
+            class="form-control"
+            id="end_date"
+            name="end_date"
+            value="{{ booking.end_date.strftime('%Y-%m-%dT%H:%M') }}"
+            required
+          />
         </div>
 
         <div class="form-group">
           <label for="car">Автомобиль:</label>
           <div class="input-group">
-            <input type="text" class="form-control" id="selectedCar" name="selectedCar" readonly />
+            <input
+              type="text"
+              class="form-control"
+              id="selectedCar"
+              name="selectedCar"
+              readonly
+            />
             <input type="hidden" id="selectedCarId" name="car" readonly />
             <div class="input-group-append">
-              <button type="button" class="btn btn-info" onclick="openCarModal()">Выбрать автомобиль</button>
+              <button
+                type="button"
+                class="btn btn-info"
+                onclick="openCarModal()"
+              >
+                Выбрать автомобиль
+              </button>
             </div>
           </div>
         </div>
 
         <div class="form-group">
           <label for="phone">Телефон:</label>
-          <input type="text" class="form-control" id="phone" name="phone" value="{{ booking.phone }}">
+          <input
+            type="text"
+            class="form-control"
+            id="phone"
+            name="phone"
+            value="{{ booking.phone }}"
+          />
         </div>
 
         <div class="form-group">
           <label for="description">Заметка:</label>
-          <textarea class="form-control" id="description" name="description" rows="4" cols="50">{{ booking.description }}</textarea>
+          <textarea
+            class="form-control"
+            id="description"
+            name="description"
+            rows="4"
+            cols="50"
+          >
+{{ booking.description }}</textarea
+          >
         </div>
 
         <div class="form-group">
           <label for="status">Статус:</label>
           <select class="form-control" id="status" name="status" required>
-            {% for key, value in booking_statuses.items() %}
-            <option value="{{ key }}" {% if booking.status == key %}selected{% endif %}>{{ key }}</option>
+            {% for key, value in booking_statuses.items() %} <option value="{{
+            key }}" {% if booking.status == key %}selected{% endif %}>{{ key }}
             {% endfor %}
           </select>
         </div>
@@ -63,7 +110,9 @@
       </thead>
       <tbody>
         {% for car in cars %}
-        <tr onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')">
+        <tr
+          onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')"
+        >
           <td>{{ car.brand }}</td>
           <td>{{ car.car_number }}</td>
         </tr>
@@ -74,12 +123,12 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var selectedCarInput = document.getElementById('selectedCar');
-    var selectedCarIdInput = document.getElementById('selectedCarId');
+  document.addEventListener("DOMContentLoaded", function () {
+    var selectedCarInput = document.getElementById("selectedCar");
+    var selectedCarIdInput = document.getElementById("selectedCarId");
 
-    var selectedCar = '{{ booking.car.brand }} {{ booking.car.car_number }}';
-    var selectedCarId = '{{ booking.car.id }}';
+    var selectedCar = "{{ booking.car.brand }} {{ booking.car.car_number }}";
+    var selectedCarId = "{{ booking.car.id }}";
 
     selectedCarInput.value = selectedCar;
     selectedCarIdInput.value = selectedCarId;
