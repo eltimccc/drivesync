@@ -1,3 +1,5 @@
+from collections import defaultdict
+from datetime import date
 import calendar
 from flask import (
     flash,
@@ -8,6 +10,8 @@ from flask import (
     url_for,
 )
 from datetime import datetime, timedelta
+
+from sqlalchemy import and_
 from app import app, db
 from forms import BookingForm, CarForm
 from models import Booking, Car
@@ -241,9 +245,6 @@ def get_me():
     return render_template("index.html")
 
 
-from datetime import date
-
-
 @app.template_filter("month_name")
 def month_name(month_number):
     return calendar.month_name[month_number]
@@ -317,3 +318,158 @@ def q():
         current_year=current_year,
         current_month=current_month,
     )
+
+
+@app.route("/report_all_bookings", methods=["GET", "POST"])
+def generate_report():
+    if request.method == "POST":
+        start_date_str = request.form["start_date"]
+        end_date_str = request.form["end_date"]
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%dT%H:%M")
+
+        bookings = Booking.query.filter(
+            Booking.start_date.between(start_date, end_date)
+        ).all()
+
+        bookings_completed = Booking.query.filter(
+            and_(
+                Booking.end_date.between(start_date, end_date),
+                Booking.start_date <= end_date,
+            )
+        ).count()
+
+        bookings_by_status = defaultdict(int)
+        for booking in bookings:
+            bookings_by_status[booking.status] += 1
+
+        start_date_formatted = start_date.strftime("%d.%m.%Y %H:%M")
+        end_date_formatted = end_date.strftime("%d.%m.%Y %H:%M")
+
+        return render_template(
+            "reports/report_all_bookings.html",
+            start_date=start_date_formatted,
+            end_date=end_date_formatted,
+            bookings_count=len(bookings),
+            bookings_completed=bookings_completed,
+            bookings_by_status=bookings_by_status,
+            booking_statuses=BOOKING_STATUSES,
+        )
+
+    return render_template("reports/report_all_bookings.html")
+
+
+@app.route("/report_rent_amount", methods=["GET", "POST"])
+def report_rent_amount():
+    if request.method == "POST":
+        start_date_str = request.form["start_date"]
+        end_date_str = request.form["end_date"]
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%dT%H:%M")
+
+        cars = Car.query.all()
+
+        cars_booked = []
+        for car in cars:
+            bookings_count = Booking.query.filter(
+                Booking.car_id == car.id,
+                Booking.start_date <= end_date,
+                Booking.end_date >= start_date,
+            ).count()
+            if bookings_count > 0:
+                cars_booked.append((car, bookings_count))
+
+        start_date_formatted = start_date.strftime("%d.%m.%Y %H:%M")
+        end_date_formatted = end_date.strftime("%d.%m.%Y %H:%M")
+
+        return render_template(
+            "reports/report_rent_amount.html",
+            start_date=start_date_formatted,
+            end_date=end_date_formatted,
+            cars_booked=cars_booked,
+        )
+
+    return render_template("reports/report_rent_amount.html")
+
+
+@app.route("/report_status_rent", methods=["GET", "POST"])
+def report_status_rent():
+    if request.method == "POST":
+        start_date_str = request.form["start_date"]
+        end_date_str = request.form["end_date"]
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%dT%H:%M")
+
+        bookings = Booking.query.filter(
+            Booking.start_date <= end_date,
+            Booking.end_date >= start_date,
+            Booking.status == "Аренда",
+        ).all()
+
+        cars_status = {}
+        for booking in bookings:
+            car = booking.car
+            if car not in cars_status:
+                cars_status[car] = "Аренда"
+
+        start_date_formatted = start_date.strftime("%d.%m.%Y %H:%M")
+        end_date_formatted = end_date.strftime("%d.%m.%Y %H:%M")
+
+        return render_template(
+            "reports/report_status_rent.html",
+            start_date=start_date_formatted,
+            end_date=end_date_formatted,
+            cars_status=cars_status,
+        )
+
+    return render_template("reports/report_status_rent.html")
+
+
+@app.route("/report_booking_duration", methods=["GET", "POST"])
+def report_booking_duration():
+    if request.method == "POST":
+        start_date_str = request.form["start_date"]
+        end_date_str = request.form["end_date"]
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%dT%H:%M")
+
+        cars = Car.query.filter(Car.is_deleted == False).all()
+
+        cars_duration = {}
+        total_duration = timedelta()
+
+        for car in cars:
+            bookings = Booking.query.filter(
+                Booking.car_id == car.id,
+                Booking.start_date <= end_date,
+                Booking.end_date >= start_date
+            ).all()
+
+            car_duration = timedelta()
+            for booking in bookings:
+                intersection_start = booking.start_date if booking.start_date >= start_date else start_date
+                intersection_end = booking.end_date if booking.end_date <= end_date else end_date
+                duration = intersection_end - intersection_start
+                car_duration += duration
+
+            cars_duration[car] = car_duration
+            total_duration += car_duration
+
+        total_hours = total_duration.total_seconds() // 3600
+        total_minutes = (total_duration.total_seconds() % 3600) // 60
+        total_duration_str = f"{int(total_hours)} часов {int(total_minutes)} минут"
+
+        return render_template(
+            "reports/report_booking_duration.html",
+            start_date=start_date_str,
+            end_date=end_date_str,
+            cars_duration=cars_duration,
+            total_duration=total_duration_str
+        )
+
+    return render_template("reports/report_booking_duration.html")
+
+
+@app.route("/reports_page", methods=["GET"])
+def reports_page():
+    return render_template("reports/reports.html")
