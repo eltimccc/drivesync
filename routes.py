@@ -11,11 +11,11 @@ from flask import (
 )
 from datetime import datetime, timedelta
 
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from app import app, db
-from forms import BookingForm, CarForm, EditCarForm
+from forms import BookingForm, CarForm, EditCarForm, SearchCarsForm
 from models import Booking, Car
-from utils import BOOKING_STATUSES, add_booking_get, add_booking_post
+from utils import BOOKING_STATUSES, add_booking_get, add_booking_post, enrich_car_with_bookings, get_available_cars
 from validators import validate_booking_data
 
 
@@ -438,51 +438,111 @@ def reports_page():
     return render_template("reports/reports.html")
 
 
+# @app.route("/search_cars", methods=["GET", "POST"])
+# def search_cars():
+#     if request.method == "POST":
+#         start_date = datetime.fromisoformat(request.form.get("start_date"))
+#         end_date = datetime.fromisoformat(request.form.get("end_date"))
+        
+#         current_datetime = datetime.now().replace(second=0, microsecond=0, minute=0, hour=0)
+
+#         if start_date < current_datetime:
+#             return render_template("available_cars.html", error="Дата начала бронирования не может быть раньше текущей даты")
+
+#         if start_date >= end_date:
+
+#             return render_template("available_cars.html", error="Дата начала не может быть больше даты окончания бронирования "), 400
+
+#         available_cars = Car.query.filter(~Car.bookings.any(
+#             (Booking.start_date <= end_date) & (Booking.end_date >= start_date)
+#         )).all()
+
+#         for car in available_cars:
+#             last_booking = Booking.query.filter(
+#                 Booking.car_id == car.id,
+#                 Booking.end_date < start_date
+#             ).order_by(Booking.end_date.desc()).first()
+
+#             if last_booking:
+#                 last_booking.start_date_formatted = last_booking.start_date.strftime("%d.%m.%Y %H:%M")
+#                 last_booking.end_date_formatted = last_booking.end_date.strftime("%d.%m.%Y %H:%M")
+
+#                 car.last_booking_info = last_booking
+
+#             next_booking = Booking.query.filter(
+#                 Booking.car_id == car.id,
+#                 Booking.start_date >= end_date
+#             ).order_by(Booking.start_date.asc()).first()
+
+#             if next_booking:
+#                 next_booking.start_date_formatted = next_booking.start_date.strftime("%d.%m.%Y %H:%M")
+#                 next_booking.end_date_formatted = next_booking.end_date.strftime("%d.%m.%Y %H:%M")
+
+#                 car.next_booking_info = next_booking
+
+#         start_date_formatted = start_date.strftime("%d.%m.%Y %H:%M")
+#         end_date_formatted = end_date.strftime("%d.%m.%Y %H:%M")
+        
+#         return render_template("available_cars.html", cars=available_cars, start_date=start_date_formatted, end_date=end_date_formatted)
+#     else:
+#         return render_template("available_cars.html")
+
+
 @app.route("/search_cars", methods=["GET", "POST"])
 def search_cars():
-    if request.method == "POST":
-        start_date = datetime.fromisoformat(request.form.get("start_date"))
-        end_date = datetime.fromisoformat(request.form.get("end_date"))
+    form = SearchCarsForm()
+    if form.validate_on_submit():
+        start_date = form.start_date.data
+        end_date = form.end_date.data
 
-        # Находим доступные автомобили на заданный период
-        available_cars = Car.query.filter(~Car.bookings.any(
-            (Booking.start_date <= end_date) & (Booking.end_date >= start_date)
-        )).all()
-
-        # Для каждого автомобиля находим последнее бронирование перед start_date
-        for car in available_cars:
-            last_booking = Booking.query.filter(
-                Booking.car_id == car.id,
-                Booking.end_date < start_date
-            ).order_by(Booking.end_date.desc()).first()
-
-            if last_booking:
-                # Форматируем даты последнего бронирования
-                last_booking.start_date_formatted = last_booking.start_date.strftime("%d.%m.%Y %H:%M")
-                last_booking.end_date_formatted = last_booking.end_date.strftime("%d.%m.%Y %H:%M")
-
-                # Добавляем информацию о последнем бронировании к объекту автомобиля
-                car.last_booking_info = last_booking
-
-            # Находим следующее бронирование после end_date
-            next_booking = Booking.query.filter(
-                Booking.car_id == car.id,
-                Booking.start_date >= end_date
-            ).order_by(Booking.start_date.asc()).first()
-
-            if next_booking:
-                # Форматируем даты следующего бронирования
-                next_booking.start_date_formatted = next_booking.start_date.strftime("%d.%m.%Y %H:%M")
-                next_booking.end_date_formatted = next_booking.end_date.strftime("%d.%m.%Y %H:%M")
-
-                # Добавляем информацию о следующем бронировании к объекту автомобиля
-                car.next_booking_info = next_booking
-
-        start_date_formatted = start_date.strftime("%d.%m.%Y %H:%M")
-        end_date_formatted = end_date.strftime("%d.%m.%Y %H:%M")
-        
-        return render_template("available_cars.html", cars=available_cars, start_date=start_date_formatted, end_date=end_date_formatted)
+        return search_cars_post(start_date, end_date, form)
     else:
-        # Если метод GET, просто отображаем форму без автомобилей
-        return render_template("available_cars.html")
+        return render_template("available_cars.html", form=form)
+
+
+def search_cars_post(start_date, end_date, form):
+    start_date = datetime.combine(start_date, datetime.min.time())
+    end_date = datetime.combine(end_date, datetime.max.time())
+
+    available_cars = get_available_cars(start_date, end_date)
+
+    start_date_formatted = start_date.strftime("%d.%m.%Y %H:%M")
+    end_date_formatted = end_date.strftime("%d.%m.%Y %H:%M")
+    
+    return render_template("available_cars.html", cars=available_cars, start_date=start_date_formatted, end_date=end_date_formatted, form=form)
+
+
+def get_available_cars(start_date, end_date):
+    available_cars = Car.query.filter(~Car.bookings.any(
+        (Booking.start_date <= end_date) & (Booking.end_date >= start_date)
+    )).all()
+
+    for car in available_cars:
+        last_booking = get_last_booking(car.id, start_date)
+        if last_booking:
+            car.last_booking_info = format_booking_dates(last_booking)
+
+        next_booking = get_next_booking(car.id, end_date)
+        if next_booking:
+            car.next_booking_info = format_booking_dates(next_booking)
+
+    return available_cars
+
+def get_last_booking(car_id, start_date):
+    return Booking.query.filter(
+        Booking.car_id == car_id,
+        Booking.end_date < start_date
+    ).order_by(Booking.end_date.desc()).first()
+
+def get_next_booking(car_id, end_date):
+    return Booking.query.filter(
+        Booking.car_id == car_id,
+        Booking.start_date >= end_date
+    ).order_by(Booking.start_date.asc()).first()
+
+def format_booking_dates(booking):
+    booking.start_date_formatted = booking.start_date.strftime("%d.%m.%Y %H:%M")
+    booking.end_date_formatted = booking.end_date.strftime("%d.%m.%Y %H:%M")
+    
+    return booking
 
