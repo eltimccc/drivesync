@@ -1,33 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Горизонтальная таблица с фиксированным скролл-баром</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Стиль для привязки к низу */
-        .table-wrapper {
-            overflow-x: auto;
-            max-height: 80vh; /* Опционально, чтобы не занимала весь экран */
-        }
-        .today {
-            background-color: #ffff99; /* Цвет фона для текущей даты */
-        }
-        .year {
-            font-size: larger;
-            font-weight: bold;
-            text-align: center;
-            display: inline-block;
-            margin-right: 10px;
-        }
-        .month {
-            font-size: larger;
-            font-weight: bold;
-            text-align: center;
-            display: inline-block;
-        }
-    </style>
+<style>
+    .table {
+        width: 100%; /* Занимает всю ширину контейнера */
+        border-collapse: collapse; /* Убирает двойные границы между ячейками */
+    }
+
+    .table, .table th, .table td {
+        border: 1px solid black; /* Добавляет границы для таблицы, заголовков и ячеек */
+    }
+
+    .table th, .table td {
+        padding: 8px; /* Добавляет отступы внутри ячеек */
+        text-align: left; /* Выравнивание текста в ячейках */
+    }
+
+    .table th {
+        background-color: #f2f2f2; /* Цвет фона для заголовков таблицы */
+    }
+</style>
 </head>
 <body>
 <div class="container">
@@ -41,22 +33,29 @@
         <table class="table table-striped">
             <thead>
             <tr id="calendar-header">
-                
+                <th>Автомобили</th>
                 {% for date in dates %}
-    <th {% if date == today.strftime("%a, %d, %Y ") %}class="today"{% endif %}>{{ date }}</th>
-{% endfor %}
-                
+                <th {% if date == today.strftime("%a, %d, %Y ") %}class="today"{% endif %}>{{ date }}</th>
+                {% endfor %}
             </tr>
             </thead>
             <tbody id="table-body">
-            <!-- Здесь будет содержимое ячеек -->
+            {% for car in cars %}
+            <tr>
+                <td>{{ car }}</td>
+                {% for date in dates %}
+                <td></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
-    <th><button onclick="scrollBack()">Назад</button></th>
-    
-    <th><button onclick="scrollForward()">Вперед</button></th>
 </div>
+
+
+
+
 
 <!-- Скрипт Bootstrap и jQuery для взаимодействия с прокруткой -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -64,6 +63,46 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <!-- Наш кастомный скрипт для прокрутки -->
+<script>
+$(document).ready(function() {
+    // Функция для обновления года и месяца
+    function updateYearAndMonth() {
+        // Находим видимые ячейки заголовка таблицы
+        var visibleThs = $('#table-wrapper th').filter(function() {
+            var $th = $(this);
+            var thOffset = $th.offset().left;
+            var scrollWrapperOffset = $('#table-wrapper').offset().left;
+            var scrollWrapperWidth = $('#table-wrapper').width();
+            // Проверяем, видна ли ячейка
+            return thOffset >= scrollWrapperOffset && thOffset <= (scrollWrapperOffset + scrollWrapperWidth);
+        });
+
+        if (visibleThs.length > 0) {
+            // Берём дату из первой видимой ячейки
+            var firstVisibleDate = $(visibleThs[0]).text().trim();
+            var dateParts = firstVisibleDate.split('-'); // Предполагается формат YYYY-MM-DD
+
+            if (dateParts.length === 3) {
+                var year = dateParts[0];
+                var month = dateParts[1];
+
+                // Обновляем содержимое .year и .month
+                $('.year').text(year);
+                $('.month').text(month); // Здесь можно добавить логику для преобразования номера месяца в название
+            }
+        }
+    }
+
+    // Вызываем функцию при первой загрузке страницы
+    updateYearAndMonth();
+
+    // Обновляем год и месяц при прокрутке
+    $('#table-wrapper').scroll(function() {
+        updateYearAndMonth();
+    });
+});
+</script>
+
 <script>
     function scrollBack() {
         document.getElementById('table-wrapper').scrollLeft -= 100; // Изменяем значение в соответствии с вашими потребностями

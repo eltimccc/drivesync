@@ -1,45 +1,42 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
       <h4 class="text-center mb-3">
-        Редактирование информации о машине №{{ car.id }}
+        Редактирование информации о машине {{ car.brand }} {{ car.car_number }}
       </h4>
       <form method="POST">
+        {{ form.csrf_token }}
         <div class="form-group">
-          <label for="brand">Марка:</label>
-          <input
-            type="text"
-            class="form-control"
-            id="brand"
-            name="brand"
-            value="{{ car.brand }}"
-            required
-          />
+          {{ form.brand.label(class="form-label") }}
+          {{ form.brand(class="form-control") }}
+          {% for error in form.brand.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
         </div>
         <div class="form-group">
-          <label for="car_number">Номер машины:</label>
-          <input
-            type="text"
-            class="form-control"
-            id="car_number"
-            name="car_number"
-            value="{{ car.car_number }}"
-            required
-          />
+          {{ form.car_number.label(class="form-label") }}
+          {{ form.car_number(class="form-control") }}
+          {% for error in form.car_number.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
         </div>
         <div class="form-group">
-          <label for="is_deleted">Удалена:</label>
-          <select class="form-control" id="is_deleted" name="is_deleted">
-            <option value="0" {% if not car.is_deleted %}selected{% endif %}>
-              Нет
-            </option>
-            <option value="1" {% if car.is_deleted %}selected{% endif %}>
-              Да
-            </option>
-          </select>
+          {{ form.transmission.label(class="form-label") }}
+          {{ form.transmission(class="form-control") }}
+          {% for error in form.transmission.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
         </div>
-        <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
+        <div class="form-group">
+          {{ form.is_deleted.label(class="form-label") }}
+          {{ form.is_deleted(class="form-control") }}
+          {% for error in form.is_deleted.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {{ form.submit(class="btn btn-primary btn-sm") }}
       </form>
       <form
         method="post"
