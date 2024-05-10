@@ -15,6 +15,7 @@ BOOKING_STATUSES = {
 }
 
 
+
 def add_booking_post():
     try:
         start_datetime = request.form.get("start_datetime")

@@ -1,0 +1,76 @@
+{% extends 'base.html' %} {% block title %} Доступные автомобили {% endblock %}
+{% block content %}
+    <style>
+        .form-row > div {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+        .car-card {
+            margin-bottom: 20px;
+        }
+        .availability-info {
+            text-align: center;
+        }
+        .booking-info {
+            padding: 10px;
+            background-color: #f8f9fa;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+    <h3 class="mb-4">Поиск доступных автомобилей</h3>
+    <form action="/search_cars" method="post">
+        <div class="form-row">
+            <div class="col">
+                <label for="start_date">Дата и время начала аренды:</label>
+                <input type="datetime-local" id="start_date" name="start_date" class="form-control" required>
+            </div>
+            <div class="col">
+                <label for="end_date">Дата и время окончания аренды:</label>
+                <input type="datetime-local" id="end_date" name="end_date" class="form-control" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Поиск</button>
+    </form>
+
+    {% if cars %}
+        <h3 class="mt-5">Доступные автомобили с {{ start_date }} по {{ end_date }}</h3>
+        <div class="row">
+            {% for car in cars %}
+                <div class="col-md-6 mb-4">
+                    <div class="card car-card" style="max-width: 500px;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ car.brand }}  {{ car.car_number }}; {{ car.transmission }}</h5>
+                            <p class="card-text availability-info alert alert-success">Доступен с {{ start_date }} по {{ end_date }}</p>
+                            {% if car.last_booking_info %}
+                                <div class="booking-info">
+                                    <div>Последнее бронирование:</div>
+                                    <div><a href="{{ url_for('view_booking', booking_id=car.last_booking_info.id) }}">с {{ car.last_booking_info.start_date_formatted }} по {{ car.last_booking_info.end_date_formatted }}</a></div>
+                                </div>
+                            {% else %}
+                                <div class="booking-info">
+                                <p class="card-text">Нет предыдущих бронирований</p>
+                                </div>
+                            {% endif %}
+                            {% if car.next_booking_info %}
+                                <div class="booking-info">
+                                    <div>Следующее бронирование:</div>
+                                    <div><a href="{{ url_for('view_booking', booking_id=car.next_booking_info.id) }}">с {{ car.next_booking_info.start_date_formatted }} по {{ car.next_booking_info.end_date_formatted }}</a></div>
+                                </div>
+                            {% else %}
+                                <div class="booking-info">
+                                    <p class="card-text">Нет следующих бронирований</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Нет доступных автомобилей на выбранные даты.</p>
+    {% endif %}
+</div>
+{% endblock %}

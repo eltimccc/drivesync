@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import and_
 from app import app, db
-from forms import BookingForm, CarForm
+from forms import BookingForm, CarForm, EditCarForm
 from models import Booking, Car
 from utils import BOOKING_STATUSES, add_booking_get, add_booking_post
 from validators import validate_booking_data
@@ -61,52 +61,6 @@ def delete_booking(booking_id):
     return redirect(url_for("get_bookings"))
 
 
-# @app.route("/booking/<int:booking_id>/edit", methods=["GET", "POST"])
-# def edit_booking(booking_id):
-#     booking = Booking.query.get_or_404(booking_id)
-#     cars = Car.query.all()
-#     status_choices = list(BOOKING_STATUSES.keys())
-
-#     if request.method == "POST":
-#         try:
-#             description = request.form["description"]
-#             phone = request.form["phone"]
-#             start_date = datetime.strptime(request.form["start_date"], "%Y-%m-%dT%H:%M")
-#             end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%dT%H:%M")
-#             car_id = request.form.get("car")
-#             car = Car.query.get(car_id)
-#             new_status = request.form.get("status")
-
-#             validate_booking_data(start_date, end_date, car)
-
-#             booking.description = description
-#             booking.phone = phone
-#             booking.start_date = start_date
-#             booking.end_date = end_date
-#             booking.car = car
-
-#             if new_status in status_choices:
-#                 booking.status = new_status
-#                 booking.color = BOOKING_STATUSES[new_status]
-#                 if booking.color == BOOKING_STATUSES["Отказ"]:
-#                     booking.end_date = booking.start_date
-
-#             db.session.commit()
-#             flash("Бронирование успешно обновлено", "success")
-#             return redirect(url_for("get_bookings", booking_id=booking.id))
-
-#         except ValueError as e:
-#             flash(str(e), "error")
-#             return redirect(url_for("edit_booking", booking_id=booking_id))
-
-
-#     return render_template(
-#         "edit_booking.html",
-#         booking=booking,
-#         cars=cars,
-#         status_choices=status_choices,
-#         booking_statuses=BOOKING_STATUSES,
-#     )
 @app.route("/booking/<int:booking_id>/edit", methods=["GET", "POST"])
 def edit_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
@@ -124,7 +78,7 @@ def edit_booking(booking_id):
             car = Car.query.get(car_id)
             new_status = request.form.get("status")
 
-            validate_booking_data(start_date, end_date, car)
+            # validate_booking_data(start_date, end_date, car)
 
             booking.description = description
             booking.phone = phone
@@ -163,6 +117,7 @@ def add_car():
             new_car = Car(
                 brand=form.brand.data,
                 car_number=form.car_number.data,
+                transmission=form.transmission.data,
             )
             db.session.add(new_car)
             db.session.commit()
@@ -203,19 +158,30 @@ def car_detail(car_id):
     return render_template("car_detail.html", car=car, bookings=bookings)
 
 
+# @app.route("/cars/<int:car_id>/edit", methods=["GET", "POST"])
+# def edit_car(car_id):
+#     car = Car.query.get_or_404(car_id)
+#     if request.method == "POST":
+#         car.brand = request.form["brand"]
+#         car.car_number = request.form["car_number"]
+#         car.transmission = request.form["transmission"]
+
+#         is_deleted = request.form.get("is_deleted", "0")
+#         car.is_deleted = is_deleted == "1"
+
+#         db.session.commit()
+#         return redirect(url_for("get_cars"))
+#     return render_template("edit_car.html", car=car)
+
 @app.route("/cars/<int:car_id>/edit", methods=["GET", "POST"])
 def edit_car(car_id):
     car = Car.query.get_or_404(car_id)
-    if request.method == "POST":
-        car.brand = request.form["brand"]
-        car.car_number = request.form["car_number"]
-
-        is_deleted = request.form.get("is_deleted", "0")
-        car.is_deleted = is_deleted == "1"
-
+    form = EditCarForm(obj=car)
+    if form.validate_on_submit():
+        form.populate_obj(car)
         db.session.commit()
         return redirect(url_for("get_cars"))
-    return render_template("edit_car.html", car=car)
+    return render_template("edit_car.html", form=form, car=car)
 
 
 @app.route("/cars/<int:car_id>/delete", methods=["POST"])
@@ -238,11 +204,6 @@ def view_booking(booking_id):
         return render_template(
             "view_booking.html", booking=booking, status_color=status_color
         )
-
-
-@app.route("/me", methods=["GET"])
-def get_me():
-    return render_template("index.html")
 
 
 @app.template_filter("month_name")
@@ -310,6 +271,7 @@ def q():
     today = datetime.today()
     current_year = today.year
     current_month = today.strftime("%B")
+    cars = Car.query.all()
 
     return render_template(
         "q.html",
@@ -317,6 +279,7 @@ def q():
         today=today,
         current_year=current_year,
         current_month=current_month,
+        cars=cars,
     )
 
 
@@ -473,3 +436,53 @@ def report_booking_duration():
 @app.route("/reports_page", methods=["GET"])
 def reports_page():
     return render_template("reports/reports.html")
+
+
+@app.route("/search_cars", methods=["GET", "POST"])
+def search_cars():
+    if request.method == "POST":
+        start_date = datetime.fromisoformat(request.form.get("start_date"))
+        end_date = datetime.fromisoformat(request.form.get("end_date"))
+
+        # Находим доступные автомобили на заданный период
+        available_cars = Car.query.filter(~Car.bookings.any(
+            (Booking.start_date <= end_date) & (Booking.end_date >= start_date)
+        )).all()
+
+        # Для каждого автомобиля находим последнее бронирование перед start_date
+        for car in available_cars:
+            last_booking = Booking.query.filter(
+                Booking.car_id == car.id,
+                Booking.end_date < start_date
+            ).order_by(Booking.end_date.desc()).first()
+
+            if last_booking:
+                # Форматируем даты последнего бронирования
+                last_booking.start_date_formatted = last_booking.start_date.strftime("%d.%m.%Y %H:%M")
+                last_booking.end_date_formatted = last_booking.end_date.strftime("%d.%m.%Y %H:%M")
+
+                # Добавляем информацию о последнем бронировании к объекту автомобиля
+                car.last_booking_info = last_booking
+
+            # Находим следующее бронирование после end_date
+            next_booking = Booking.query.filter(
+                Booking.car_id == car.id,
+                Booking.start_date >= end_date
+            ).order_by(Booking.start_date.asc()).first()
+
+            if next_booking:
+                # Форматируем даты следующего бронирования
+                next_booking.start_date_formatted = next_booking.start_date.strftime("%d.%m.%Y %H:%M")
+                next_booking.end_date_formatted = next_booking.end_date.strftime("%d.%m.%Y %H:%M")
+
+                # Добавляем информацию о следующем бронировании к объекту автомобиля
+                car.next_booking_info = next_booking
+
+        start_date_formatted = start_date.strftime("%d.%m.%Y %H:%M")
+        end_date_formatted = end_date.strftime("%d.%m.%Y %H:%M")
+        
+        return render_template("available_cars.html", cars=available_cars, start_date=start_date_formatted, end_date=end_date_formatted)
+    else:
+        # Если метод GET, просто отображаем форму без автомобилей
+        return render_template("available_cars.html")
+
