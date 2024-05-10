@@ -3,6 +3,8 @@ import re
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
+    DateField,
+    DateTimeLocalField,
     SelectField,
     StringField,
     DateTimeField,
@@ -78,3 +80,18 @@ class BookingForm(FlaskForm):
     description = StringField("Описание")
     phone = StringField("Телефон", validators=[DataRequired()])
     submit = SubmitField("Забронировать")
+
+
+class SearchCarsForm(FlaskForm):
+    start_date = DateTimeLocalField('Дата и время начала', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
+    end_date = DateTimeLocalField('Дата и время окончания', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
+    submit = SubmitField('Поиск')
+
+    def validate_end_datetime(form, field):
+        if field.data <= form.start_date.data:
+            raise ValidationError("Дата и время окончания должны быть позже даты и времени начала.")
+
+    def validate_start_datetime(form, field):
+        if field.data < datetime.now():
+            raise ValidationError("Дата и время начала не могут быть в прошлом.")
+
