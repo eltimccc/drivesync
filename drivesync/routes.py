@@ -1,5 +1,4 @@
 from collections import defaultdict
-from datetime import date
 import calendar
 from flask import (
     flash,
@@ -11,12 +10,12 @@ from flask import (
 )
 from datetime import datetime, timedelta
 
-from sqlalchemy import and_, or_
-from app import app, db
-from forms import BookingForm, CarForm, EditCarForm, SearchCarsForm
-from models import Booking, Car
-from utils import BOOKING_STATUSES, add_booking_get, add_booking_post, enrich_car_with_bookings, get_available_cars
-from validators import validate_booking_data
+from sqlalchemy import and_
+from drivesync.app import app, db
+from drivesync.forms import BookingForm, CarForm, EditCarForm, SearchCarsForm
+from drivesync.models import Booking, Car
+from drivesync.utils import BOOKING_STATUSES, add_booking_get, add_booking_post, get_available_cars
+from drivesync.validators import validate_booking_data, validate_dates
 
 
 @app.route("/", methods=["GET"])
@@ -78,7 +77,7 @@ def edit_booking(booking_id):
             car = Car.query.get(car_id)
             new_status = request.form.get("status")
 
-            # validate_booking_data(start_date, end_date, car)
+            # validate_dates(start_date, end_date)
 
             booking.description = description
             booking.phone = phone
@@ -157,21 +156,6 @@ def car_detail(car_id):
 
     return render_template("car_detail.html", car=car, bookings=bookings)
 
-
-# @app.route("/cars/<int:car_id>/edit", methods=["GET", "POST"])
-# def edit_car(car_id):
-#     car = Car.query.get_or_404(car_id)
-#     if request.method == "POST":
-#         car.brand = request.form["brand"]
-#         car.car_number = request.form["car_number"]
-#         car.transmission = request.form["transmission"]
-
-#         is_deleted = request.form.get("is_deleted", "0")
-#         car.is_deleted = is_deleted == "1"
-
-#         db.session.commit()
-#         return redirect(url_for("get_cars"))
-#     return render_template("edit_car.html", car=car)
 
 @app.route("/cars/<int:car_id>/edit", methods=["GET", "POST"])
 def edit_car(car_id):
@@ -438,56 +422,6 @@ def reports_page():
     return render_template("reports/reports.html")
 
 
-# @app.route("/search_cars", methods=["GET", "POST"])
-# def search_cars():
-#     if request.method == "POST":
-#         start_date = datetime.fromisoformat(request.form.get("start_date"))
-#         end_date = datetime.fromisoformat(request.form.get("end_date"))
-        
-#         current_datetime = datetime.now().replace(second=0, microsecond=0, minute=0, hour=0)
-
-#         if start_date < current_datetime:
-#             return render_template("available_cars.html", error="Дата начала бронирования не может быть раньше текущей даты")
-
-#         if start_date >= end_date:
-
-#             return render_template("available_cars.html", error="Дата начала не может быть больше даты окончания бронирования "), 400
-
-#         available_cars = Car.query.filter(~Car.bookings.any(
-#             (Booking.start_date <= end_date) & (Booking.end_date >= start_date)
-#         )).all()
-
-#         for car in available_cars:
-#             last_booking = Booking.query.filter(
-#                 Booking.car_id == car.id,
-#                 Booking.end_date < start_date
-#             ).order_by(Booking.end_date.desc()).first()
-
-#             if last_booking:
-#                 last_booking.start_date_formatted = last_booking.start_date.strftime("%d.%m.%Y %H:%M")
-#                 last_booking.end_date_formatted = last_booking.end_date.strftime("%d.%m.%Y %H:%M")
-
-#                 car.last_booking_info = last_booking
-
-#             next_booking = Booking.query.filter(
-#                 Booking.car_id == car.id,
-#                 Booking.start_date >= end_date
-#             ).order_by(Booking.start_date.asc()).first()
-
-#             if next_booking:
-#                 next_booking.start_date_formatted = next_booking.start_date.strftime("%d.%m.%Y %H:%M")
-#                 next_booking.end_date_formatted = next_booking.end_date.strftime("%d.%m.%Y %H:%M")
-
-#                 car.next_booking_info = next_booking
-
-#         start_date_formatted = start_date.strftime("%d.%m.%Y %H:%M")
-#         end_date_formatted = end_date.strftime("%d.%m.%Y %H:%M")
-        
-#         return render_template("available_cars.html", cars=available_cars, start_date=start_date_formatted, end_date=end_date_formatted)
-#     else:
-#         return render_template("available_cars.html")
-
-
 @app.route("/search_cars", methods=["GET", "POST"])
 def search_cars():
     form = SearchCarsForm()
@@ -497,12 +431,11 @@ def search_cars():
 
         return search_cars_post(start_date, end_date, form)
     else:
-        return render_template("available_cars.html", form=form)
+        errors = form.errors
+        return render_template("available_cars.html", form=form, errors=errors)
 
 
 def search_cars_post(start_date, end_date, form):
-    start_date = datetime.combine(start_date, datetime.min.time())
-    end_date = datetime.combine(end_date, datetime.max.time())
 
     available_cars = get_available_cars(start_date, end_date)
 

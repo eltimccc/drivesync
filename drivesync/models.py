@@ -1,4 +1,4 @@
-from app import db
+from drivesync.app import db
 
 
 class Car(db.Model):
