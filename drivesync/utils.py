@@ -2,10 +2,10 @@ from datetime import datetime
 
 from flask import jsonify, redirect, render_template, request, url_for
 
-from forms import BookingForm
-from models import Booking, Car
-from app import db
-from validators import validate_booking_data
+from drivesync.forms import BookingForm
+from drivesync.models import Booking, Car
+from drivesync.app import db
+from drivesync.validators import validate_booking_data
 
 BOOKING_STATUSES = {
     "Аренда": "#007bff",  # Синий цвет

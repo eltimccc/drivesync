@@ -1,5 +1,5 @@
-from app import app, db  # Импортируем объект app из вашего модуля app.py
-from models import Car
+from drivesync.app import app, db  # Импортируем объект app из вашего модуля app.py
+from drivesync.models import Car
 
 
 def add_cars():
