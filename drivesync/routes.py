@@ -52,12 +52,18 @@ def add_booking():
         return add_booking_get()
 
 
-@app.route("/delete_booking/<int:booking_id>/", methods=["POST"])
-def delete_booking(booking_id):
+@app.route("/booking/<int:booking_id>", methods=["GET"])
+def view_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
-    db.session.delete(booking)
-    db.session.commit()
-    return redirect(url_for("get_bookings"))
+    status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return render_template(
+            "view_booking_modal.html", booking=booking, status_color=status_color
+        )
+    else:
+        return render_template(
+            "view_booking.html", booking=booking, status_color=status_color
+        )
 
 
 @app.route("/booking/<int:booking_id>/edit", methods=["GET", "POST"])
@@ -106,6 +112,14 @@ def edit_booking(booking_id):
         booking_statuses=BOOKING_STATUSES,
         errors=errors,
     )
+
+
+@app.route("/delete_booking/<int:booking_id>/", methods=["POST"])
+def delete_booking(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    db.session.delete(booking)
+    db.session.commit()
+    return redirect(url_for("get_bookings"))
 
 
 @app.route("/add_car", methods=["GET", "POST"])
@@ -174,97 +188,6 @@ def delete_car(car_id):
     car.is_deleted = True
     db.session.commit()
     return redirect(url_for("get_cars"))
-
-
-@app.route("/booking/<int:booking_id>", methods=["GET"])
-def view_booking(booking_id):
-    booking = Booking.query.get_or_404(booking_id)
-    status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
-    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        return render_template(
-            "view_booking_modal.html", booking=booking, status_color=status_color
-        )
-    else:
-        return render_template(
-            "view_booking.html", booking=booking, status_color=status_color
-        )
-
-
-@app.template_filter("month_name")
-def month_name(month_number):
-    return calendar.month_name[month_number]
-
-
-@app.route("/c")
-def booking_calendar():
-    cars = Car.query.all()
-    bookings = Booking.query.all()
-
-    current_date = datetime.now()
-
-    num_months = 12
-    months = []
-    for i in range(num_months):
-        year = current_date.year
-        month = current_date.month + i
-        if month > 12:
-            month -= 12
-            year += 1
-        days_in_month = calendar.monthrange(year, month)[1]
-        months.append(
-            {
-                "year": year,
-                "month": month,
-                "days": range(1, days_in_month + 1),
-                "name": calendar.month_name[month],
-            }
-        )
-
-    return render_template(
-        "booking_table.html",
-        cars=cars,
-        bookings=bookings,
-        months=months,
-        num_months=num_months,
-        booking_statuses_colors=BOOKING_STATUSES,
-    )
-
-
-def generate_dates():
-    today = datetime.today()
-    start_date_past = today - timedelta(days=365)
-    end_date_future = today + timedelta(days=183)
-
-    dates = []
-
-    while start_date_past < today:
-        dates.append(start_date_past.strftime("%a, %d, %Y "))
-
-        start_date_past += timedelta(days=1)
-
-    while today < end_date_future:
-        dates.append(today.strftime("%a, %d, %Y"))
-        today += timedelta(days=1)
-
-    return dates
-
-
-@app.route("/q", methods=["GET"])
-def q():
-    dates = generate_dates()
-    today = datetime.today()
-    current_year = today.year
-    current_month = today.strftime("%B")
-    cars = Car.query.all()
-
-    return render_template(
-        "q.html",
-        dates=dates,
-        today=today,
-        current_year=current_year,
-        current_month=current_month,
-        cars=cars,
-    )
 
 
 @app.route("/report_all_bookings", methods=["GET", "POST"])
@@ -448,7 +371,7 @@ def search_cars_post(start_date, end_date, form):
 def get_available_cars(start_date, end_date):
     available_cars = Car.query.filter(~Car.bookings.any(
         (Booking.start_date <= end_date) & (Booking.end_date >= start_date)
-    )).all()
+    )).filter_by(is_deleted=False).all()
 
     for car in available_cars:
         last_booking = get_last_booking(car.id, start_date)
