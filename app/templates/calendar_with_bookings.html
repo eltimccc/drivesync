@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendar</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+    <style>
+      #calendar {
+        width: 100%;
+        height: 80vh;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    {% extends 'base.html' %} {% block content %}
+    <div class="mt-4">
+      <h4 class="text-center mb-3">Календарь бронирований</h4>
+      <a
+        href="{{ url_for('booking.add_booking') }}"
+        class="btn btn-success btn-sm mt-2 text-white"
+        >Добавить бронь</a
+      >
+      <a
+        href="report/search_cars"
+        class="btn btn-warning btn-sm mt-2"
+        style="color: white; text-decoration: none; display: inline-block"
+        >Доступные автомобили</a
+      >
+      <a
+        href="/car/cars"
+        class="btn btn-info btn-sm mt-2"
+        style="color: white; text-decoration: none; display: inline-block"
+        >Все машины</a
+      >
+      <a
+        href="report/reports_page"
+        class="btn btn-secondary btn-sm mt-2 text-white"
+        style="text-decoration: none; display: inline-block"
+        >Отчеты</a
+      >
+      <div id="calendar"></div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="bookingModal"
+      tabindex="-1"
+      aria-labelledby="bookingModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <!-- содержимое страницы бронирования -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+          document.addEventListener('DOMContentLoaded', function() {
+              var calendarEl = document.getElementById('calendar');
+
+              var calendar = new FullCalendar.Calendar(calendarEl, {
+                  initialView: 'dayGridWeek',
+                  events: [
+                      {% for booking in bookings %}
+                      {
+                          title: '{{ booking.car }}',
+                          start: '{{ booking.start }}',
+                          end: '{{ booking.end }}',
+                          url: '{{ url_for("booking.view_booking", booking_id=booking.id) }}',
+                          color: '{{ booking.status_color }}'
+                      }{% if not loop.last %},{% endif %}
+                      {% endfor %}
+                  ],
+                  headerToolbar: {
+                      left: 'prev,next today',
+                      center: 'title',
+                      right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek'
+                  },
+                  eventClick: function(info) {
+                      info.jsEvent.preventDefault();
+                      $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
+                  },
+                  dateClick: function(info) {
+                      calendar.gotoDate(info.date);
+                      calendar.changeView('dayGridDay');
+                  },
+                  locale: 'ru',
+                  monthNames: [
+                      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+                  ],
+                  buttonText: {
+                      month: 'Месяц',
+                      week: 'Неделя',
+                      year: 'Год',
+                      day: 'День',
+                  }
+              });
+
+              calendar.render();
+
+      });
+    </script>
+    {% endblock %}
+  </body>
+</html>
