@@ -93,6 +93,15 @@
         </div>
 
         <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
+                    <form
+              method="post"
+              action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}"
+              onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');"
+              class="d-inline-block"
+            >
+              <button type="submit" class="btn btn-danger">Удалить</button>
+            </form>
+
       </form>
     </div>
   </div>

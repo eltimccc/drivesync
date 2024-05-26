@@ -1,3 +1,6 @@
+from app.models import User
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from datetime import datetime
 import re
 from flask_wtf import FlaskForm
@@ -64,6 +67,7 @@ class EditCarForm(FlaskForm):
     def validate_car_number(form, field):
         field.data = field.data.upper()
 
+
 class BookingForm(FlaskForm):
     start_datetime = DateTimeField(
         "Дата начала бронирования", format="%Y-%m-%dT%H:%M", validators=[DataRequired()]
@@ -92,3 +96,30 @@ class SearchCarsForm(FlaskForm):
         if end_date.data <= self.start_date.data:
             raise ValidationError(
                 "Дата и время окончания должны быть позже даты и времени начала.")
+
+
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[
+                           DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[
+                                     DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('Такой пользователь уже есть.')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('Такой email уже есть.')
+
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
