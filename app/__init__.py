@@ -11,6 +11,15 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'info'
 
 
+def create_superuser():
+    from .models import User
+    if not User.query.filter_by(is_superuser=True).first():
+        hashed_password = bcrypt.generate_password_hash('superpassword').decode('utf-8')
+        superuser = User(username='admin', email='admin@example.com', password=hashed_password, is_superuser=True)
+        db.session.add(superuser)
+        db.session.commit()
+        print('Superuser created.')
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
@@ -36,5 +45,6 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        create_superuser()
 
     return app
