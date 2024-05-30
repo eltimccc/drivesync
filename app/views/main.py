@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, url_for
+from flask_login import login_required
 
 from app.models import Booking
 from app.utils.utils import BOOKING_STATUSES
@@ -8,6 +9,7 @@ main = Blueprint('main', __name__)
 
 
 @main.route("/", methods=["GET"])
+@login_required
 def get_bookings():
     bookings = Booking.query.all()
     formatted_bookings = []

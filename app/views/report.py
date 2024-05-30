@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request
+from flask_login import login_required
 from sqlalchemy import and_
 
 from app.constants import (
@@ -24,11 +25,13 @@ report_blueprint = Blueprint("report", __name__, url_prefix="/report")
 
 
 @report_blueprint.route("/reports_page", methods=["GET"])
+@login_required
 def reports_page():
     return render_template(REPORT_PAGE_TEMPLATE)
 
 
 @report_blueprint.route(REPORT_BOOKING_PERIOD_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def generate_report():
     if request.method == "POST":
         start_date_str = request.form["start_date"]
@@ -68,6 +71,7 @@ def generate_report():
 
 
 @report_blueprint.route(REPORT_RENTCAR_AMOUNT_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def report_rent_amount():
     if request.method == "POST":
         start_date_str = request.form["start_date"]
@@ -101,6 +105,7 @@ def report_rent_amount():
 
 
 @report_blueprint.route(REPORT_STATUS_RENT_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def report_status_rent():
     if request.method == "POST":
         start_date_str = request.form["start_date"]
@@ -134,6 +139,7 @@ def report_status_rent():
 
 
 @report_blueprint.route(REPORT_BOOKING_DURATION_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def report_booking_duration():
     if request.method == "POST":
         start_date_str = request.form["start_date"]
@@ -179,6 +185,7 @@ def report_booking_duration():
 
 
 @report_blueprint.route(SEARCH_CARS_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def search_cars():
     form = SearchCarsForm()
     if request.method == "POST" and form.validate_on_submit():
