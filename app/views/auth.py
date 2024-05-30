@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, current_user, logout_user, login_required
 from app import db, bcrypt, login_manager
-from app.decorators import superuser_required
+from app.utils.decorators import superuser_required
 from app.models import User
 from app.forms import RegistrationForm, LoginForm
 
