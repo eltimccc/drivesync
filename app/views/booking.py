@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import login_required
 
 from app import db
 from app.constants import (
@@ -9,7 +10,6 @@ from app.constants import (
     BOOKING_DETAIL_TEMPLATE,
     BOOKING_EDIT_BP_ROUTE,
     BOOKING_EDIT_TEMPLATE,
-    BOOKING_GET_ROUTE,
     BOOKING_MAIN_ROUTE,
     BOOKING_VIEW_BOOKING_ROUTE,
     BOOKING_VIEW_BP_ROUTE,
@@ -22,6 +22,7 @@ booking_blueprint = Blueprint("booking", __name__, url_prefix="/booking")
 
 
 @booking_blueprint.route(BOOKING_VIEW_BP_ROUTE, methods=["GET"])
+@login_required
 def view_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
@@ -36,6 +37,7 @@ def view_booking(booking_id):
 
 
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def add_booking():
     if request.method == "POST":
         return add_booking_post()
@@ -44,6 +46,7 @@ def add_booking():
 
 
 @booking_blueprint.route(BOOKING_EDIT_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def edit_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     cars = Car.query.filter_by(is_deleted=False).all()
@@ -92,6 +95,7 @@ def edit_booking(booking_id):
 
 
 @booking_blueprint.route(BOOKING_DELETE_BP_ROUTE, methods=["POST"])
+@login_required
 def delete_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     db.session.delete(booking)

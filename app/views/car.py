@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from flask_login import login_required
 
 from app.constants import (
     CAR_ADD_BP_ROUTE,
@@ -22,6 +23,7 @@ car_blueprint = Blueprint("car", __name__, url_prefix="/car")
 
 
 @car_blueprint.route(CAR_ADD_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def add_car():
     form = CarForm()
     if form.validate_on_submit() and request.method == "POST":
@@ -50,6 +52,7 @@ def add_car():
 
 
 @car_blueprint.route(CARS_BP_ROUTE)
+@login_required
 def get_cars():
     is_deleted_param = request.args.get("is_deleted")
 
@@ -62,6 +65,7 @@ def get_cars():
 
 
 @car_blueprint.route(CAR_DETAIL_BP_ROUTE)
+@login_required
 def car_detail(car_id):
     car = Car.query.get(car_id)
 
@@ -71,6 +75,7 @@ def car_detail(car_id):
 
 
 @car_blueprint.route(CAR_EDIT_BP_ROUTE, methods=["GET", "POST"])
+@login_required
 def edit_car(car_id):
     car = Car.query.get_or_404(car_id)
     form = EditCarForm(obj=car)
@@ -82,6 +87,7 @@ def edit_car(car_id):
 
 
 @car_blueprint.route(CAR_DELETE_BP_ROUTE, methods=["POST"])
+@login_required
 def delete_car(car_id):
     car = Car.query.get_or_404(car_id)
     car.is_deleted = True
