@@ -211,7 +211,10 @@ def handle_search_cars_post(start_date, end_date, form):
 def fetch_available_cars(start_date, end_date):
     available_cars = Car.query.filter(
         ~Car.bookings.any(
-            (Booking.start_date <= end_date) & (Booking.end_date >= start_date)
+            (Booking.start_date <= end_date) & 
+            (Booking.end_date >= start_date) & 
+            (Booking.status != "Отказ") &
+            (Booking.status != "Завершено")
         )
     ).filter_by(is_deleted=False).all()
 

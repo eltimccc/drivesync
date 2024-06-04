@@ -29,13 +29,6 @@
           <span class="text-danger">{{ error }}</span>
           {% endfor %}
         </div>
-        <div class="form-group">
-          {{ form.is_deleted.label(class="form-label") }}
-          {{ form.is_deleted(class="form-control") }}
-          {% for error in form.is_deleted.errors %}
-          <span class="text-danger">{{ error }}</span>
-          {% endfor %}
-        </div>
         {{ form.submit(class="btn btn-primary btn-sm") }}
       </form>
       <form
