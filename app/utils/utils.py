@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import jsonify, redirect, render_template, request, url_for
+from flask_login import current_user
 
 from app.constants import BOOKING_ADD_TEMPLATE, BOOKING_VIEW_BOOKING_ROUTE
 from app.forms import BookingForm
@@ -15,6 +16,35 @@ BOOKING_STATUSES = {
     "Ожидание": "#ffc107",  # Желтый цвет
 }
 
+
+# def add_booking_post():
+#     try:
+#         start_datetime = request.form.get("start_datetime")
+#         start_datetime = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M")
+
+#         end_datetime = request.form.get("end_datetime")
+#         end_datetime = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M")
+
+#         car_id = request.form.get("car")
+#         car = Car.query.get(car_id)
+#         description = request.form.get("description")
+#         phone = request.form.get("phone")
+
+#         validate_booking_data(start_datetime, end_datetime, car)
+
+#         new_booking = Booking(
+#             start_date=start_datetime,
+#             end_date=end_datetime,
+#             car=car,
+#             phone=phone,
+#             description=description,
+#         )
+#         db.session.add(new_booking)
+#         db.session.commit()
+
+#         return redirect(url_for("main.get_bookings"))
+#     except ValueError as e:
+#             return render_template(BOOKING_ADD_TEMPLATE, error=str(e)), 400
 
 def add_booking_post():
     try:
@@ -37,6 +67,7 @@ def add_booking_post():
             car=car,
             phone=phone,
             description=description,
+            user=current_user
         )
         db.session.add(new_booking)
         db.session.commit()

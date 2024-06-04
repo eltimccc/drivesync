@@ -43,6 +43,8 @@
             </div>
             <p><strong>Телефон:</strong> {{ booking.phone }}</p>
             <p><strong>Заметка:</strong> {{ booking.description }}</p>
+            <p><strong>Создал:</strong> {{ booking.user.username }}</p>
+            <p><strong>Дата создания:</strong> {{ formatted_created_at }}</p>
           </div>
           <div class="buttons">
             <a
