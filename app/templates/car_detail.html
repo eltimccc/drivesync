@@ -1,64 +1,56 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+
+
+<title>{% block title %}{{ car.brand }} {{ car.car_number }}{% endblock %}</title>
+{% block content %}
 <div class="container mt-4">
-  <h4>Информация по автомобилю</h4>
+  <h4 class="text-center mb-4">Информация по автомобилю</h4>
   <div class="row">
     <div class="col-md-6">
       <div class="card">
-        <div class="card-body car-info">
-          <p class="card-text">
-            <strong>Удалена:</strong> {{ car.is_deleted }}
-          </p>
-          <p class="card-text">
-            <strong>Марка, модель:</strong> {{ car.brand }}
-          </p>
-          <p class="card-text">
-            <strong>Гос. номер:</strong> {{ car.car_number }}
-          </p>
+        <div class="card-body">
+          <h5 class="card-title">{{ car.brand }} {{ car.transmission }} {{ car.car_number }}</h5>
         </div>
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-12 mt-4">
-      <h4>Список бронирований</h4>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Номер</th>
-            <th>Начало</th>
-            <th>Окончание</th>
-            <th>Статус</th>
-            <th>Телефон</th>
-            <th>Заметка</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for booking in bookings %}
-          <tr>
-            <td>
-              <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}"
-                >{{ booking.id }}</a
-              >
-            </td>
-            <td>
-              <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}"
-                >{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a
-              >
-            </td>
-
-            <td>
-              <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}"
-                >{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a
-              >
-            </td>
-            <td>{{ booking.status }}</td>
-            <td>{{ booking.phone }}</td>
-            <td>{{ booking.description }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  
+  <div class="row mt-5">
+    <div class="col-md-12">
+      <h4 class="text-center mb-4">Список бронирований</h4>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th>Номер</th>
+              <th>Начало</th>
+              <th>Окончание</th>
+              <th>Статус</th>
+              <th>Телефон</th>
+              <th>Заметка</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in bookings %}
+            <tr>
+              <td>
+                <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a>
+              </td>
+              <td>
+                <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a>
+              </td>
+              <td>
+                <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a>
+              </td>
+              <td>{{ booking.status }}</td>
+              <td>{{ booking.phone }}</td>
+              <td>{{ booking.description }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-  {% endblock %}
 </div>
+{% endblock %}
