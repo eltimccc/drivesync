@@ -26,13 +26,16 @@ booking_blueprint = Blueprint("booking", __name__, url_prefix="/booking")
 def view_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
+
+    formatted_created_at = booking.created_at.strftime('%d.%m.%Y %H:%M')
+    
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return render_template(
-            BOOKING_DETAIL_MODAL_TEMPLATE, booking=booking, status_color=status_color
+            BOOKING_DETAIL_MODAL_TEMPLATE, booking=booking, status_color=status_color, formatted_created_at=formatted_created_at
         )
     else:
         return render_template(
-            BOOKING_DETAIL_TEMPLATE, booking=booking, status_color=status_color
+            BOOKING_DETAIL_TEMPLATE, booking=booking, status_color=status_color, formatted_created_at=formatted_created_at
         )
 
 
