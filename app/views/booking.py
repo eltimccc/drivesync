@@ -39,6 +39,26 @@ def view_booking(booking_id):
         )
 
 
+# @booking_blueprint.route('/all_bookings', methods=["GET"])
+# @login_required
+# def all_bookings():
+#     bookings = Booking.query.all()
+#     return render_template('all_bookings.html', bookings=bookings)
+@booking_blueprint.route('/all_bookings', methods=["GET"])
+@login_required
+def all_bookings():
+    sort_by = request.args.get('sort_by', 'created_at')
+    sort_order = request.args.get('sort_order', 'desc')
+
+    if sort_order == 'desc':
+        bookings = Booking.query.order_by(getattr(Booking, sort_by).desc()).all()
+    else:
+        bookings = Booking.query.order_by(getattr(Booking, sort_by).asc()).all()
+
+    return render_template('all_bookings.html', bookings=bookings, sort_by=sort_by, sort_order=sort_order)
+
+
+
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET", "POST"])
 @login_required
 def add_booking():
