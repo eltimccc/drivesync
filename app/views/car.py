@@ -64,15 +64,28 @@ def get_cars():
     return render_template(CARS_GET, cars=cars)
 
 
-@car_blueprint.route(CAR_DETAIL_BP_ROUTE)
+# @car_blueprint.route(CAR_DETAIL_BP_ROUTE)
+# @login_required
+# def car_detail(car_id):
+#     car = Car.query.get(car_id)
+
+#     bookings = Booking.query.filter_by(car_id=car_id).all()
+
+#     return render_template(CAR_DETAIL_TEMPLATE, car=car, bookings=bookings)
+@car_blueprint.route('/car/<int:car_id>', methods=["GET"])
 @login_required
 def car_detail(car_id):
-    car = Car.query.get(car_id)
+    sort_by = request.args.get('sort_by', 'start_date')
+    sort_order = request.args.get('sort_order', 'desc')
 
-    bookings = Booking.query.filter_by(car_id=car_id).all()
+    if sort_order == 'desc':
+        bookings = Booking.query.filter_by(car_id=car_id).order_by(getattr(Booking, sort_by).desc()).all()
+    else:
+        bookings = Booking.query.filter_by(car_id=car_id).order_by(getattr(Booking, sort_by).asc()).all()
 
-    return render_template(CAR_DETAIL_TEMPLATE, car=car, bookings=bookings)
+    car = Car.query.get_or_404(car_id)
 
+    return render_template('car_detail.html', car=car, bookings=bookings, sort_by=sort_by, sort_order=sort_order)
 
 @car_blueprint.route(CAR_EDIT_BP_ROUTE, methods=["GET", "POST"])
 @login_required

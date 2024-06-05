@@ -1,59 +1,74 @@
 {% extends 'base.html' %}
 
-
 <title>{% block title %}{{ car.brand }} {{ car.car_number }}{% endblock %}</title>
+
 {% block content %}
+<style>
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #17a2b8;
+        color: white;
+        cursor: pointer;
+    }
+    .table td, .table th {
+        padding: 8px;
+        white-space: nowrap;
+    }
+    .fixed-header {
+        max-height: 83vh;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 0;
+    }
+</style>
 <div class="container mt-4">
-  <h4 class="text-center mb-4">Информация по автомобилю</h4>
-  <div class="row">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">{{ car.brand }} {{ car.transmission }} {{ car.car_number }}</h5>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="row mt-5">
-    <div class="col-md-12">
-      <h4 class="text-center mb-4">Список бронирований</h4>
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead class="thead-dark">
-            <tr>
-              <th>Номер</th>
-              <th>Начало</th>
-              <th>Окончание</th>
-              <th>Статус</th>
-              <th>Телефон</th>
-              <th>Заметка</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for booking in bookings %}
-            <tr>
-              <td>
-                <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a>
-              </td>
-              <td>
-                <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a>
-              </td>
-              <td>
-                <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a>
-              </td>
-              <td>{{ booking.status }}</td>
-              <td>{{ booking.phone }}</td>
-              <td>
-              <a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">
-              {{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
+    <h4 class="text-center">Список бронирований {{ car.brand }} {{ car.transmission }} {{ car.car_number }}</h4>
+    <div class="fixed-header">
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th data-sort="id">ID</th>
+                    <th data-sort="start_date">Начало</th>
+                    <th data-sort="end_date">Окончание</th>
+                    <th data-sort="status">Статус</th>
+                    <th data-sort="phone">Телефон</th>
+                    <th data-sort="description">Заметка</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
+                    <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
+                    <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
+                    <td>{{ booking.status }}</td>
+                    <td>{{ booking.phone }}</td>
+                    <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
-      </div>
     </div>
-  </div>
 </div>
+<script>
+    document.querySelectorAll('.table thead th').forEach(header => {
+        header.addEventListener('click', function() {
+            const sortField = this.getAttribute('data-sort');
+            const currentUrl = new URL(window.location.href);
+            const currentSortBy = currentUrl.searchParams.get('sort_by');
+            const currentSortOrder = currentUrl.searchParams.get('sort_order');
+
+            let newSortOrder = 'asc';
+            if (currentSortBy === sortField && currentSortOrder === 'asc') {
+                newSortOrder = 'desc';
+            }
+
+            currentUrl.searchParams.set('sort_by', sortField);
+            currentUrl.searchParams.set('sort_order', newSortOrder);
+
+            window.location.href = currentUrl.toString();
+        });
+    });
+</script>
 {% endblock %}

@@ -1,5 +1,4 @@
 {% extends 'base.html' %} {% block title %} Доступные автомобили {% endblock %}
-
 {% block content %}
 <style>
   .form-row > div {
@@ -21,34 +20,27 @@
 <div class="container mt-5">
   <h4 class="mb-4">Поиск доступных автомобилей</h4>
 
-<form method="POST">
+  <form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-row">
-        <div class="col-md-3">
-            <label for="start_date">{{ form.start_date.label }}</label>
-            {{ form.start_date(class="form-control", id="start_date") }}
-
-        </div>
-        <div class="col-md-3">
-            <label for="end_date">{{ form.end_date.label }}</label>
-            {{ form.end_date(class="form-control", id="end_date") }}
-        </div>
+      <div class="col-md-3">
+        <label for="start_date">{{ form.start_date.label }}</label>
+        {{ form.start_date(class="form-control", id="start_date") }}
+      </div>
+      <div class="col-md-3">
+        <label for="end_date">{{ form.end_date.label }}</label>
+        {{ form.end_date(class="form-control", id="end_date") }}
+      </div>
     </div>
     <div class="col-md-6">
-    <div class="errors" style="margin-top:15px">
-        {% for field in form %}
-            {% for error in field.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        {% endfor %}
-    </div>
+      <div class="errors" style="margin-top: 15px">
+        {% for field in form %} {% for error in field.errors %}
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endfor %} {% endfor %}
+      </div>
     </div>
     {{ form.submit(class="btn btn-primary") }}
-</form>
-
-
+  </form>
 
   {% if cars %}
   <h4 class="mt-5">
@@ -62,8 +54,11 @@
           <h5 class="card-title">
             {{ car.brand }} {{ car.car_number }}; {{ car.transmission }}
           </h5>
-          <a href="{{ url_for('booking.add_booking', car_id=car.id, start_date=start_date, end_date=end_date) }}">Book Now</a>
-          
+          <a
+            href="{{ url_for('booking.add_booking', car_id=car.id, start_date=start_date, end_date=end_date) }}"
+            >Забронировать</a
+          >
+
           <p class="card-text availability-info alert alert-success">
             Доступен с {{ start_date }} по {{ end_date }}
           </p>
@@ -101,7 +96,7 @@
         </div>
       </div>
     </div>
-    
+
     {% endfor %}
   </div>
   {% else %}
