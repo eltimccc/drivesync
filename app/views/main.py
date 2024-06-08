@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for
+from flask import Blueprint, render_template, url_for, current_app
 from flask_login import login_required
 
 from app.models import Booking
@@ -11,6 +11,7 @@ main = Blueprint('main', __name__)
 @main.route("/", methods=["GET"])
 @login_required
 def get_bookings():
+    current_app.logger.info('Accessed main page.')
     bookings = Booking.query.all()
     formatted_bookings = []
 

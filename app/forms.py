@@ -1,8 +1,9 @@
+import re
+from datetime import datetime
+from flask import current_app
 from app.models import User
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from datetime import datetime
-import re
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
@@ -42,6 +43,7 @@ class CarForm(FlaskForm):
         car_number.data = car_number.data.upper()
         car = Car.query.filter_by(car_number=car_number.data).first()
         if car:
+            current_app.logger.error(f'Error add car with  number: {car_number.data}')
             raise ValidationError("Машина с таким номером уже существует!")
 
     submit = SubmitField("Добавить")

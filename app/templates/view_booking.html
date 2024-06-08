@@ -1,64 +1,61 @@
-{% extends 'base.html' %} {% block additional_styles %}
+{% extends 'base.html' %}
+
+{% block additional_styles %}
 <style>
-  .booking-details {
-    font-size: 1.1em;
+  .booking-details p {
+    margin-bottom: 5px;
   }
-  .status {
-    font-size: 0.9em;
+
+  .buttons {
+    margin-top: 20px;
+  }
+
+  @media (max-width: 576px) {
+    .booking-details p {
+      margin-bottom: 10px;
+    }
   }
 </style>
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-md-8 mt-2">
       <div class="card">
         <div class="card-header">
           <h4 class="card-title mb-3">Бронирование № {{ booking.id }}</h4>
-          <p
-            class="text-white"
-            style="background-color: {{ status_color }}; padding: 5px;"
-          >
+          <p class="text-white" style="background-color: {{ status_color }}; padding: 5px;">
             Статус: {{ booking.status }}
           </p>
         </div>
         <div class="card-body">
-          <h5>
-            <strong>Автомобиль:</strong> {{ booking.car.brand }} {{
-            booking.car.car_number }}
-          </h5>
-          <div class="booking-details">
-            <div class="row">
-              <div class="col">
-                <p>
-                  <strong>Начало:</strong> {{
-                  booking.start_date.strftime('%d.%m.%Y %H:%M') }}
-                </p>
-              </div>
-              <div class="col">
-                <p>
-                  <strong>Окончание:</strong> {{
-                  booking.end_date.strftime('%d.%m.%Y %H:%M') }}
-                </p>
-              </div>
+          <h5><strong>Автомобиль:</strong> {{ booking.car.brand }} {{ booking.car.car_number }}</h5>
+          <div class="row booking-details">
+            <div class="col-md-6">
+              <p><strong>Начало:</strong> {{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</p>
             </div>
-            <p><strong>Телефон:</strong> {{ booking.phone }}</p>
-            <p><strong>Заметка:</strong> {{ booking.description }}</p>
-            <p><strong>Создал:</strong> {{ booking.user.username }}</p>
-            <p><strong>Дата создания:</strong> {{ formatted_created_at }}</p>
+            <div class="col-md-6">
+              <p><strong>Окончание:</strong> {{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Телефон:</strong> {{ booking.phone }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Создал:</strong> {{ booking.user.username }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Дата создания:</strong> {{ formatted_created_at }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <p><strong>Заметка:</strong> {{ booking.description }}</p>
+            </div>
           </div>
           <div class="buttons">
-            <a
-              href="{{ url_for('booking.edit_booking', booking_id=booking.id) }}"
-              role="button"
-              class="btn btn-primary mr-2 text-white"
-              >Редактировать</a
-            >
-            <form
-              method="post"
-              action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}"
-              onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');"
-              class="d-inline-block"
-            >
+            <a href="{{ url_for('booking.edit_booking', booking_id=booking.id) }}" role="button" class="btn btn-primary mr-2 text-white">Редактировать</a>
+            <form method="post" action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');" class="d-inline-block">
               <button type="submit" class="btn btn-danger">Удалить</button>
             </form>
           </div>
@@ -67,5 +64,4 @@
     </div>
   </div>
 </div>
-
 {% endblock %}
