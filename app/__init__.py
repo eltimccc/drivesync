@@ -1,3 +1,7 @@
+import os
+import logging
+from logging.handlers import RotatingFileHandler
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -43,8 +47,24 @@ def create_app():
     from app.views.auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
 
+    from app.views.errors import errors
+    app.register_blueprint(errors)
+
     with app.app_context():
         db.create_all()
         create_superuser()
+
+    if not app.debug:
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        file_handler = RotatingFileHandler('logs/flask_app.log', maxBytes=102400, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('Flask App Started')
 
     return app

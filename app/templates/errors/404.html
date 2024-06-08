@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страница не найдена</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #dc3545;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            color: #6c757d;
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        .icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <i class="fas fa-exclamation-circle icon"></i>
+        <h1>404 - Страница не найдена</h1>
+        <p>Извините, но страница, которую вы ищете, не существует.</p>
+        <a href="{{ url_for('main.get_bookings') }}">Вернуться на главную</a>
+    </div>
+</body>
+
+</html>

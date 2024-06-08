@@ -32,6 +32,27 @@
           background-color: #f6f9fe !important;
           margin-top: 70px; /* To account for the fixed navbar */
       }
+
+      .table td, .table th {
+        padding: 8px;
+        white-space: nowrap;
+        font-size: 13px;
+    }
+      .table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #17a2b8; /* Ensure the background color remains the same as thead */
+        color: white;
+        cursor: pointer;
+    }
+
+      .fixed-header {
+        max-height: 83vh;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 0;
+    }
+
       .btn {
           border-radius: 0 !important;
       }
@@ -44,6 +65,7 @@
       .content-wrapper {
           margin-top: 70px; /* Adjust based on the height of your navbar */
       }
+      
     </style>
     {% block additional_styles %}
     {% endblock %}

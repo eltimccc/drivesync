@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for, current_app
 from flask_login import login_required
 
 from app import db
@@ -24,6 +24,7 @@ booking_blueprint = Blueprint("booking", __name__, url_prefix="/booking")
 @booking_blueprint.route(BOOKING_VIEW_BP_ROUTE, methods=["GET"])
 @login_required
 def view_booking(booking_id):
+    current_app.logger.info(f'Accessed view booking with ID: {booking_id}')
     booking = Booking.query.get_or_404(booking_id)
     status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
 
@@ -39,14 +40,10 @@ def view_booking(booking_id):
         )
 
 
-# @booking_blueprint.route('/all_bookings', methods=["GET"])
-# @login_required
-# def all_bookings():
-#     bookings = Booking.query.all()
-#     return render_template('all_bookings.html', bookings=bookings)
 @booking_blueprint.route('/all_bookings', methods=["GET"])
 @login_required
 def all_bookings():
+    current_app.logger.info('Accessed all bookings page.')
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
 
@@ -63,14 +60,17 @@ def all_bookings():
 @login_required
 def add_booking():
     if request.method == "POST":
+        current_app.logger.info('Adding a new booking.')
         return add_booking_post()
     else:
+        current_app.logger.info('Accessed add booking page.')
         return add_booking_get()
 
 
 @booking_blueprint.route(BOOKING_EDIT_BP_ROUTE, methods=["GET", "POST"])
 @login_required
 def edit_booking(booking_id):
+    current_app.logger.info(f'Accessed edit booking page with ID: {booking_id}')
     booking = Booking.query.get_or_404(booking_id)
     cars = Car.query.filter_by(is_deleted=False).all()
     status_choices = list(BOOKING_STATUSES.keys())
@@ -102,6 +102,7 @@ def edit_booking(booking_id):
 
             db.session.commit()
             flash("Бронирование успешно обновлено", "success")
+            current_app.logger.info(f'Updated booking with ID: {booking_id}')
             return redirect(url_for(BOOKING_VIEW_BOOKING_ROUTE, booking_id=booking.id))
 
         except ValueError as e:
@@ -120,7 +121,9 @@ def edit_booking(booking_id):
 @booking_blueprint.route(BOOKING_DELETE_BP_ROUTE, methods=["POST"])
 @login_required
 def delete_booking(booking_id):
+    current_app.logger.info(f'Accessed delete booking with ID: {booking_id}')
     booking = Booking.query.get_or_404(booking_id)
     db.session.delete(booking)
     db.session.commit()
+    current_app.logger.warning(f'Deleted booking with ID: {booking_id}')
     return redirect(url_for(BOOKING_MAIN_ROUTE))
