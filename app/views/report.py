@@ -17,7 +17,7 @@ from app.constants import (
     SEARCH_AVAIALBLE_CARS_TEMPLATE,
     SEARCH_CARS_BP_ROUTE,
 )
-from app.forms import SearchCarsForm
+from app.forms.forms import SearchCarsForm
 from app.models import Booking, Car
 from app.utils.utils import BOOKING_STATUSES
 

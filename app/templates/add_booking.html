@@ -1,85 +1,66 @@
 {% extends 'base.html' %} {% block content %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/car_input_styles.css') }}"
-/>
+
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
       <h4 class="text-center mb-3">Добавить бронирование</h4>
 
-      <form id="bookingForm" method="POST" action="/booking/add_booking">
+      <form method="POST" action="{{ url_for('booking.add_booking') }}">
+        {{ form.hidden_tag() }}
+
         <div class="form-group">
-          <label for="start_datetime">Дата и время начала:</label>
-          <input
-            type="datetime-local"
-            class="form-control"
-            id="start_datetime"
-            name="start_datetime"
-            required
-          />
+          {{ form.start_datetime.label(class="form-control-label") }} {{
+          form.start_datetime(class="form-control datetimepicker",
+          required="required", placeholder="дд.мм.гггг чч:мм") }} {% if
+          form.start_datetime.errors %}
+          <span style="color: red">{{ form.start_datetime.errors[0] }}</span>
+          {% endif %}
         </div>
 
         <div class="form-group">
-          <label for="end_datetime">Дата и время окончания:</label>
-          <input
-            type="datetime-local"
-            class="form-control"
-            id="end_datetime"
-            name="end_datetime"
-            required
-          />
-        </div>
-      <span style="color: red">{{ error }}</span>
-        <div class="form-group">
-          <label for="car">Автомобиль:</label>
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control"
-              id="selectedCar"
-              name="selectedCar"
-              readonly
-            />
-            <input type="hidden" id="selectedCarId" name="car" readonly />
-            <div class="input-group-append">
-              <button
-                type="button"
-                class="btn btn-info"
-                onclick="openCarModal()"
-              >
-                Выбрать автомобиль
-              </button>
-            </div>
-          </div>
+          {{ form.end_datetime.label(class="form-control-label") }} {{
+          form.end_datetime(class="form-control datetimepicker",
+          required="required", placeholder="дд.мм.гггг чч:мм") }} {% if
+          form.end_datetime.errors %}
+          <span style="color: red">{{ form.end_datetime.errors[0] }}</span>
+          {% endif %}
         </div>
 
         <div class="form-group">
-          <label for="phone">Телефон:</label>
-          <input type="text" class="form-control" id="phone" name="phone" />
+          {{ form.car.label(class="form-control-label") }} {{
+          form.car(class="form-control car-input", readonly="readonly",
+          onclick="openCarModal()") }} {% if form.car.errors %}
+          <span style="color: red">{{ form.car.errors[0] }}</span>
+          {% endif %}
         </div>
 
         <div class="form-group">
-          <label for="description">Заметка:</label>
-          <textarea
-            class="form-control"
-            id="description"
-            name="description"
-            rows="3"
-          ></textarea>
+          {{ form.phone.label(class="form-control-label") }} {{
+          form.phone(class="form-control") }} {% if form.phone.errors %}
+          <span style="color: red">{{ form.phone.errors[0] }}</span>
+          {% endif %}
         </div>
+
+        <div class="form-group">
+          {{ form.description.label(class="form-control-label") }} {{
+          form.description(class="form-control", rows="3") }} {% if
+          form.description.errors %}
+          <span style="color: red">{{ form.description.errors[0] }}</span>
+          {% endif %}
+        </div>
+
         <button type="submit" class="btn btn-primary btn-sm">
           Добавить бронирование
         </button>
       </form>
     </div>
   </div>
-  
 
+  <!-- Модальное окно для выбора автомобиля -->
   <div id="carModal" class="modal" onclick="closeIfOutside(event)">
     <div class="modal-content car_modal-content">
       <span class="close" onclick="closeCarModal()">&times;</span>
-      <table id="carTable">
+      <table id="carTable" class="table">
         <thead>
           <tr>
             <th>Марка</th>
@@ -99,7 +80,38 @@
       </table>
     </div>
   </div>
-
-  <script src="{{ url_for('static', filename='js/car_input.js') }}"></script>
-  {% endblock %}
 </div>
+
+<script src="{{ url_for('static', filename='js/car_input.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    $(".datetimepicker").datetimepicker({
+      format: "d.m.Y H:i",
+      step: 15,
+    });
+  });
+
+  function openCarModal() {
+    document.getElementById("carModal").style.display = "block";
+  }
+
+  function closeCarModal() {
+    document.getElementById("carModal").style.display = "none";
+  }
+
+  function closeIfOutside(event) {
+    if (event.target == document.getElementById("carModal")) {
+      closeCarModal();
+    }
+  }
+
+  function selectCar(carId, carDescription) {
+    document.querySelector('[name="car"]').value = carId;
+    closeCarModal();
+  }
+
+  $(document).on("mousedown", ".car-input", function (e) {
+    e.preventDefault();
+  });
+</script>
+{% endblock %}
