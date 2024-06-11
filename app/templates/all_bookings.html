@@ -3,15 +3,18 @@
 {% block title %}Все бронирования{% endblock %}
 
 {% block content %}
+<style>
 
+</style>
     <h4 class="text-center">Все бронирования</h4>
     <div class="fixed-header">
         <table class="table table-hover">
-            <thead class="thead-light">
+            <thead class="table-dark">
                 <tr>
-                    <th data-sort="id">ID брони</th>
+                    <th data-sort="id">ID</th>
                     <th data-sort="created_at">Дата создания</th>
                     <th data-sort="car_id">Автомобиль</th>
+                    <th>КПП</th>
                     <th data-sort="start_date">Дата начала</th>
                     <th data-sort="end_date">Дата окончания</th>
                     <th data-sort="phone">Телефон</th>
@@ -24,6 +27,7 @@
                     <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
                     <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.created_at.strftime('%d.%m.%Y') }}</a></td>
                     <td><a href="{{ url_for('car.car_detail', car_id=booking.car_id) }}">{{ booking.car.brand }}</a></td>
+                    <td>{{ booking.car.transmission }}
                     <td>{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</td>
                     <td>{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</td>
                     <td>{{ booking.phone }}</td>
@@ -37,6 +41,8 @@
         document.querySelectorAll('.table thead th').forEach(header => {
             header.addEventListener('click', function() {
                 const sortField = this.getAttribute('data-sort');
+                if (!sortField) return;
+
                 const currentUrl = new URL(window.location.href);
                 const currentSortBy = currentUrl.searchParams.get('sort_by');
                 const currentSortOrder = currentUrl.searchParams.get('sort_order');
