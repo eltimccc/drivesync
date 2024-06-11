@@ -1,10 +1,13 @@
 from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, request, url_for, current_app
-from flask_login import login_required
+from flask_login import current_user, login_required
 
 from app import db
 from app.constants import (
     BOOKING_ADD_BP_ROUTE,
+    BOOKING_ADD_TEMPLATE,
+    BOOKING_ALL_ROUTE,
+    BOOKING_ALL_TEMPLATE,
     BOOKING_DELETE_BP_ROUTE,
     BOOKING_DETAIL_MODAL_TEMPLATE,
     BOOKING_DETAIL_TEMPLATE,
@@ -14,8 +17,10 @@ from app.constants import (
     BOOKING_VIEW_BOOKING_ROUTE,
     BOOKING_VIEW_BP_ROUTE,
 )
+from app.forms.forms import BookingForm
 from app.models import Booking, Car
-from app.utils.utils import BOOKING_STATUSES, add_booking_get, add_booking_post
+from app.utils.utils import BOOKING_STATUSES
+from app.validators import validate_booking_data
 
 
 booking_blueprint = Blueprint("booking", __name__, url_prefix="/booking")
@@ -40,7 +45,7 @@ def view_booking(booking_id):
         )
 
 
-@booking_blueprint.route('/all_bookings', methods=["GET"])
+@booking_blueprint.route(BOOKING_ALL_ROUTE, methods=["GET"])
 @login_required
 def all_bookings():
     current_app.logger.info('Accessed all bookings page.')
@@ -52,19 +57,83 @@ def all_bookings():
     else:
         bookings = Booking.query.order_by(getattr(Booking, sort_by).asc()).all()
 
-    return render_template('all_bookings.html', bookings=bookings, sort_by=sort_by, sort_order=sort_order)
+    return render_template(BOOKING_ALL_TEMPLATE, bookings=bookings, sort_by=sort_by, sort_order=sort_order)
 
 
+@booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET"])
+@login_required
+def get_booking():
+    current_app.logger.info('Accessed add booking page.')
+    form = BookingForm()
+    car_id = request.args.get("car_id")
+    start_datetime = request.args.get("start_datetime")
+    end_datetime = request.args.get("end_datetime")
+    cars = Car.query.filter_by(is_deleted=False).all()
 
-@booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET", "POST"])
+    if car_id and start_datetime and end_datetime:
+        return render_template(
+            BOOKING_ADD_TEMPLATE,
+            cars=cars,
+            car_id=car_id,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
+        )
+    elif request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return render_template("add_booking_modal.html", cars=cars)
+    else:
+        return render_template(BOOKING_ADD_TEMPLATE, cars=cars, bootstrap=True, form=form)
+
+
+# @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["POST"])
+# @login_required
+# def add_booking():
+#     current_app.logger.info('Adding a new booking.')
+#     try:
+#         start_datetime = request.form.get("start_datetime")
+#         start_datetime = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M")
+
+#         end_datetime = request.form.get("end_datetime")
+#         end_datetime = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M")
+
+#         car_id = request.form.get("car")
+#         car = Car.query.get(car_id)
+#         description = request.form.get("description")
+#         phone = request.form.get("phone")
+
+#         validate_booking_data(start_datetime, end_datetime, car)
+
+#         new_booking = Booking(
+#             start_date=start_datetime,
+#             end_date=end_datetime,
+#             car=car,
+#             phone=phone,
+#             description=description,
+#             user=current_user
+#         )
+#         db.session.add(new_booking)
+#         db.session.commit()
+
+#         return redirect(url_for(BOOKING_MAIN_ROUTE))
+#     except ValueError as e:
+#         return render_template(BOOKING_ADD_TEMPLATE, error=str(e)), 400
+    
+@booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["POST", "GET"])
 @login_required
 def add_booking():
-    if request.method == "POST":
-        current_app.logger.info('Adding a new booking.')
-        return add_booking_post()
-    else:
-        current_app.logger.info('Accessed add booking page.')
-        return add_booking_get()
+    form = BookingForm()
+    if form.validate_on_submit():
+        new_booking = Booking(
+            start_date=form.start_datetime.data,
+            end_date=form.end_datetime.data,
+            car_id=form.car.data,
+            phone=form.phone.data,
+            description=form.description.data,
+            user=current_user
+        )
+        db.session.add(new_booking)
+        db.session.commit()
+        return redirect(url_for(BOOKING_MAIN_ROUTE))
+    return render_template(BOOKING_ADD_TEMPLATE, form=form)
 
 
 @booking_blueprint.route(BOOKING_EDIT_BP_ROUTE, methods=["GET", "POST"])
@@ -85,8 +154,6 @@ def edit_booking(booking_id):
             car_id = request.form.get("car")
             car = Car.query.get(car_id)
             new_status = request.form.get("status")
-
-            # validate_dates(start_date, end_date)
 
             booking.description = description
             booking.phone = phone

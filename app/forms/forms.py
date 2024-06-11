@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import current_app
 from app.models import User
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
@@ -16,7 +16,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Length, Regexp
 
-from .models import Car
+from app.models import Car
 
 
 class CarForm(FlaskForm):
@@ -71,18 +71,15 @@ class EditCarForm(FlaskForm):
 
 
 class BookingForm(FlaskForm):
-    start_datetime = DateTimeField(
-        "Дата начала бронирования", format="%Y-%m-%dT%H:%M", validators=[DataRequired()]
-    )
-    end_datetime = DateTimeField(
-        "Дата окончания бронирования",
-        format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired()],
-    )
-    car = StringField("ID машины", validators=[DataRequired()])
-    description = StringField("Описание")
-    phone = StringField("Телефон", validators=[DataRequired()])
-    submit = SubmitField("Забронировать")
+    start_datetime = DateTimeField("Дата начала бронирования", format="%d.%m.%Y %H:%M", validators=[DataRequired()])
+    end_datetime = DateTimeField("Дата окончания бронирования", format="%d.%m.%Y %H:%M", validators=[DataRequired()])
+    car = SelectField("ID машины", coerce=int, validators=[DataRequired()])
+    phone = StringField("Телефон")
+    description = TextAreaField("Описание")
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.car.choices = [(car.id, car.brand) for car in Car.query.filter_by(is_deleted=False).all()]
 
 
 class SearchCarsForm(FlaskForm):

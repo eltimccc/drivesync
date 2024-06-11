@@ -23,6 +23,7 @@ BOOKING_DETAIL_MODAL_TEMPLATE = "view_booking_modal.html"
 BOOKING_DETAIL_TEMPLATE = "view_booking.html"
 BOOKING_EDIT_TEMPLATE = "edit_booking.html"
 BOOKING_ADD_TEMPLATE = "add_booking.html"
+BOOKING_ALL_TEMPLATE = "all_bookings.html"
 
 # Именованные маршруты BOOKING
 BOOKING_GET_ROUTE = "booking.get_bookings"
@@ -36,6 +37,7 @@ BOOKING_VIEW_BP_ROUTE = "/<int:booking_id>"
 BOOKING_ADD_BP_ROUTE = "/add_booking"
 BOOKING_EDIT_BP_ROUTE = "/<int:booking_id>/edit"
 BOOKING_DELETE_BP_ROUTE = "/delete_booking/<int:booking_id>/"
+BOOKING_ALL_ROUTE = '/all_bookings'
 
 # Имена шаблонов REPORT
 REPORT_BOOKING_PERIOD_TEMPLATE = "reports/bookings_for_period.html"
