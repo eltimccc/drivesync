@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import current_app
 from app.models import Booking, User
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import HiddenField, StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
