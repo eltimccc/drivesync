@@ -156,13 +156,19 @@ def report_booking_duration():
             bookings = Booking.query.filter(
                 Booking.car_id == car.id,
                 Booking.start_date <= end_date,
-                Booking.end_date >= start_date
+                Booking.end_date >= start_date,
             ).all()
 
             car_duration = timedelta()
             for booking in bookings:
-                intersection_start = booking.start_date if booking.start_date >= start_date else start_date
-                intersection_end = booking.end_date if booking.end_date <= end_date else end_date
+                intersection_start = (
+                    booking.start_date
+                    if booking.start_date >= start_date
+                    else start_date
+                )
+                intersection_end = (
+                    booking.end_date if booking.end_date <= end_date else end_date
+                )
                 duration = intersection_end - intersection_start
                 car_duration += duration
 
@@ -178,7 +184,7 @@ def report_booking_duration():
             start_date=start_date_str,
             end_date=end_date_str,
             cars_duration=cars_duration,
-            total_duration=total_duration_str
+            total_duration=total_duration_str,
         )
 
     return render_template(REPORT_BOOKING_DURATION_TEMPLATE)
@@ -192,31 +198,37 @@ def search_cars():
         start_date = form.start_date.data
         end_date = form.end_date.data
         return handle_search_cars_post(start_date, end_date, form)
-    
+
     return render_search_form_with_errors(form)
+
 
 def handle_search_cars_post(start_date, end_date, form):
     available_cars = fetch_available_cars(start_date, end_date)
     start_date_formatted = format_date(start_date)
     end_date_formatted = format_date(end_date)
-    
+
     return render_template(
         SEARCH_AVAIALBLE_CARS_TEMPLATE,
         cars=available_cars,
         start_date=start_date_formatted,
         end_date=end_date_formatted,
-        form=form
+        form=form,
     )
 
+
 def fetch_available_cars(start_date, end_date):
-    available_cars = Car.query.filter(
-        ~Car.bookings.any(
-            (Booking.start_date <= end_date) & 
-            (Booking.end_date >= start_date) & 
-            (Booking.status != "Отказ") &
-            (Booking.status != "Завершено")
+    available_cars = (
+        Car.query.filter(
+            ~Car.bookings.any(
+                (Booking.start_date <= end_date)
+                & (Booking.end_date >= start_date)
+                & (Booking.status != "Отказ")
+                & (Booking.status != "Завершено")
+            )
         )
-    ).filter_by(is_deleted=False).all()
+        .filter_by(is_deleted=False)
+        .all()
+    )
 
     for car in available_cars:
         car.last_booking_info = get_formatted_last_booking(car.id, start_date)
@@ -224,31 +236,37 @@ def fetch_available_cars(start_date, end_date):
 
     return available_cars
 
+
 def get_formatted_last_booking(car_id, start_date):
-    last_booking = Booking.query.filter(
-        Booking.car_id == car_id,
-        Booking.end_date < start_date
-    ).order_by(Booking.end_date.desc()).first()
-    
+    last_booking = (
+        Booking.query.filter(Booking.car_id == car_id, Booking.end_date < start_date)
+        .order_by(Booking.end_date.desc())
+        .first()
+    )
+
     return format_booking_dates(last_booking) if last_booking else None
 
+
 def get_formatted_next_booking(car_id, end_date):
-    next_booking = Booking.query.filter(
-        Booking.car_id == car_id,
-        Booking.start_date >= end_date
-    ).order_by(Booking.start_date.asc()).first()
-    
+    next_booking = (
+        Booking.query.filter(Booking.car_id == car_id, Booking.start_date >= end_date)
+        .order_by(Booking.start_date.asc())
+        .first()
+    )
+
     return format_booking_dates(next_booking) if next_booking else None
+
 
 def format_booking_dates(booking):
     booking.start_date_formatted = format_date(booking.start_date)
     booking.end_date_formatted = format_date(booking.end_date)
     return booking
 
+
 def format_date(date):
     return date.strftime("%d.%m.%Y %H:%M")
+
 
 def render_search_form_with_errors(form):
     errors = form.errors
     return render_template(SEARCH_AVAIALBLE_CARS_TEMPLATE, form=form, errors=errors)
-

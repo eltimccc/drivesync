@@ -9,7 +9,7 @@ CAR_ADD_MODAL_TEMPLATE = "add_car_modal.html"
 CARS_GET = "cars.html"
 
 # Именованные маршруты CAR
-CARS_GET_ROUTE= "car.get_cars"
+CARS_GET_ROUTE = "car.get_cars"
 
 # Blueprint маршруты CAR
 CAR_ADD_BP_ROUTE = "/add_car"
@@ -29,7 +29,7 @@ BOOKING_ALL_TEMPLATE = "all_bookings.html"
 BOOKING_GET_ROUTE = "booking.get_bookings"
 BOOKING_VIEW_BOOKING_ROUTE = "booking.view_booking"
 BOOKING_EDIT_BOOKING_ROUTE = "booking.edit_booking"
-BOOKING_MAIN_ROUTE = 'main.get_bookings'
+BOOKING_MAIN_ROUTE = "main.get_bookings"
 BOOKING = "booking.add_booking"
 
 # Blueprint маршруты BOOKING
@@ -37,14 +37,14 @@ BOOKING_VIEW_BP_ROUTE = "/<int:booking_id>"
 BOOKING_ADD_BP_ROUTE = "/add_booking"
 BOOKING_EDIT_BP_ROUTE = "/<int:booking_id>/edit"
 BOOKING_DELETE_BP_ROUTE = "/delete_booking/<int:booking_id>/"
-BOOKING_ALL_ROUTE = '/all_bookings'
+BOOKING_ALL_ROUTE = "/all_bookings"
 
 # Имена шаблонов REPORT
 REPORT_BOOKING_PERIOD_TEMPLATE = "reports/bookings_for_period.html"
 REPORT_PAGE_TEMPLATE = "reports/reports.html"
 REPORT_RENTCAR_AMOUNT_TEMPLATE = "reports/report_rent_amount.html"
 REPORT_STATUS_RENT_TEMPLATE = "reports/report_status_rent.html"
-REPORT_BOOKING_DURATION_TEMPLATE= "reports/report_booking_duration.html"
+REPORT_BOOKING_DURATION_TEMPLATE = "reports/report_booking_duration.html"
 
 SEARCH_AVAIALBLE_CARS_TEMPLATE = "available_cars.html"
 

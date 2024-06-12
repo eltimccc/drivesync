@@ -5,13 +5,13 @@ from app.models import Booking
 from app.utils.utils import BOOKING_STATUSES
 from app.constants import BOOKING_VIEW_BOOKING_ROUTE, MAIN_TEMPLATE
 
-main = Blueprint('main', __name__)
+main = Blueprint("main", __name__)
 
 
 @main.route("/", methods=["GET"])
 @login_required
 def get_bookings():
-    current_app.logger.info('Accessed main page.')
+    current_app.logger.info("Accessed main page.")
     bookings = Booking.query.all()
     formatted_bookings = []
 

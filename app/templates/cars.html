@@ -1,4 +1,11 @@
 {% extends 'base.html' %} {% block additional_styles %}
+<style>
+
+  .fixed-header {
+    max-height: 78vh;
+  }
+
+</style>
 
 {% endblock %} {% block content %}
 <div class="container mt-4">
@@ -44,7 +51,7 @@
                 <th scope="col">Марка, модель</th>
                 <th scope="col">КПП</th>
                 <th scope="col">Гос. номер</th>
-                <th scope="col">Редактировать</th>
+                <th scope="col">Ред.</th>
               </tr>
             </thead>
             <tbody>
@@ -60,7 +67,7 @@
                 <td>{{ car.car_number }}</td>
                 <td>
                   <a href="{{ url_for('car.edit_car', car_id=car.id) }}"
-                    >Редактировать</a
+                    >Ред.</a
                   >
                 </td>
               </tr>
