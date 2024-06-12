@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% block title %} Доступные автомобили {% endblock %}
+{% extends 'base.html' %}
+{% block title %} Доступные автомобили {% endblock %}
 {% block content %}
 
 <div class="container mt-5">
@@ -9,7 +10,6 @@
     <div class="form-row">
         <div class="col-md-5">
             <div class="card" style="padding: 15px; display: flex; justify-content: space-between;">
-                <!-- Карточка для полей ввода -->
                 <div style="width: 45%;">
                     <label for="start_date">{{ form.start_date.label }}</label>
                     {{ form.start_date(class="form-control", id="start_date") }}
@@ -32,7 +32,6 @@
 
     {{ form.submit(class="btn btn-primary") }}
 </form>
-
 
   {% if cars %}
   <h4 class="mt-5">
@@ -103,5 +102,18 @@
 
   {% endif %}
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#start_date').datetimepicker({
+            format:'Y-m-d H:i',
+            step: 30
+        });
+        $('#end_date').datetimepicker({
+            format:'Y-m-d H:i',
+            step: 30
+        });
+    });
+</script>
 
 {% endblock %}
