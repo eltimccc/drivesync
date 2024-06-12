@@ -1,6 +1,5 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %} Добавление бронирования {% endblock
+%} {% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
@@ -9,48 +8,64 @@
       <form method="POST" action="{{ url_for('booking.add_booking') }}">
         {{ form.hidden_tag() }}
 
-        <div class="form-group">
-          {{ form.start_datetime.label(class="form-control-label") }}
-          {{ form.start_datetime(class="form-control datetimepicker", required="required", placeholder="дд.мм.гггг чч:мм") }}
-          {% if form.start_datetime.errors %}
-            <span style="color: red">{{ form.start_datetime.errors[0] }}</span>
-          {% endif %}
+        <div class="form-row">
+          <div class="col">
+            <div class="form-group">
+              {{ form.start_datetime.label(class="form-control-label") }} {{
+              form.start_datetime(class="form-control datetimepicker",
+              required="required", placeholder="дд.мм.гггг чч:мм") }} {% if
+              form.start_datetime.errors %}
+              <span style="color: red"
+                >{{ form.start_datetime.errors[0] }}</span
+              >
+              {% endif %}
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              {{ form.end_datetime.label(class="form-control-label") }} {{
+              form.end_datetime(class="form-control datetimepicker",
+              required="required", placeholder="дд.мм.гггг чч:мм") }} {% if
+              form.end_datetime.errors %}
+              <span style="color: red">{{ form.end_datetime.errors[0] }}</span>
+              {% endif %}
+            </div>
+          </div>
         </div>
 
-        <div class="form-group">
-          {{ form.end_datetime.label(class="form-control-label") }}
-          {{ form.end_datetime(class="form-control datetimepicker", required="required", placeholder="дд.мм.гггг чч:мм") }}
-          {% if form.end_datetime.errors %}
-            <span style="color: red">{{ form.end_datetime.errors[0] }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          {{ form.car.label(class="form-control-label") }}
-          {{ form.car(class="form-control car-input", onclick="openCarModal()") }}
-         <input type="hidden" name="car" value="{{ form.car.data }}">
-          {% if form.car.errors %}
+        <div class="form-row">
+          <div class="col">
+            <div class="form-group">
+              {{ form.car.label(class="form-control-label") }} {{
+              form.car(class="form-control car-input", onclick="openCarModal()")
+              }}
+              <input type="hidden" name="car" value="{{ form.car.data }}" />
+              {% if form.car.errors %}
               <span style="color: red">{{ form.car.errors[0] }}</span>
-          {% endif %}
+              {% endif %}
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              {{ form.phone.label(class="form-control-label") }} {{
+              form.phone(class="form-control") }} {% if form.phone.errors %}
+              <span style="color: red">{{ form.phone.errors[0] }}</span>
+              {% endif %}
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
-          {{ form.phone.label(class="form-control-label") }}
-          {{ form.phone(class="form-control") }}
-          {% if form.phone.errors %}
-            <span style="color: red">{{ form.phone.errors[0] }}</span>
+          {{ form.description.label(class="form-control-label") }} {{
+          form.description(class="form-control", rows="3") }} {% if
+          form.description.errors %}
+          <span style="color: red">{{ form.description.errors[0] }}</span>
           {% endif %}
         </div>
 
-        <div class="form-group">
-          {{ form.description.label(class="form-control-label") }}
-          {{ form.description(class="form-control", rows="3") }}
-          {% if form.description.errors %}
-            <span style="color: red">{{ form.description.errors[0] }}</span>
-          {% endif %}
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-sm">Добавить бронирование</button>
+        <button type="submit" class="btn btn-primary btn-sm">
+          Добавить бронирование
+        </button>
       </form>
     </div>
   </div>
@@ -68,7 +83,9 @@
         </thead>
         <tbody>
           {% for car in cars %}
-          <tr onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')">
+          <tr
+            onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')"
+          >
             <td>{{ car.brand }}</td>
             <td>{{ car.car_number }}</td>
           </tr>
@@ -79,39 +96,38 @@
   </div>
 </div>
 
-
 <script>
-$(document).ready(function () {
+  $(document).ready(function () {
     $(".datetimepicker").datetimepicker({
-        format: "d.m.Y H:i",
-        step: 15,
+      format: "d.m.Y H:i",
+      step: 15,
     });
 
     $(".car-input").on("mousedown", function (e) {
-        e.preventDefault();
-        openCarModal();
+      e.preventDefault();
+      openCarModal();
     });
-});
+  });
 
-function openCarModal() {
+  function openCarModal() {
     document.getElementById("carModal").style.display = "block";
-}
+  }
 
-function closeCarModal() {
+  function closeCarModal() {
     document.getElementById("carModal").style.display = "none";
-}
+  }
 
-function closeIfOutside(event) {
+  function closeIfOutside(event) {
     if (event.target == document.getElementById("carModal")) {
-        closeCarModal();
+      closeCarModal();
     }
-}
+  }
 
-function selectCar(carId, carDescription) {
+  function selectCar(carId, carDescription) {
     var carInput = document.querySelector('[name="car"]');
     carInput.value = carId;
     carInput.nextElementSibling.textContent = carDescription;
     closeCarModal();
-}
+  }
 </script>
 {% endblock %}
