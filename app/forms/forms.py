@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import current_app
 from app.models import Booking, User
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import HiddenField, StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
@@ -45,7 +45,8 @@ class CarForm(FlaskForm):
         car_number.data = car_number.data.upper()
         car = Car.query.filter_by(car_number=car_number.data).first()
         if car:
-            current_app.logger.error(f"Error add car with  number: {car_number.data}")
+            current_app.logger.error(
+                f"Error add car with  number: {car_number.data}")
             raise ValidationError("Машина с таким номером уже существует!")
 
     submit = SubmitField("Добавить")
@@ -87,7 +88,7 @@ class BookingForm(FlaskForm):
         format="%d.%m.%Y %H:%M",
         validators=[DataRequired()],
     )
-    car = SelectField("Автомобиль", coerce=int, validators=[DataRequired()])
+    car = SelectField("Автомобиль", coerce=int, validators=[DataRequired()], default=None)
     phone = StringField("Телефон")
     description = TextAreaField("Описание")
     submit = SubmitField("Забронировать")
@@ -97,10 +98,12 @@ class BookingForm(FlaskForm):
         self.set_car_choices()
 
     def set_car_choices(self):
-        self.car.choices = [
+        car_choices = [(0, "Выберите автомобиль")]  # Пустое значение для пустого выбора
+        car_choices.extend(
             (car.id, f"{car.brand} {car.car_number}")
             for car in Car.query.filter_by(is_deleted=False).all()
-        ]
+        )
+        self.car.choices = car_choices
 
     def validate_start_datetime(self, field):
         current_datetime = datetime.now().replace(
@@ -124,7 +127,18 @@ class BookingForm(FlaskForm):
             Booking.end_date > self.start_datetime.data,
         ).first()
         if overlapping_bookings:
-            raise ValidationError("Эта машина уже забронирована на выбранный период")
+            raise ValidationError(
+                "Эта машина уже забронирована на выбранный период")
+
+
+class BookingUpdateForm(FlaskForm):
+    start_date = DateTimeField(
+        "Дата и время начала", format="%d.%m.%Y %H:%M", validators=[DataRequired()])
+    end_date = DateTimeField(
+        "Дата и время окончания", format="%d.%m.%Y %H:%M", validators=[DataRequired()])
+    phone = StringField("Телефон", validators=[Length(max=20)])
+    description = TextAreaField("Заметка", validators=[Length(max=200)])
+    status = SelectField("Статус", validators=[DataRequired()])
 
 
 class SearchCarsForm(FlaskForm):
@@ -135,7 +149,8 @@ class SearchCarsForm(FlaskForm):
         "Дата и время окончания", format="%Y-%m-%dT%H:%M", validators=[DataRequired()]
     )
     submit = SubmitField("Поиск")
-    current_datetime = datetime.now().replace(second=0, microsecond=0, minute=0, hour=0)
+    current_datetime = datetime.now().replace(
+        second=0, microsecond=0, minute=0, hour=0)
 
     def validate_end_date(self, end_date):
         if end_date.data <= self.start_date.data:

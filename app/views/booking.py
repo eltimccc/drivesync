@@ -25,7 +25,7 @@ from app.constants import (
     BOOKING_VIEW_BOOKING_ROUTE,
     BOOKING_VIEW_BP_ROUTE,
 )
-from app.forms.forms import BookingForm
+from app.forms.forms import BookingForm, BookingUpdateForm
 from app.models import Booking, Car
 from app.utils.utils import BOOKING_STATUSES
 
@@ -83,9 +83,10 @@ def get_booking():
     car_id = request.args.get("car_id")
     start_datetime = request.args.get("start_datetime")
     end_datetime = request.args.get("end_datetime")
-    cars = Car.query.filter_by(is_deleted=False).all()
-
+    
+    cars = None
     if car_id and start_datetime and end_datetime:
+        cars = Car.query.filter_by(is_deleted=False).all()
         return render_template(
             BOOKING_ADD_TEMPLATE,
             cars=cars,
@@ -94,30 +95,14 @@ def get_booking():
             end_datetime=end_datetime,
         )
     elif request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        cars = Car.query.filter_by(is_deleted=False).all()
         return render_template("add_booking_modal.html", cars=cars)
     else:
+        if not cars:
+            cars = Car.query.filter_by(is_deleted=False).all()
         return render_template(
             BOOKING_ADD_TEMPLATE, cars=cars, bootstrap=True, form=form
         )
-
-
-# @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["POST", "GET"])
-# @login_required
-# def add_booking():
-#     form = BookingForm()
-#     if form.validate_on_submit():
-#         new_booking = Booking(
-#             start_date=form.start_datetime.data,
-#             end_date=form.end_datetime.data,
-#             car_id=form.car.data,
-#             phone=form.phone.data,
-#             description=form.description.data,
-#             user=current_user
-#         )
-#         db.session.add(new_booking)
-#         db.session.commit()
-#         return redirect(url_for(BOOKING_MAIN_ROUTE))
-#     return render_template(BOOKING_ADD_TEMPLATE, form=form)
 
 
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["POST", "GET"])
@@ -139,53 +124,39 @@ def add_booking():
         return redirect(url_for(BOOKING_MAIN_ROUTE))
     return render_template(BOOKING_ADD_TEMPLATE, form=form, cars=cars)
 
-
 @booking_blueprint.route(BOOKING_EDIT_BP_ROUTE, methods=["GET", "POST"])
 @login_required
 def edit_booking(booking_id):
     current_app.logger.info(f"Accessed edit booking page with ID: {booking_id}")
     booking = Booking.query.get_or_404(booking_id)
+    form = BookingUpdateForm(obj=booking)
+    form.status.choices = [(key, key) for key in BOOKING_STATUSES.keys()]
     cars = Car.query.filter_by(is_deleted=False).all()
-    status_choices = list(BOOKING_STATUSES.keys())
-    errors = {}
 
-    if request.method == "POST":
-        try:
-            description = request.form["description"]
-            phone = request.form["phone"]
-            start_date = datetime.strptime(request.form["start_date"], "%Y-%m-%dT%H:%M")
-            end_date = datetime.strptime(request.form["end_date"], "%Y-%m-%dT%H:%M")
-            car_id = request.form.get("car")
-            car = Car.query.get(car_id)
-            new_status = request.form.get("status")
+    if form.validate_on_submit():
+        booking.description = form.description.data
+        booking.phone = form.phone.data
+        booking.start_date = form.start_date.data
+        booking.end_date = form.end_date.data
+        booking.status = form.status.data
 
-            booking.description = description
-            booking.phone = phone
-            booking.start_date = start_date
-            booking.end_date = end_date
-            booking.car = car
+        car_id = request.form.get("car")
+        booking.car = Car.query.get(car_id)
 
-            if new_status in status_choices:
-                booking.status = new_status
-                booking.color = BOOKING_STATUSES[new_status]
-                if booking.color == BOOKING_STATUSES["Отказ"]:
-                    booking.end_date = booking.start_date
-
-            db.session.commit()
-            flash("Бронирование успешно обновлено", "success")
-            current_app.logger.info(f"Updated booking with ID: {booking_id}")
-            return redirect(url_for(BOOKING_VIEW_BOOKING_ROUTE, booking_id=booking.id))
-
-        except ValueError as e:
-            errors["validation_error"] = str(e)
+        booking.color = BOOKING_STATUSES[booking.status]
+        if booking.color == BOOKING_STATUSES["Отказ"]:
+            booking.end_date = booking.start_date
+        
+        db.session.commit()
+        flash("Бронирование успешно обновлено", "success")
+        current_app.logger.info(f"Updated booking with ID: {booking_id}")
+        return redirect(url_for(BOOKING_VIEW_BOOKING_ROUTE, booking_id=booking.id))
 
     return render_template(
         BOOKING_EDIT_TEMPLATE,
+        form=form,
         booking=booking,
-        cars=cars,
-        status_choices=status_choices,
-        booking_statuses=BOOKING_STATUSES,
-        errors=errors,
+        cars=cars
     )
 
 
