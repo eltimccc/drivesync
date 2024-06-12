@@ -105,11 +105,48 @@ def get_booking():
         )
 
 
+# @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["POST", "GET"])
+# @login_required
+# def add_booking():
+#     form = BookingForm()
+#     cars = Car.query.filter_by(is_deleted=False).all()
+#     if form.validate_on_submit():
+#         new_booking = Booking(
+#             start_date=form.start_datetime.data,
+#             end_date=form.end_datetime.data,
+#             car_id=form.car.data,
+#             phone=form.phone.data,
+#             description=form.description.data,
+#             user=current_user,
+#         )
+#         db.session.add(new_booking)
+#         db.session.commit()
+#         return redirect(url_for(BOOKING_MAIN_ROUTE))
+#     return render_template(BOOKING_ADD_TEMPLATE, form=form, cars=cars)
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["POST", "GET"])
 @login_required
 def add_booking():
     form = BookingForm()
     cars = Car.query.filter_by(is_deleted=False).all()
+
+    if request.method == "GET":
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        car_id = request.args.get('car_id')
+
+        if start_date:
+            try:
+                form.start_datetime.data = datetime.strptime(start_date, '%Y-%m-%d %H:%M')
+            except ValueError:
+                form.start_datetime.data = None
+        if end_date:
+            try:
+                form.end_datetime.data = datetime.strptime(end_date, '%Y-%m-%d %H:%M')
+            except ValueError:
+                form.end_datetime.data = None
+        if car_id:
+            form.car.data = car_id
+
     if form.validate_on_submit():
         new_booking = Booking(
             start_date=form.start_datetime.data,
@@ -122,7 +159,9 @@ def add_booking():
         db.session.add(new_booking)
         db.session.commit()
         return redirect(url_for(BOOKING_MAIN_ROUTE))
+
     return render_template(BOOKING_ADD_TEMPLATE, form=form, cars=cars)
+
 
 @booking_blueprint.route(BOOKING_EDIT_BP_ROUTE, methods=["GET", "POST"])
 @login_required
