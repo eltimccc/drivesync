@@ -13,8 +13,9 @@
             <div class="form-group">
               {{ form.start_datetime.label(class="form-control-label") }} {{
               form.start_datetime(class="form-control datetimepicker",
-              required="required", placeholder="дд.мм.гггг чч:мм") }} {% if
-              form.start_datetime.errors %}
+              required="required", placeholder="дд.мм.гггг чч:мм",
+              value=form.start_datetime.data or request.args.get('start_date',
+              '')) }} {% if form.start_datetime.errors %}
               <span style="color: red"
                 >{{ form.start_datetime.errors[0] }}</span
               >
@@ -25,8 +26,9 @@
             <div class="form-group">
               {{ form.end_datetime.label(class="form-control-label") }} {{
               form.end_datetime(class="form-control datetimepicker",
-              required="required", placeholder="дд.мм.гггг чч:мм") }} {% if
-              form.end_datetime.errors %}
+              required="required", placeholder="дд.мм.гггг чч:мм",
+              value=form.end_datetime.data or request.args.get('end_date', ''))
+              }} {% if form.end_datetime.errors %}
               <span style="color: red">{{ form.end_datetime.errors[0] }}</span>
               {% endif %}
             </div>
@@ -37,9 +39,13 @@
           <div class="col">
             <div class="form-group">
               {{ form.car.label(class="form-control-label") }} {{
-              form.car(class="form-control car-input", onclick="openCarModal()")
-              }}
-              <input type="hidden" name="car" value="{{ form.car.data }}" />
+              form.car(class="form-control car-input", onclick="openCarModal()",
+              value=form.car.data or request.args.get('car_id', '')) }}
+              <input
+                type="hidden"
+                name="car"
+                value="{{ form.car.data or request.args.get('car_id', '') }}"
+              />
               {% if form.car.errors %}
               <span style="color: red">{{ form.car.errors[0] }}</span>
               {% endif %}

@@ -1,5 +1,4 @@
-{% extends 'base.html' %}
-{% block title %} Доступные автомобили {% endblock %}
+{% extends 'base.html' %} {% block title %} Доступные автомобили {% endblock %}
 {% block content %}
 
 <div class="container mt-5">
@@ -8,30 +7,33 @@
   <form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-row">
-        <div class="col-md-5">
-            <div class="card" style="padding: 15px; display: flex; justify-content: space-between;">
-                <div style="width: 45%;">
-                    <label for="start_date">{{ form.start_date.label }}</label>
-                    {{ form.start_date(class="form-control", id="start_date") }}
-                </div>
-                <div style="width: 45%;">
-                    <label for="end_date">{{ form.end_date.label }}</label>
-                    {{ form.end_date(class="form-control", id="end_date") }}
-                </div>
-            </div>
+      <div class="col-md-5">
+        <div
+          class="card"
+          style="padding: 15px; display: flex; justify-content: space-between"
+        >
+          <div style="width: 45%">
+            <label for="start_date">{{ form.start_date.label }}</label>
+            {{ form.start_date(class="form-control", id="start_date") }}
+          </div>
+          <div style="width: 45%">
+            <label for="end_date">{{ form.end_date.label }}</label>
+            {{ form.end_date(class="form-control", id="end_date") }}
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="col-md-6">
-        <div class="errors" style="margin-top: 15px">
-            {% for field in form %} {% for error in field.errors %}
-            <div class="alert alert-danger" role="alert">{{ error }}</div>
-            {% endfor %} {% endfor %}
-        </div>
+      <div class="errors" style="margin-top: 15px">
+        {% for field in form %} {% for error in field.errors %}
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endfor %} {% endfor %}
+      </div>
     </div>
 
     {{ form.submit(class="btn btn-primary") }}
-</form>
+  </form>
 
   {% if cars %}
   <h4 class="mt-5">
@@ -104,16 +106,16 @@
 </div>
 
 <script>
-    $(document).ready(function() {
-        $('#start_date').datetimepicker({
-            format:'Y-m-d H:i',
-            step: 30
-        });
-        $('#end_date').datetimepicker({
-            format:'Y-m-d H:i',
-            step: 30
-        });
+  $(document).ready(function () {
+    $("#start_date").datetimepicker({
+      format: "Y-m-d H:i",
+      step: 30,
     });
+    $("#end_date").datetimepicker({
+      format: "Y-m-d H:i",
+      step: 30,
+    });
+  });
 </script>
 
 {% endblock %}
