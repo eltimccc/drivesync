@@ -4,6 +4,26 @@
     max-height: 60%;
     overflow: auto;
   }
+  .custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+  }
+  .custom-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 300px;
+    text-align: center;
+  }
 </style>
 
 <div class="modal-header">
@@ -35,19 +55,44 @@
 <!-- Заголовок и содержимое модального окна -->
 <div class="modal-footer">
   <form
+    id="delete-form"
+    method="post"
+    action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}"
+  >
+    <button id="delete-button" type="submit" class="btn btn-danger">Удалить</button>
+  </form>
+  <form
     method="get"
     action="{{ url_for('booking.edit_booking', booking_id=booking.id) }}"
   >
     <button type="submit" class="btn btn-primary">Редактировать</button>
   </form>
-  <form
-    method="post"
-    action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}"
-    onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');"
-  >
-    <button type="submit" class="btn btn-danger">Удалить</button>
-  </form>
   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
     Закрыть
   </button>
 </div>
+
+<!-- Кастомное модальное окно -->
+<div id="custom-confirm-modal" class="custom-modal">
+  <div class="custom-modal-content">
+    <p>Вы уверены, что хотите удалить это бронирование?</p>
+    <button id="confirm-ok-button" class="btn btn-success">OK</button>
+    <button id="confirm-cancel-button" class="btn btn-secondary">Отмена</button>
+  </div>
+</div>
+
+<script>
+  document.getElementById('delete-button').addEventListener('click', function(event) {
+    event.preventDefault(); // предотвращаем отправку формы сразу
+    document.getElementById('custom-confirm-modal').style.display = 'flex'; // показываем кастомное модальное окно
+  });
+
+  document.getElementById('confirm-ok-button').addEventListener('click', function() {
+    document.getElementById('custom-confirm-modal').style.display = 'none'; // скрываем кастомное модальное окно
+    document.getElementById('delete-form').submit(); // отправляем форму
+  });
+
+  document.getElementById('confirm-cancel-button').addEventListener('click', function() {
+    document.getElementById('custom-confirm-modal').style.display = 'none'; // скрываем кастомное модальное окно
+  });
+</script>

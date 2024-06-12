@@ -18,7 +18,7 @@ def create_test_bookings(car_id=1, num_bookings=100):
             car_id=car_id,
             user_id=randint(
                 1, 10
-            ),  # Assuming there are at least 10 users in the database
+            ),
             phone=f"8921{randint(1000000, 9999999)}",
             description=f"Test booking {i+1}",
             start_date=booking_start,
