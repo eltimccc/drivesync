@@ -31,45 +31,46 @@ def create_superuser():
         print("Superuser created.")
 
 
-def create_app():
-    app = Flask(__name__)
-    app.config.from_object("config.Config")
+def create_app(config_class="config.Config"):
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_object(config_class)
+
+    try:
+        os.makedirs(app.instance_path, exist_ok=True)
+    except OSError:
+        pass
 
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
 
     from .views.main import main as main_blueprint
-
     app.register_blueprint(main_blueprint)
 
     from app.views.booking import booking_blueprint
-
     app.register_blueprint(booking_blueprint)
 
     from app.views.car import car_blueprint
-
     app.register_blueprint(car_blueprint)
 
     from app.views.report import report_blueprint
-
     app.register_blueprint(report_blueprint)
 
     from app.views.auth import auth_blueprint
-
     app.register_blueprint(auth_blueprint)
 
-    from app.views.errors import errors
-
-    app.register_blueprint(errors)
+    from app.views.errors import errors_blueprint
+    app.register_blueprint(errors_blueprint)
 
     with app.app_context():
-        db.create_all()
-        create_superuser()
+        db_path = os.path.join(app.instance_path, app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', ''))
+        if not os.path.exists(db_path):
+            db.create_all()
+            create_superuser()
 
     if not app.debug:
         if not os.path.exists("logs"):
-            os.mkdir("logs")
+            os.makedirs("logs", exist_ok=True)
         file_handler = RotatingFileHandler(
             "logs/flask_app.log", maxBytes=102400, backupCount=10
         )
