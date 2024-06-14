@@ -7,7 +7,7 @@
     <title>Ошибка сервера</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
+ <style>
         body {
             display: flex;
             justify-content: center;
@@ -16,36 +16,63 @@
             background-color: #f8f9fa;
             margin: 0;
             font-family: 'Arial', sans-serif;
+            overflow: hidden;
         }
 
         .container {
             text-align: center;
             background: #fff;
-            padding: 40px;
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1 {
-            font-size: 3em;
+            font-size: 2.5em;
             margin-bottom: 20px;
             color: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         p {
-            font-size: 1.2em;
-            margin-bottom: 30px;
+            font-size: 1.1em;
+            margin-bottom: 25px;
             color: #6c757d;
         }
 
         a {
             display: inline-block;
-            padding: 10px 25px;
+            padding: 10px 20px;
             color: #fff;
             background-color: #007bff;
             text-decoration: none;
             border-radius: 5px;
-            font-size: 1.1em;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
         }
 
         a:hover {
@@ -53,14 +80,31 @@
         }
 
         .icon {
-            font-size: 4em;
+            font-size: 3em;
             margin-bottom: 20px;
             color: #dc3545;
+            animation: shake 0.5s;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            50% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-5px);
+            }
         }
     </style>
 </head>
 
-<body>
+body>
     <div class="container">
         <i class="fas fa-exclamation-triangle icon"></i>
         <h1>500 - Ошибка сервера</h1>
