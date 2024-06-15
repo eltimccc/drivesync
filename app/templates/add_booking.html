@@ -1,5 +1,8 @@
-{% extends 'base.html' %} {% block title %} Добавление бронирования {% endblock
-%} {% block content %}
+{% extends 'base.html' %}
+
+{% block title %} Добавление бронирования {% endblock %}
+
+{% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
@@ -11,24 +14,20 @@
         <div class="form-row">
           <div class="col">
             <div class="form-group">
-              {{ form.start_datetime.label(class="form-control-label") }} {{
-              form.start_datetime(class="form-control datetimepicker",
-              required="required", placeholder="дд.мм.гггг чч:мм",
-              value=form.start_datetime.data or request.args.get('start_date',
-              '')) }} {% if form.start_datetime.errors %}
-              <span style="color: red"
-                >{{ form.start_datetime.errors[0] }}</span
-              >
+              {{ form.start_datetime.label(class="form-control-label") }}
+              <input type="text" name="start_datetime" class="form-control datetimepicker" required="required" placeholder="дд.мм.гггг чч:мм"
+                     value="{{ form.start_datetime.data.strftime('%d.%m.%Y %H:%M') if form.start_datetime.data else request.args.get('start_date', '') }}">
+              {% if form.start_datetime.errors %}
+              <span style="color: red">{{ form.start_datetime.errors[0] }}</span>
               {% endif %}
             </div>
           </div>
           <div class="col">
             <div class="form-group">
-              {{ form.end_datetime.label(class="form-control-label") }} {{
-              form.end_datetime(class="form-control datetimepicker",
-              required="required", placeholder="дд.мм.гггг чч:мм",
-              value=form.end_datetime.data or request.args.get('end_date', ''))
-              }} {% if form.end_datetime.errors %}
+              {{ form.end_datetime.label(class="form-control-label") }}
+              <input type="text" name="end_datetime" class="form-control datetimepicker" required="required" placeholder="дд.мм.гггг чч:мм"
+                     value="{{ form.end_datetime.data.strftime('%d.%m.%Y %H:%M') if form.end_datetime.data else request.args.get('end_date', '') }}">
+              {% if form.end_datetime.errors %}
               <span style="color: red">{{ form.end_datetime.errors[0] }}</span>
               {% endif %}
             </div>
@@ -38,14 +37,9 @@
         <div class="form-row">
           <div class="col">
             <div class="form-group">
-              {{ form.car.label(class="form-control-label") }} {{
-              form.car(class="form-control car-input", onclick="openCarModal()",
-              value=form.car.data or request.args.get('car_id', '')) }}
-              <input
-                type="hidden"
-                name="car"
-                value="{{ form.car.data or request.args.get('car_id', '') }}"
-              />
+              {{ form.car.label(class="form-control-label") }}
+              {{ form.car(class="form-control car-input", onclick="openCarModal()") }}
+              <input type="hidden" name="car" value="{{ form.car.data or request.args.get('car_id', '') }}">
               {% if form.car.errors %}
               <span style="color: red">{{ form.car.errors[0] }}</span>
               {% endif %}
@@ -53,8 +47,9 @@
           </div>
           <div class="col">
             <div class="form-group">
-              {{ form.phone.label(class="form-control-label") }} {{
-              form.phone(class="form-control") }} {% if form.phone.errors %}
+              {{ form.phone.label(class="form-control-label") }}
+              {{ form.phone(class="form-control") }}
+              {% if form.phone.errors %}
               <span style="color: red">{{ form.phone.errors[0] }}</span>
               {% endif %}
             </div>
@@ -62,16 +57,14 @@
         </div>
 
         <div class="form-group">
-          {{ form.description.label(class="form-control-label") }} {{
-          form.description(class="form-control", rows="3") }} {% if
-          form.description.errors %}
+          {{ form.description.label(class="form-control-label") }}
+          {{ form.description(class="form-control", rows="3") }}
+          {% if form.description.errors %}
           <span style="color: red">{{ form.description.errors[0] }}</span>
           {% endif %}
         </div>
 
-        <button type="submit" class="btn btn-primary btn-sm">
-          Добавить бронирование
-        </button>
+        <button type="submit" class="btn btn-primary btn-sm">Добавить бронирование</button>
       </form>
     </div>
   </div>
@@ -89,9 +82,7 @@
         </thead>
         <tbody>
           {% for car in cars %}
-          <tr
-            onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')"
-          >
+          <tr onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')">
             <td>{{ car.brand }}</td>
             <td>{{ car.car_number }}</td>
           </tr>
