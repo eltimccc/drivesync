@@ -75,34 +75,6 @@ def all_bookings():
     )
 
 
-# @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET"])
-# @login_required
-# def get_booking():
-#     current_app.logger.info("Accessed add booking page.")
-#     form = BookingForm()
-#     car_id = request.args.get("car_id")
-#     start_datetime = request.args.get("start_datetime")
-#     end_datetime = request.args.get("end_datetime")
-    
-#     cars = None
-#     if car_id and start_datetime and end_datetime:
-#         cars = Car.query.filter_by(is_deleted=False).all()
-#         return render_template(
-#             BOOKING_ADD_TEMPLATE,
-#             cars=cars,
-#             car_id=car_id,
-#             start_datetime=start_datetime,
-#             end_datetime=end_datetime,
-#         )
-#     elif request.headers.get("X-Requested-With") == "XMLHttpRequest":
-#         cars = Car.query.filter_by(is_deleted=False).all()
-#         return render_template("add_booking_modal.html", cars=cars)
-#     else:
-#         if not cars:
-#             cars = Car.query.filter_by(is_deleted=False).all()
-#         return render_template(
-#             BOOKING_ADD_TEMPLATE, cars=cars, bootstrap=True, form=form
-#         )
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET"])
 @login_required
 def get_booking():
@@ -111,7 +83,7 @@ def get_booking():
     car_id = request.args.get("car_id")
     start_datetime = request.args.get("start_datetime")
     end_datetime = request.args.get("end_datetime")
-    
+
     cars = None
     if car_id and start_datetime and end_datetime:
         cars = Car.query.filter_by(is_deleted=False).all()
@@ -140,19 +112,21 @@ def add_booking():
     cars = Car.query.filter_by(is_deleted=False).all()
 
     if request.method == "GET":
-        start_date = request.args.get('start_date')
-        end_date = request.args.get('end_date')
-        car_id = request.args.get('car_id')
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        car_id = request.args.get("car_id")
 
         if start_date:
             print(start_date)
             try:
-                form.start_datetime.data = datetime.strptime(start_date, '%d.%m.%Y %H:%M')
+                form.start_datetime.data = datetime.strptime(
+                    start_date, "%d.%m.%Y %H:%M"
+                )
             except ValueError:
                 form.start_datetime.data = None
         if end_date:
             try:
-                form.end_datetime.data = datetime.strptime(end_date, '%d.%m.%Y %H:%M')
+                form.end_datetime.data = datetime.strptime(end_date, "%d.%m.%Y %H:%M")
             except ValueError:
                 form.end_datetime.data = None
         if car_id:
@@ -196,18 +170,13 @@ def edit_booking(booking_id):
         booking.color = BOOKING_STATUSES[booking.status]
         if booking.color == BOOKING_STATUSES["Отказ"]:
             booking.end_date = booking.start_date
-        
+
         db.session.commit()
         flash("Бронирование успешно обновлено", "success")
         current_app.logger.info(f"Updated booking with ID: {booking_id}")
         return redirect(url_for(BOOKING_VIEW_BOOKING_ROUTE, booking_id=booking.id))
 
-    return render_template(
-        BOOKING_EDIT_TEMPLATE,
-        form=form,
-        booking=booking,
-        cars=cars
-    )
+    return render_template(BOOKING_EDIT_TEMPLATE, form=form, booking=booking, cars=cars)
 
 
 @booking_blueprint.route(BOOKING_DELETE_BP_ROUTE, methods=["POST"])

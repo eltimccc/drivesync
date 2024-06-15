@@ -37,7 +37,6 @@ def create_app(config_class="config.Config"):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config_class)
 
-
     try:
         os.makedirs(app.instance_path, exist_ok=True)
     except OSError:
@@ -49,25 +48,34 @@ def create_app(config_class="config.Config"):
     login_manager.init_app(app)
 
     from .views.main import main as main_blueprint
+
     app.register_blueprint(main_blueprint)
 
     from app.views.booking import booking_blueprint
+
     app.register_blueprint(booking_blueprint)
 
     from app.views.car import car_blueprint
+
     app.register_blueprint(car_blueprint)
 
     from app.views.report import report_blueprint
+
     app.register_blueprint(report_blueprint)
 
     from app.views.auth import auth_blueprint
+
     app.register_blueprint(auth_blueprint)
 
     from app.views.errors import errors_blueprint
+
     app.register_blueprint(errors_blueprint)
 
     with app.app_context():
-        db_path = os.path.join(app.instance_path, app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', ''))
+        db_path = os.path.join(
+            app.instance_path,
+            app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""),
+        )
         if not os.path.exists(db_path):
             db.create_all()
             create_superuser()
