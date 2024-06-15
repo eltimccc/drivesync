@@ -3,9 +3,9 @@ from flask_login import login_required
 
 from app.models import Booking
 from app.utils.utils import BOOKING_STATUSES
-from app.constants import BOOKING_VIEW_BOOKING_ROUTE, MAIN_TEMPLATE
+from app.constants import BOOKING_VIEW_BOOKING_ROUTE, MAIN_BP_NAME_ROUTE, MAIN_TEMPLATE
 
-main = Blueprint("main", __name__)
+main = Blueprint(MAIN_BP_NAME_ROUTE, __name__)
 
 
 @main.route("/", methods=["GET"])
