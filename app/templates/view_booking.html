@@ -97,12 +97,12 @@
 
 <script>
   document.getElementById('delete-button').addEventListener('click', function(event) {
-    event.preventDefault(); // предотвращаем отправку формы сразу
-    document.getElementById('custom-confirm-modal').style.display = 'flex'; // показываем кастомное модальное окно
+    event.preventDefault();
+    document.getElementById('custom-confirm-modal').style.display = 'flex';
   });
 
   document.getElementById('confirm-cancel-button').addEventListener('click', function() {
-    document.getElementById('custom-confirm-modal').style.display = 'none'; // скрываем кастомное модальное окно
+    document.getElementById('custom-confirm-modal').style.display = 'none';
   });
 </script>
 {% endblock %}

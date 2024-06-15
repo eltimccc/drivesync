@@ -98,7 +98,7 @@ class BookingForm(FlaskForm):
         self.set_car_choices()
 
     def set_car_choices(self):
-        car_choices = [(0, "Выберите автомобиль")]  # Пустое значение для пустого выбора
+        car_choices = [(0, "Выберите автомобиль")]
         car_choices.extend(
             (car.id, f"{car.brand} {car.car_number}")
             for car in Car.query.filter_by(is_deleted=False).all()
@@ -121,14 +121,15 @@ class BookingForm(FlaskForm):
             )
 
     def validate_car(self, field):
-        overlapping_bookings = Booking.query.filter(
-            Booking.car_id == field.data,
-            Booking.start_date < self.end_datetime.data,
-            Booking.end_date > self.start_datetime.data,
-        ).first()
-        if overlapping_bookings:
-            raise ValidationError(
-                "Эта машина уже забронирована на выбранный период")
+        if field.data is not None:
+            overlapping_bookings = Booking.query.filter(
+                Booking.car_id == field.data,
+                Booking.start_date < self.end_datetime.data,
+                Booking.end_date > self.start_datetime.data,
+            ).first()
+            if overlapping_bookings:
+                raise ValidationError(
+                    "Эта машина уже забронирована на выбранный период")
 
 
 class BookingUpdateForm(FlaskForm):

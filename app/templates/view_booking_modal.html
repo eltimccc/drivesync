@@ -83,16 +83,16 @@
 
 <script>
   document.getElementById('delete-button').addEventListener('click', function(event) {
-    event.preventDefault(); // предотвращаем отправку формы сразу
-    document.getElementById('custom-confirm-modal').style.display = 'flex'; // показываем кастомное модальное окно
+    event.preventDefault();
+    document.getElementById('custom-confirm-modal').style.display = 'flex';
   });
 
   document.getElementById('confirm-ok-button').addEventListener('click', function() {
-    document.getElementById('custom-confirm-modal').style.display = 'none'; // скрываем кастомное модальное окно
-    document.getElementById('delete-form').submit(); // отправляем форму
+    document.getElementById('custom-confirm-modal').style.display = 'none';
+    document.getElementById('delete-form').submit();
   });
 
   document.getElementById('confirm-cancel-button').addEventListener('click', function() {
-    document.getElementById('custom-confirm-modal').style.display = 'none'; // скрываем кастомное модальное окно
+    document.getElementById('custom-confirm-modal').style.display = 'none';
   });
 </script>
