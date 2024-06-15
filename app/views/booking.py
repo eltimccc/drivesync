@@ -16,12 +16,15 @@ from app.constants import (
     BOOKING_ADD_TEMPLATE,
     BOOKING_ALL_ROUTE,
     BOOKING_ALL_TEMPLATE,
+    BOOKING_BP_NAME_ROUTE,
     BOOKING_DELETE_BP_ROUTE,
     BOOKING_DETAIL_MODAL_TEMPLATE,
     BOOKING_DETAIL_TEMPLATE,
     BOOKING_EDIT_BP_ROUTE,
     BOOKING_EDIT_TEMPLATE,
     BOOKING_MAIN_ROUTE,
+    BOOKING_MODAL_TEMPLATE,
+    BOOKING_URL_PREFIX,
     BOOKING_VIEW_BOOKING_ROUTE,
     BOOKING_VIEW_BP_ROUTE,
 )
@@ -30,7 +33,7 @@ from app.models import Booking, Car
 from app.utils.utils import BOOKING_STATUSES
 
 
-booking_blueprint = Blueprint("booking", __name__, url_prefix="/booking")
+booking_blueprint = Blueprint(BOOKING_BP_NAME_ROUTE, __name__, url_prefix=BOOKING_URL_PREFIX)
 
 
 @booking_blueprint.route(BOOKING_VIEW_BP_ROUTE, methods=["GET"])
@@ -96,9 +99,9 @@ def get_booking():
         )
     elif request.headers.get("X-Requested-With") == "XMLHttpRequest":
         cars = Car.query.filter_by(is_deleted=False).all()
-        return render_template("add_booking_modal.html", cars=cars)
+        return render_template(BOOKING_MODAL_TEMPLATE, cars=cars)
     else:
-        if cars is None:  # Изменено на is None
+        if cars is None:
             cars = Car.query.filter_by(is_deleted=False).all()
         return render_template(
             BOOKING_ADD_TEMPLATE, cars=cars, bootstrap=True, form=form

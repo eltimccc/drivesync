@@ -12,13 +12,14 @@ from flask_login import login_required
 
 from app.constants import (
     CAR_ADD_BP_ROUTE,
-    CAR_ADD_MODAL_TEMPLATE,
     CAR_ADD_TEMPLATE,
+    CAR_BP_NAME_ROUTE,
     CAR_DELETE_BP_ROUTE,
     CAR_DETAIL_BP_ROUTE,
     CAR_DETAIL_TEMPLATE,
     CAR_EDIT_BP_ROUTE,
     CAR_EDIT_TEMPLATE,
+    CAR_URL_PREFIX,
     CARS_BP_ROUTE,
     CARS_GET,
     CARS_GET_ROUTE,
@@ -28,7 +29,7 @@ from app.models import Booking, Car
 from app import db
 
 
-car_blueprint = Blueprint("car", __name__, url_prefix="/car")
+car_blueprint = Blueprint(CAR_BP_NAME_ROUTE, __name__, url_prefix=CAR_URL_PREFIX)
 
 
 @car_blueprint.route(CAR_ADD_BP_ROUTE, methods=["GET", "POST"])
