@@ -17,5 +17,5 @@ def internal_server_error(e):
 
 @errors_blueprint.app_errorhandler(403)
 def internal_server_error(e):
-    current_app.logger.error(f"INTERNAL SERVER ERROR at {request.url}: {e}")
-    return render_template("errors/500.html"), 500
+    current_app.logger.error(f"ACCESS IS DENIED at {request.url}: {e}")
+    return render_template("errors/403.html"), 403
