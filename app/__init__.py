@@ -1,6 +1,7 @@
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+import time
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -16,6 +17,8 @@ login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 login_manager.login_message_category = "info"
 
+os.environ['TZ'] = 'Europe/Moscow'
+time.tzset()
 
 def create_superuser():
     from .models import User

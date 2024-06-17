@@ -11,5 +11,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  web:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://${DATABASE_LOGIN}:${DATABASE_PASSWORD}@db:5432/${DATABASE_NAME}
+      FLASK_ENV: development
+    ports:
+      - "5001:5000"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+
 volumes:
   postgres_data:
