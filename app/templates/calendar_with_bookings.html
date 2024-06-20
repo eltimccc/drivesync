@@ -20,12 +20,33 @@
         border-radius: 0px;
       }
       .fc-day-today {
-        background-color: rgba(
-          204,
-          255,
-          255,
-          0.5
-        ) !important;
+        background-color: rgba(204, 255, 255, 0.5) !important;
+      }
+    </style>
+    <style>
+      @media (max-width: 768px) {
+        .fc-header-toolbar {
+          display: flex;
+          flex-direction: column;
+        }
+        .fc-header-toolbar .fc-toolbar-title {
+          order: -1;
+          font-size: 1.5rem; /* Уменьшение шрифта */
+          text-align: center; /* Центрирование текста */
+        }
+      }
+
+      @media (min-width: 769px) {
+        .fc-header-toolbar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .fc-header-toolbar .fc-toolbar-title {
+          order: 0;
+          font-size: 1.5rem; /* Размер шрифта для больших экранов */
+          text-align: center; /* Центрирование текста */
+        }
       }
     </style>
   </head>
@@ -73,50 +94,55 @@
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-          var calendarEl = document.getElementById('calendar');
+        var calendarEl = document.getElementById('calendar');
 
-          var calendar = new FullCalendar.Calendar(calendarEl, {
-              initialView: 'dayGridWeek',
-              events: [
-                  {% for booking in bookings %}
-                  {
-                      title: '{{ booking.car }}',
-                      start: '{{ booking.start }}',
-                      end: '{{ booking.end }}',
-                      url: '{{ url_for("booking.view_booking", booking_id=booking.id) }}',
-                      color: '{{ booking.status_color }}'
-                  }{% if not loop.last %},{% endif %}
-                  {% endfor %}
-              ],
-              headerToolbar: {
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek'
-              },
-              eventClick: function(info) {
-                  info.jsEvent.preventDefault();
-                  $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
-              },
-              dateClick: function(info) {
-                  calendar.gotoDate(info.date);
-                  calendar.changeView('dayGridDay');
-              },
-              locale: 'ru',
-              monthNames: [
-                  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-                  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-              ],
-              buttonText: {
-                  month: 'Месяц',
-                  week: 'Неделя',
-                  year: 'Год',
-                  day: 'День',
-              }
-          });
+        // Определяем начальный вид в зависимости от ширины экрана
+        var initialView = window.innerWidth <= 768 ? 'dayGridDay' : 'dayGridWeek';
 
-          calendar.render();
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: initialView,
+          events: [
+                      {% for booking in bookings %}
+                      {
+                          title: '{{ booking.car }}',
+                          start: '{{ booking.start }}',
+                          end: '{{ booking.end }}',
+                          url: '{{ url_for("booking.view_booking", booking_id=booking.id) }}',
+                          color: '{{ booking.status_color }}'
+                      }{% if not loop.last %},{% endif %}
+                      {% endfor %}
+                  ],
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,dayGridYear,dayGridDay,dayGridWeek'
+          },
+          eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            $('#bookingModal').modal('show').find('.modal-content').load(info.event.url);
+          },
+          dateClick: function(info) {
+            calendar.gotoDate(info.date);
+            calendar.changeView('dayGridDay');
+          },
+          locale: 'ru',
+          monthNames: [
+            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+          ],
+          buttonText: {
+            month: 'Месяц',
+            week: 'Неделя',
+            year: 'Год',
+            day: 'День',
+          }
+        });
+
+        calendar.render();
+
       });
     </script>
+
     {% endblock %}
   </body>
 </html>
