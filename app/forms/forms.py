@@ -190,3 +190,7 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", validators=[DataRequired()])
     remember = BooleanField("Запомнить меня")
     submit = SubmitField("Login")
+
+
+class HiddenForm(FlaskForm):
+    pass

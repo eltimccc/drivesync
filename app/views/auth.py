@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, current_app
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_required, login_user, current_user, logout_user
 from app import db, bcrypt, login_manager
 from app.constants import (
     AUTH_BP_NAME_ROUTE,
+    AUTH_LIST_BP_ROUTE,
+    AUTH_LIST_TEMPLATE,
     AUTH_LOGIN_BP_ROUTE,
     AUTH_LOGIN_TEMPLATE,
     AUTH_LOGOUT_BP_ROUTE,
@@ -14,7 +16,7 @@ from app.constants import (
 )
 from app.utils.decorators import superuser_required
 from app.models import User
-from app.forms.forms import RegistrationForm, LoginForm
+from app.forms.forms import HiddenForm, RegistrationForm, LoginForm
 
 auth_blueprint = Blueprint(AUTH_BP_NAME_ROUTE, __name__, url_prefix=AUTH_URL_PREFIX)
 
@@ -59,8 +61,30 @@ def login():
             current_app.logger.warning("Failed login attempt.")
     return render_template(AUTH_LOGIN_TEMPLATE, title="Login", form=form)
 
+
 @auth_blueprint.route(AUTH_LOGOUT_BP_ROUTE)
+@login_required
 def logout():
     current_app.logger.info(f"User {current_user.username} logged out.")
     logout_user()
     return redirect(url_for(BOOKING_MAIN_ROUTE))
+
+
+@auth_blueprint.route(AUTH_LIST_BP_ROUTE, methods=["GET"])
+@login_required
+@superuser_required
+def list_users():
+    form = HiddenForm()
+    users = User.query.all()
+    return render_template(AUTH_LIST_TEMPLATE, users=users, form=form)
+
+
+@auth_blueprint.route('/delete_user/<int:user_id>', methods=["POST"])
+@login_required
+@superuser_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    flash('Пользователь был удален!', 'success')
+    return redirect(url_for('auth.list_users'))
