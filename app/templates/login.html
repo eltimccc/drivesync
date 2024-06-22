@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Login</title>
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -25,7 +24,7 @@
         .form-control {
             background-color: #2c3e50;
             border: none;
-            color: #ecf0f1;
+            color: #000000;
         }
         .form-control::placeholder {
             color: #95a5a6;
@@ -44,12 +43,12 @@
                         <h2>Login</h2>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="">
+                        <form method="POST" action="{{ url_for('auth.login') }}">
                             {{ form.hidden_tag() }}
                             <div class="form-group">
-                                {{ form.email.label(class="form-label") }}
-                                {{ form.email(class="form-control", placeholder="Enter your email") }}
-                                {% for error in form.email.errors %}
+                                {{ form.username.label(class="form-label") }}
+                                {{ form.username(class="form-control", placeholder="Enter your username") }}
+                                {% for error in form.username.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
@@ -71,19 +70,8 @@
             </div>
         </div>
     </div>
-    <!-- Bootstrap JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.form-control').on('focus', function() {
-                $(this).css('background-color', '#34495e');
-            }).on('blur', function() {
-                $(this).css('background-color', '#2c3e50');
-            });
-        });
-    </script>
 </body>
 </html>
-
