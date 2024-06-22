@@ -1,5 +1,5 @@
     .modal-content {
-       width: 80%;
+        width: 90%;
         max-height: 60%;
         overflow: auto;
     }
@@ -8,7 +8,7 @@
         margin: auto;
         padding: 20px;
         border: 1px solid #888;
-        width: 30%;
+        width: 50%;
         max-height: 60%;
         overflow: auto;
     }
