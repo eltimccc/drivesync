@@ -49,16 +49,15 @@ def login():
         return redirect(url_for(BOOKING_MAIN_ROUTE))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             current_app.logger.info(f"User {user.username} logged in successfully.")
             return redirect(url_for(BOOKING_MAIN_ROUTE))
         else:
-            flash("Неполучилось, проверьте ввденные данные", "danger")
+            flash("Неполучилось, проверьте введенные данные", "danger")
             current_app.logger.warning("Failed login attempt.")
     return render_template(AUTH_LOGIN_TEMPLATE, title="Login", form=form)
-
 
 @auth_blueprint.route(AUTH_LOGOUT_BP_ROUTE)
 def logout():
