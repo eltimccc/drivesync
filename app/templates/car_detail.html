@@ -1,35 +1,92 @@
 {% extends 'base.html' %}
 
-<title>{% block title %}{{ car.brand }} {{ car.car_number }}{% endblock %}</title>
+{% block title %}{{ car.brand }} {{ car.car_number }}{% endblock %}
+
+{% block additional_styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    .fixed-header {
+        max-height: 78vh;
+        overflow-y: auto;
+    }
+    .table-container {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+    .completed {
+        background-color: #00d92497 !important;
+    }
+    .canceled {
+        background-color: #ff4c4c33 !important;
+    }
+    .pending {
+        background-color: #ffff0097 !important;
+    }
+    .status-icon {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        border-radius: 50%;
+    }
+    .status-completed {
+        background-color: #00d924;
+    }
+    .status-rental {
+        background-color: #007bff;
+    }
+    .status-canceled {
+        background-color: #ff4c4c;
+    }
+    .status-pending {
+        background-color: #ffeb3b;
+    }
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background: #2c3e50;
+        color: white;
+        z-index: 1;
+    }
+    .table tbody td:first-child {
+        white-space: nowrap;
+        width: 1%;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <h4 class="text-center">Список бронирований {{ car.brand }} {{ car.transmission }} {{ car.car_number }}</h4>
-    <div class="fixed-header">
-        <table class="table table-hover table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th data-sort="id">ID</th>
-                    <th data-sort="start_date">Начало</th>
-                    <th data-sort="end_date">Окончание</th>
-                    <th data-sort="status">Статус</th>
-                    <th data-sort="phone">Телефон</th>
-                    <th data-sort="description">Заметка</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for booking in bookings %}
-                <tr>
-                    <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
-                    <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
-                    <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
-                    <td>{{ booking.status }}</td>
-                    <td>{{ booking.phone }}</td>
-                    <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="table-container">
+        <div class="fixed-header">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th data-sort="id">ID</th>
+                        <th data-sort="start_date">Начало</th>
+                        <th data-sort="end_date">Окончание</th>
+                        <th data-sort="phone">Телефон</th>
+                        <th data-sort="description">Заметка</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr class="{% if booking.status == 'Завершено' %}completed{% elif booking.status == 'Аренда' %}rental{% elif booking.status == 'Отказ' %}canceled{% elif booking.status == 'Ожидание' %}pending{% endif %}">
+                        <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
+                        <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
+                        <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
+                        <td>{{ booking.phone }}</td>
+                        <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <script>
