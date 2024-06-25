@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} Добавление бронирования {% endblock %}
+{% block title %}Добавление бронирования{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -38,8 +38,9 @@
           <div class="col">
             <div class="form-group">
               {{ form.car.label(class="form-control-label") }}
-              {{ form.car(class="form-control car-input", onclick="openCarModal()") }}
-              <input type="hidden" name="car" value="{{ form.car.data or request.args.get('car_id', '') }}">
+              <input type="text" class="form-control car-input" onclick="openCarModal()" readonly
+                     value="{{ form.car.data or request.args.get('car_id', '') }}">
+              <input type="hidden" name="car" id="car-id" value="{{ form.car.data or request.args.get('car_id', '') }}">
               {% if form.car.errors %}
               <span style="color: red">{{ form.car.errors[0] }}</span>
               {% endif %}
@@ -121,9 +122,8 @@
   }
 
   function selectCar(carId, carDescription) {
-    var carInput = document.querySelector('[name="car"]');
-    carInput.value = carId;
-    carInput.nextElementSibling.textContent = carDescription;
+    document.querySelector('[name="car"]').value = carId;
+    document.querySelector('.car-input').value = carDescription;
     closeCarModal();
   }
 </script>
