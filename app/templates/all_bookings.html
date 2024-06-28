@@ -35,6 +35,21 @@
         color: white;
         z-index: 1;
     }
+
+    .highlight {
+        animation: highlight 2s ease-in-out;
+    }
+
+    @keyframes highlight {
+        0% {
+            background-color: purple;
+            transform: scale(1.05);
+        }
+        100% {
+            background-color: white;
+            transform: scale(1);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -60,7 +75,7 @@
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
-                    <tr class="{% if booking.status == 'Завершено' %}status-completed{% elif booking.status == 'Аренда' %}status-arenda{% elif booking.status == 'Отказ' %}status-otkaz{% elif booking.status == 'Ожидание' %}status-ozhidanie{% endif %}">
+                    <tr id="booking-{{ booking.id }}" class="{% if booking.status == 'Завершено' %}status-completed{% elif booking.status == 'Аренда' %}status-arenda{% elif booking.status == 'Отказ' %}status-otkaz{% elif booking.status == 'Ожидание' %}status-ozhidanie{% endif %}">
                         <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
                         <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.created_at.strftime('%d.%m.%y') }}</a></td>
                         <td><a href="{{ url_for('car.car_detail', car_id=booking.car_id) }}">{{ booking.car.brand }}</a></td>
@@ -98,6 +113,19 @@
 
             window.location.href = currentUrl.toString();
         });
+    });
+
+    window.addEventListener('load', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const editedBookingId = urlParams.get('edited_booking_id');
+
+        if (editedBookingId) {
+            const editedBookingRow = document.getElementById(`booking-${editedBookingId}`);
+            if (editedBookingRow) {
+                editedBookingRow.classList.add('highlight');
+                editedBookingRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
     });
 </script>
 {% endblock %}

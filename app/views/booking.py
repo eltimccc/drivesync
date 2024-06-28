@@ -14,6 +14,7 @@ from app import db
 from app.constants import (
     BOOKING_ADD_BP_ROUTE,
     BOOKING_ADD_TEMPLATE,
+    BOOKING_ALL_BOOKING_ROUTE,
     BOOKING_ALL_ROUTE,
     BOOKING_ALL_TEMPLATE,
     BOOKING_BP_NAME_ROUTE,
@@ -207,7 +208,7 @@ def edit_booking(booking_id):
         db.session.commit()
         flash("Бронирование успешно обновлено", "success")
         current_app.logger.info(f"User {current_user.username} updated booking with ID: {booking_id}")
-        return redirect(url_for(BOOKING_VIEW_BOOKING_ROUTE, booking_id=booking.id))
+        return redirect(url_for(BOOKING_ALL_BOOKING_ROUTE, edited_booking_id=booking.id))
     else:
         current_app.logger.warning(f"User {current_user.username} failed booking form validation for booking ID: {booking_id}")
 
