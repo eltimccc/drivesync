@@ -1,39 +1,52 @@
 {% extends 'base.html' %} {% block title %} Доступные автомобили {% endblock %}
-{% block content %}
+{% block additional_styles %} 
+<style>
+  .xdsoft_datetimepicker {
+    transform: scale(1.2);
+    transform-origin: top left;
+  }
 
+  #start_date,
+  #end_date {
+    max-width: 370px;
+  }
+</style>
+{% endblock %}
+{% block content %}
 <div class="container mt-5">
   <h4 class="mb-4">Поиск доступных автомобилей</h4>
 
-  <form method="POST">
+<form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-row">
-      <div class="col-md-5">
-        <div
-          class="card"
-          style="padding: 15px; display: flex; justify-content: space-between"
-        >
-          <div style="width: 45%">
-            <label for="start_date">{{ form.start_date.label }}</label>
-            {{ form.start_date(class="form-control", id="start_date") }}
-          </div>
-          <div style="width: 45%">
-            <label for="end_date">{{ form.end_date.label }}</label>
-            {{ form.end_date(class="form-control", id="end_date") }}
-          </div>
+        <div class="col-md-6 mb-3">
+            <div class="card p-3">
+                <div class="form-group">
+                    <label for="start_date">{{ form.start_date.label }}</label>
+                    {{ form.start_date(class="form-control", id="start_date") }}
+                </div>
+                <div class="form-group">
+                    <label for="end_date">{{ form.end_date.label }}</label>
+                    {{ form.end_date(class="form-control", id="end_date") }}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="col-md-6">
-      <div class="errors" style="margin-top: 15px">
-        {% for field in form %} {% for error in field.errors %}
-        <div class="alert alert-danger" role="alert">{{ error }}</div>
-        {% endfor %} {% endfor %}
-      </div>
+        <div class="errors mt-3">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger" role="alert">{{ error }}</div>
+                {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 
-    {{ form.submit(class="btn btn-primary") }}
-  </form>
+    <div class="col-md-12 mt-3">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
 
   {% if cars %}
   <h4 class="mt-5">
