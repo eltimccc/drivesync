@@ -127,6 +127,8 @@ class BookingForm(FlaskForm):
                 Booking.car_id == field.data,
                 Booking.start_date < self.end_datetime.data,
                 Booking.end_date > self.start_datetime.data,
+                Booking.status != 'Отказ',
+                Booking.status != 'Завершено'
             ).first()
             if overlapping_bookings:
                 raise ValidationError(
