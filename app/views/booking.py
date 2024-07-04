@@ -31,6 +31,7 @@ from app.constants import (
 )
 from app.forms.forms import BookingForm, BookingUpdateForm
 from app.models import Booking, Car
+from app.utils.booking_filters import apply_filters, get_sorting_parameters
 from app.utils.utils import BOOKING_STATUSES
 
 
@@ -64,37 +65,55 @@ def view_booking(booking_id):
         )
 
 
+# @booking_blueprint.route(BOOKING_ALL_ROUTE, methods=["GET"])
+# @login_required
+# def all_bookings():
+#     current_app.logger.info("Accessed all bookings page.")
+#     sort_by = request.args.get("sort_by", "created_at")
+#     sort_order = request.args.get("sort_order", "desc")
+#     current_app.logger.debug(f"Sorting bookings by {sort_by} in {sort_order} order")
+
+#     valid_sort_columns = {
+#         "created_at": Booking.created_at,
+#         "start_date": Booking.start_date,
+#         "end_date": Booking.end_date,
+#         "car_number": Car.car_number,
+#         "transmission": Car.transmission,
+#         "id": Booking.id,
+#         "car_id": Booking.car_id,
+#         "phone": Booking.phone,
+#         "user_id": Booking.user_id
+#     }
+
+#     if sort_by not in valid_sort_columns:
+#         sort_by = "created_at"
+
+#     sort_column = valid_sort_columns[sort_by]
+#     sort_direction = sort_column.desc() if sort_order == "desc" else sort_column.asc()
+
+#     bookings = db.session.query(Booking).join(Car).order_by(sort_direction).all()
+
+#     current_app.logger.debug(f"Retrieved {len(bookings)} bookings")
+#     return render_template(
+#         BOOKING_ALL_TEMPLATE, bookings=bookings, sort_by=sort_by, sort_order=sort_order
+#     )
 @booking_blueprint.route(BOOKING_ALL_ROUTE, methods=["GET"])
 @login_required
 def all_bookings():
     current_app.logger.info("Accessed all bookings page.")
-    sort_by = request.args.get("sort_by", "created_at")
-    sort_order = request.args.get("sort_order", "desc")
-    current_app.logger.debug(f"Sorting bookings by {sort_by} in {sort_order} order")
-
-    valid_sort_columns = {
-        "created_at": Booking.created_at,
-        "start_date": Booking.start_date,
-        "end_date": Booking.end_date,
-        "car_number": Car.car_number,
-        "transmission": Car.transmission,
-        "id": Booking.id,
-        "car_id": Booking.car_id,
-        "phone": Booking.phone,
-        "user_id": Booking.user_id
-    }
-
-    if sort_by not in valid_sort_columns:
-        sort_by = "created_at"
-
-    sort_column = valid_sort_columns[sort_by]
-    sort_direction = sort_column.desc() if sort_order == "desc" else sort_column.asc()
-
-    bookings = db.session.query(Booking).join(Car).order_by(sort_direction).all()
-
+    
+    sort_direction = get_sorting_parameters()
+    current_app.logger.debug(f"Sorting bookings in {sort_direction} order")
+    
+    query = db.session.query(Booking).join(Car).order_by(sort_direction)
+    
+    query = apply_filters(query)
+    
+    bookings = query.all()
+    
     current_app.logger.debug(f"Retrieved {len(bookings)} bookings")
     return render_template(
-        BOOKING_ALL_TEMPLATE, bookings=bookings, sort_by=sort_by, sort_order=sort_order
+        BOOKING_ALL_TEMPLATE, bookings=bookings, sort_by=request.args.get("sort_by", "created_at"), sort_order=request.args.get("sort_order", "desc")
     )
 
 
