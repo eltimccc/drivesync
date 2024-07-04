@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Все бронирования{% endblock %}
+{% block title %}Бронирования{% endblock %}
 
 {% block additional_styles %}
 <style>
@@ -50,15 +50,27 @@
             transform: scale(1);
         }
     }
+    
+    /* Custom styles for pick-up and drop-off */
+    .pick-up {
+        background-color: #dff0d8 !important;  /* Light green */
+    }
+    .drop-off {
+        background-color: #f2dede !important;  /* Light red */
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h4 class="text-center">Все бронирования</h4>
+    <h4 class="text-center">Бронирования</h4>
+    <div class="d-flex justify-content-center mb-3">
+        <a href="{{ url_for('booking.all_bookings') }}" class="btn btn-secondary">Все бронирования</a>
+        <a href="{{ url_for('booking.all_bookings', filter='today') }}" class="btn btn-primary ml-2">Сегодня</a>
+    </div>
     <div class="table-container">
         <div class="fixed-header">
-            <table class="table table-hover table-striped">
+            <table class="table table-hover">
                 <thead class="table-dark">
                     <tr>
                         <th data-sort="id">ID</th>
@@ -75,7 +87,7 @@
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
-                    <tr id="booking-{{ booking.id }}" class="{% if booking.status == 'Завершено' %}status-completed{% elif booking.status == 'Аренда' %}status-arenda{% elif booking.status == 'Отказ' %}status-otkaz{% elif booking.status == 'Ожидание' %}status-ozhidanie{% endif %}">
+                    <tr id="booking-{{ booking.id }}" class="{% if booking.status == 'Завершено' %}status-completed{% elif booking.status == 'Аренда' %}status-arenda{% elif booking.status == 'Отказ' %}status-otkaz{% elif booking.status == 'Ожидание' %}status-ozhidanie{% endif %} {% if booking.filter_type == 'pick-up' %}pick-up{% elif booking.filter_type == 'drop-off' %}drop-off{% endif %}">
                         <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
                         <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.created_at.strftime('%d.%m.%y') }}</a></td>
                         <td><a href="{{ url_for('car.car_detail', car_id=booking.car_id) }}">{{ booking.car.brand }}</a></td>
@@ -93,39 +105,6 @@
         </div>
     </div>
 </div>
-<script>
-    document.querySelectorAll('.table thead th').forEach(header => {
-        header.addEventListener('click', function() {
-            const sortField = this.getAttribute('data-sort');
-            if (!sortField) return;
+<script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
 
-            const currentUrl = new URL(window.location.href);
-            const currentSortBy = currentUrl.searchParams.get('sort_by');
-            const currentSortOrder = currentUrl.searchParams.get('sort_order');
-
-            let newSortOrder = 'asc';
-            if (currentSortBy === sortField && currentSortOrder === 'asc') {
-                newSortOrder = 'desc';
-            }
-
-            currentUrl.searchParams.set('sort_by', sortField);
-            currentUrl.searchParams.set('sort_order', newSortOrder);
-
-            window.location.href = currentUrl.toString();
-        });
-    });
-
-    window.addEventListener('load', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const editedBookingId = urlParams.get('edited_booking_id');
-
-        if (editedBookingId) {
-            const editedBookingRow = document.getElementById(`booking-${editedBookingId}`);
-            if (editedBookingRow) {
-                editedBookingRow.classList.add('highlight');
-                editedBookingRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-    });
-</script>
 {% endblock %}
