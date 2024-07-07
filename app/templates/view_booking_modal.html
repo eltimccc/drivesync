@@ -35,9 +35,7 @@
 <div class="modal-body">
   <p>
     <strong>Автомобиль:</strong>
-    <a href="{{ url_for('car.car_detail', car_id=booking.car.id) }}"
-      >{{ booking.car.brand }} {{ booking.car.car_number }}</a
-    >
+    <a href="{{ url_for('car.car_detail', car_id=booking.car.id) }}">{{ booking.car.brand }} {{ booking.car.car_number }}</a>
   </p>
   <p>
     <strong>Начало:</strong> {{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}
@@ -52,27 +50,17 @@
   <p><strong>Дата создания:</strong> {{ formatted_created_at }}</p>
 </div>
 
-<!-- Заголовок и содержимое модального окна -->
 <div class="modal-footer">
-  <form
-    id="delete-form"
-    method="post"
-    action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}"
-  >
+  <form id="delete-form" method="post" action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}">
     <button id="delete-button" type="submit" class="btn btn-danger">Удалить</button>
   </form>
-  <form
-    method="get"
-    action="{{ url_for('booking.edit_booking', booking_id=booking.id) }}"
-  >
+  <form method="get" action="{{ url_for('booking.edit_booking', booking_id=booking.id) }}">
     <button type="submit" class="btn btn-primary">Редактировать</button>
   </form>
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-    Закрыть
-  </button>
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
 </div>
 
-<!-- Кастомное модальное окно -->
+<!-- Кастомное модальное окно для подтверждения удаления -->
 <div id="custom-confirm-modal" class="custom-modal">
   <div class="custom-modal-content">
     <p>Вы уверены, что хотите удалить это бронирование?</p>
@@ -83,16 +71,19 @@
 
 <script>
   document.getElementById('delete-button').addEventListener('click', function(event) {
+    console.log('Delete button clicked');
     event.preventDefault();
     document.getElementById('custom-confirm-modal').style.display = 'flex';
   });
 
   document.getElementById('confirm-ok-button').addEventListener('click', function() {
+    console.log('Confirm OK button clicked');
     document.getElementById('custom-confirm-modal').style.display = 'none';
     document.getElementById('delete-form').submit();
   });
 
   document.getElementById('confirm-cancel-button').addEventListener('click', function() {
+    console.log('Confirm Cancel button clicked');
     document.getElementById('custom-confirm-modal').style.display = 'none';
   });
 </script>

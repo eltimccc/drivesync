@@ -4,111 +4,163 @@
 
 {% block additional_styles %}
 <style>
-    .status-completed {
-        background-color: #00d92497 !important;  /* Зеленый цвет */
+  .status-completed {
+    background-color: #00d92497 !important;
+  }
+  .status-otkaz {
+    background-color: #ff4c4c33 !important;
+  }
+  .status-ozhidanie {
+    background-color: #ffff0097 !important;
+  }
+  .status-arenda {
+    background-color: rgba(0, 123, 255, 0.5);
+  }
+  .status-pickup-cell {
+    background-color: rgba(0, 123, 255, 0.5) !important;
+  }
+  .status-dropoff-cell {
+    background-color: #ff0000 !important;
+  }
+  .fixed-header {
+    max-height: 78vh;
+    overflow-y: auto;
+  }
+  .table-container {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  .table thead th {
+    position: sticky;
+    top: 0;
+    background: #2c3e50;
+    color: white;
+    z-index: 1;
+  }
+  .highlight {
+    animation: highlight 2s ease-in-out;
+  }
+  @keyframes highlight {
+    0% {
+      background-color: purple;
+      transform: scale(1.05);
     }
-
-    .status-otkaz {
-        background-color: #ff4c4c33 !important;  /* Красный цвет */
+    100% {
+      background-color: white;
+      transform: scale(1);
     }
-    .status-ozhidanie {
-        background-color: #ffff0097 !important;  /* Желтый цвет */
-    }
-    .status-arenda {
-        background-color: rgba(0, 123, 255, 0.5); /* Синеватый с полупрозрачностью */
-    }
-
-    .status-pickup-cell {
-        background-color: rgba(0, 123, 255, 0.5) !important;  /* Синеватый с полупрозрачностью */
-    }
-    .status-dropoff-cell {
-        background-color: #ff0000 !important;  /* Красный цвет */
-    }
-
-    .fixed-header {
-        max-height: 78vh;
-        overflow-y: auto;
-    }
-    .table-container {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 20px;
-    }
-    .table-hover tbody tr:hover {
-        background-color: #f1f1f1;
-    }
-    .table thead th {
-        position: sticky;
-        top: 0;
-        background: #2c3e50;
-        color: white;
-        z-index: 1;
-    }
-
-    .highlight {
-        animation: highlight 2s ease-in-out;
-    }
-
-    @keyframes highlight {
-        0% {
-            background-color: purple;
-            transform: scale(1.05);
-        }
-        100% {
-            background-color: white;
-            transform: scale(1);
-        }
-    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h4 class="text-center">Бронирования</h4>
-<div class="d-flex justify-content-center mb-3">
+  <h4 class="text-center">Бронирования</h4>
+  <div class="d-flex justify-content-center mb-3">
     <a href="{{ url_for('booking.bookings_today') }}" class="btn btn-outline-primary ml-2">Сегодня</a>
-</div>
+  </div>
 
-    <div class="table-container">
-        <div class="fixed-header">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th></th> <!-- Новый столбец слева -->
-                        <th data-sort="id">ID</th>
-                        
-                        <th data-sort="car_id">Автомобиль</th>
-                        <th data-sort="transmission">КПП</th>
-                        <th data-sort="car_number">Гос. номер</th>
-                        <th data-sort="start_date">Дата начала</th>
-                        <th data-sort="end_date">Дата окончания</th>
-                        <th data-sort="phone">Телефон</th>
-                        <th>Заметка</th>
-                        <th data-sort="user_id">Добавил</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for booking in bookings %}
-                    <tr id="booking-{{ booking.id }}" class="{% if booking.status == 'Завершено' %}status-completed{% elif booking.status == 'Аренда' %}status-arenda{% elif booking.status == 'Отказ' %}status-otkaz{% elif booking.status == 'Ожидание' %}status-ozhidanie{% endif %}" onclick="window.location='{{ url_for('booking.view_booking', booking_id=booking.id) }}'">
-                        <td class="{% if booking.start_date.date() == today %}status-pickup-cell{% elif booking.end_date.date() == today %}status-dropoff-cell{% endif %}"></td>
-                        <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
-                       
-                        <td>{{ booking.car.brand }}</a></td>
-                        <td>{{ booking.car.transmission }}</td>
-                        <td>{{ booking.car.car_number }}</td>
-                        <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
-                        <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
-                        <td>{{ booking.phone }}</td>
-                        <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
-                        <td>{{ booking.user.username }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <div class="table-container">
+    <div class="fixed-header">
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th></th>
+            <th data-sort="id">ID</th>
+            <th data-sort="car_id">Автомобиль</th>
+            <th data-sort="transmission">КПП</th>
+            <th data-sort="car_number">Гос. номер</th>
+            <th data-sort="start_date">Дата начала</th>
+            <th data-sort="end_date">Дата окончания</th>
+            <th data-sort="phone">Телефон</th>
+            <th>Заметка</th>
+            <th data-sort="user_id">Добавил</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr id="booking-{{ booking.id }}" class="{% if booking.status == 'Завершено' %}status-completed{% elif booking.status == 'Аренда' %}status-arenda{% elif booking.status == 'Отказ' %}status-otkaz{% elif booking.status == 'Ожидание' %}status-ozhidanie{% endif %}" onclick="openBookingModal({{ booking.id }})">
+            <td class="{% if booking.start_date.date() == today %}status-pickup-cell{% elif booking.end_date.date() == today %}status-dropoff-cell{% endif %}"></td>
+            <td>{{ booking.id }}</td>
+            <td>{{ booking.car.brand }}</td>
+            <td>{{ booking.car.transmission }}</td>
+            <td>{{ booking.car.car_number }}</td>
+            <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
+            <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
+            <td>{{ booking.phone }}</td>
+            <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
+            <td>{{ booking.user.username }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
-<script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
 
+<!-- Модальное окно для бронирования -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div id="modal-content-placeholder">Загрузка...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openBookingModal(bookingId) {
+  const modalContentPlaceholder = document.getElementById('modal-content-placeholder');
+  modalContentPlaceholder.innerHTML = 'Загрузка...';
+
+  fetch(`{{ url_for('booking.view_booking_modal', booking_id=0) }}`.replace('0', bookingId))
+    .then(response => response.text())
+    .then(data => {
+      modalContentPlaceholder.innerHTML = data;
+      attachDeleteEvent(); // Привязка событий к новым элементам
+      $('#bookingModal').modal('show');
+    })
+    .catch(error => {
+      modalContentPlaceholder.innerHTML = 'Ошибка загрузки данных';
+      console.error('Ошибка:', error);
+    });
+}
+
+function attachDeleteEvent() {
+  const deleteButton = document.getElementById('delete-button');
+  if (deleteButton) {
+    deleteButton.addEventListener('click', function(event) {
+      console.log('Delete button clicked');
+      event.preventDefault();
+      document.getElementById('custom-confirm-modal').style.display = 'flex';
+    });
+  }
+
+  const confirmOkButton = document.getElementById('confirm-ok-button');
+  if (confirmOkButton) {
+    confirmOkButton.addEventListener('click', function() {
+      console.log('Confirm OK button clicked');
+      document.getElementById('custom-confirm-modal').style.display = 'none';
+      document.getElementById('delete-form').submit();
+    });
+  }
+
+  const confirmCancelButton = document.getElementById('confirm-cancel-button');
+  if (confirmCancelButton) {
+    confirmCancelButton.addEventListener('click', function() {
+      console.log('Confirm Cancel button clicked');
+      document.getElementById('custom-confirm-modal').style.display = 'none';
+    });
+  }
+}
+</script>
+
+<script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
 {% endblock %}
+
