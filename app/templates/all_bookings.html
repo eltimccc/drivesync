@@ -14,6 +14,16 @@
     .status-ozhidanie {
         background-color: #ffff0097 !important;  /* Желтый цвет */
     }
+    .status-arenda {
+        background-color: rgba(0, 123, 255, 0.5); /* Синеватый с полупрозрачностью */
+    }
+
+    .status-pickup-cell {
+        background-color: rgba(0, 123, 255, 0.5) !important;  /* Синеватый с полупрозрачностью */
+    }
+    .status-dropoff-cell {
+        background-color: #ff0000 !important;  /* Красный цвет */
+    }
 
     .fixed-header {
         max-height: 78vh;
@@ -50,31 +60,24 @@
             transform: scale(1);
         }
     }
-    
-    /* Custom styles for pick-up and drop-off */
-    .pick-up {
-        background-color: #dff0d8 !important;  /* Light green */
-    }
-    .drop-off {
-        background-color: #f2dede !important;  /* Light red */
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <h4 class="text-center">Бронирования</h4>
-    <div class="d-flex justify-content-center mb-3">
-        <a href="{{ url_for('booking.all_bookings') }}" class="btn btn-secondary">Все бронирования</a>
-        <a href="{{ url_for('booking.all_bookings', filter='today') }}" class="btn btn-primary ml-2">Сегодня</a>
-    </div>
+<div class="d-flex justify-content-center mb-3">
+    <a href="{{ url_for('booking.bookings_today') }}" class="btn btn-outline-primary ml-2">Сегодня</a>
+</div>
+
     <div class="table-container">
         <div class="fixed-header">
             <table class="table table-hover">
                 <thead class="table-dark">
                     <tr>
+                        <th></th> <!-- Новый столбец слева -->
                         <th data-sort="id">ID</th>
-                        <th data-sort="created_at">Cоздано</th>
+                        
                         <th data-sort="car_id">Автомобиль</th>
                         <th data-sort="transmission">КПП</th>
                         <th data-sort="car_number">Гос. номер</th>
@@ -87,10 +90,11 @@
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
-                    <tr id="booking-{{ booking.id }}" class="{% if booking.status == 'Завершено' %}status-completed{% elif booking.status == 'Аренда' %}status-arenda{% elif booking.status == 'Отказ' %}status-otkaz{% elif booking.status == 'Ожидание' %}status-ozhidanie{% endif %} {% if booking.filter_type == 'pick-up' %}pick-up{% elif booking.filter_type == 'drop-off' %}drop-off{% endif %}">
+                    <tr id="booking-{{ booking.id }}" class="{% if booking.status == 'Завершено' %}status-completed{% elif booking.status == 'Аренда' %}status-arenda{% elif booking.status == 'Отказ' %}status-otkaz{% elif booking.status == 'Ожидание' %}status-ozhidanie{% endif %}" onclick="window.location='{{ url_for('booking.view_booking', booking_id=booking.id) }}'">
+                        <td class="{% if booking.start_date.date() == today %}status-pickup-cell{% elif booking.end_date.date() == today %}status-dropoff-cell{% endif %}"></td>
                         <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
-                        <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.created_at.strftime('%d.%m.%y') }}</a></td>
-                        <td><a href="{{ url_for('car.car_detail', car_id=booking.car_id) }}">{{ booking.car.brand }}</a></td>
+                       
+                        <td>{{ booking.car.brand }}</a></td>
                         <td>{{ booking.car.transmission }}</td>
                         <td>{{ booking.car.car_number }}</td>
                         <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>

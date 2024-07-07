@@ -31,7 +31,7 @@ from app.constants import (
 )
 from app.forms.forms import BookingForm, BookingUpdateForm
 from app.models import Booking, Car
-from app.utils.booking_filters import apply_filters, get_sorting_parameters
+from app.utils.booking_filters import get_sorting_parameters
 from app.utils.utils import BOOKING_STATUSES
 
 
@@ -65,56 +65,40 @@ def view_booking(booking_id):
         )
 
 
-# @booking_blueprint.route(BOOKING_ALL_ROUTE, methods=["GET"])
-# @login_required
-# def all_bookings():
-#     current_app.logger.info("Accessed all bookings page.")
-#     sort_by = request.args.get("sort_by", "created_at")
-#     sort_order = request.args.get("sort_order", "desc")
-#     current_app.logger.debug(f"Sorting bookings by {sort_by} in {sort_order} order")
-
-#     valid_sort_columns = {
-#         "created_at": Booking.created_at,
-#         "start_date": Booking.start_date,
-#         "end_date": Booking.end_date,
-#         "car_number": Car.car_number,
-#         "transmission": Car.transmission,
-#         "id": Booking.id,
-#         "car_id": Booking.car_id,
-#         "phone": Booking.phone,
-#         "user_id": Booking.user_id
-#     }
-
-#     if sort_by not in valid_sort_columns:
-#         sort_by = "created_at"
-
-#     sort_column = valid_sort_columns[sort_by]
-#     sort_direction = sort_column.desc() if sort_order == "desc" else sort_column.asc()
-
-#     bookings = db.session.query(Booking).join(Car).order_by(sort_direction).all()
-
-#     current_app.logger.debug(f"Retrieved {len(bookings)} bookings")
-#     return render_template(
-#         BOOKING_ALL_TEMPLATE, bookings=bookings, sort_by=sort_by, sort_order=sort_order
-#     )
 @booking_blueprint.route(BOOKING_ALL_ROUTE, methods=["GET"])
 @login_required
 def all_bookings():
     current_app.logger.info("Accessed all bookings page.")
-    
     sort_direction = get_sorting_parameters()
     current_app.logger.debug(f"Sorting bookings in {sort_direction} order")
-    
+
     query = db.session.query(Booking).join(Car).order_by(sort_direction)
-    
-    query = apply_filters(query)
-    
     bookings = query.all()
-    
+
     current_app.logger.debug(f"Retrieved {len(bookings)} bookings")
+    today = datetime.today().date()
     return render_template(
-        BOOKING_ALL_TEMPLATE, bookings=bookings, sort_by=request.args.get("sort_by", "created_at"), sort_order=request.args.get("sort_order", "desc")
+        BOOKING_ALL_TEMPLATE,
+        bookings=bookings,
+        sort_by=request.args.get("sort_by", "created_at"),
+        sort_order=request.args.get("sort_order", "desc"),
+        today=today,
     )
+
+
+@booking_blueprint.route('/bookings/today', methods=['GET'])
+@login_required
+def bookings_today():
+    date_str = request.args.get('date')
+    if date_str:
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    else:
+        selected_date = datetime.today().date()
+        
+    pick_ups = db.session.query(Booking).join(Car).filter(db.func.date(Booking.start_date) == selected_date).all()
+    drop_offs = db.session.query(Booking).join(Car).filter(db.func.date(Booking.end_date) == selected_date).all()
+
+    return render_template('bookings_today.html', pick_ups=pick_ups, drop_offs=drop_offs, today=selected_date)
 
 
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET"])
