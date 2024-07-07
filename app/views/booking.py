@@ -65,6 +65,24 @@ def view_booking(booking_id):
         )
 
 
+@booking_blueprint.route("/modal/view_booking/<int:booking_id>", methods=["GET"])
+@login_required
+def view_booking_modal(booking_id):
+    current_app.logger.info(f"Accessed view booking modal with ID: {booking_id}")
+    booking = Booking.query.get_or_404(booking_id)
+    status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
+
+    formatted_created_at = booking.created_at.strftime("%d.%m.%Y %H:%M")
+
+    current_app.logger.debug(f"Rendering booking detail modal for booking ID: {booking_id}")
+    return render_template(
+        "view_booking_modal.html",
+        booking=booking,
+        status_color=status_color,
+        formatted_created_at=formatted_created_at,
+    )
+
+
 @booking_blueprint.route(BOOKING_ALL_ROUTE, methods=["GET"])
 @login_required
 def all_bookings():
