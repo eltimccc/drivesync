@@ -3,6 +3,7 @@
     width: 70%;
     max-height: 60%;
     overflow: auto;
+    box-shadow: 6px 10px 15px rgba(0, 0, 0, 0.3);
   }
   .custom-modal {
     display: none;
@@ -13,7 +14,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     align-items: center;
     justify-content: center;
   }
@@ -23,6 +24,13 @@
     border-radius: 5px;
     width: 300px;
     text-align: center;
+  }
+  .created-info {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+    color: #777;
   }
 </style>
 
@@ -35,7 +43,9 @@
 <div class="modal-body">
   <p>
     <strong>Автомобиль:</strong>
-    <a href="{{ url_for('car.car_detail', car_id=booking.car.id) }}">{{ booking.car.brand }} {{ booking.car.car_number }}</a>
+    <a href="{{ url_for('car.car_detail', car_id=booking.car.id) }}"
+      >{{ booking.car.brand }} {{ booking.car.car_number }}</a
+    >
   </p>
   <p>
     <strong>Начало:</strong> {{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}
@@ -45,19 +55,37 @@
   </p>
   <p><strong>Телефон:</strong> {{ booking.phone }}</p>
   <p><strong>Заметка:</strong> {{ booking.description }}</p>
-  <p><strong>Статус:</strong> {{ booking.status }}</p>
-  <p><strong>Создал:</strong> {{ booking.user.username }}</p>
-  <p><strong>Дата создания:</strong> {{ formatted_created_at }}</p>
+  <div class="created-info">
+    <i
+      >Создано {{ formatted_created_at }} пользователем {{ booking.user.username
+      }}.</i
+    >
+  </div>
 </div>
 
 <div class="modal-footer">
-  <form id="delete-form" method="post" action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}">
-    <button id="delete-button" type="submit" class="btn btn-danger">Удалить</button>
+  <form
+    id="delete-form"
+    method="post"
+    action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}"
+  >
+    <button id="delete-button" type="submit" class="btn btn-danger btn-sm">
+      Удалить
+    </button>
   </form>
-  <form method="get" action="{{ url_for('booking.edit_booking', booking_id=booking.id) }}">
-    <button type="submit" class="btn btn-primary">Редактировать</button>
+  <form
+    method="get"
+    action="{{ url_for('booking.edit_booking', booking_id=booking.id) }}"
+  >
+    <button type="submit" class="btn btn-primary btn-sm">Редактировать</button>
   </form>
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+  <button
+    type="button"
+    class="btn btn-secondary btn-sm"
+    data-bs-dismiss="modal"
+  >
+    Закрыть
+  </button>
 </div>
 
 <!-- Кастомное модальное окно для подтверждения удаления -->
@@ -70,20 +98,26 @@
 </div>
 
 <script>
-  document.getElementById('delete-button').addEventListener('click', function(event) {
-    console.log('Delete button clicked');
-    event.preventDefault();
-    document.getElementById('custom-confirm-modal').style.display = 'flex';
-  });
+  document
+    .getElementById("delete-button")
+    .addEventListener("click", function (event) {
+      console.log("Delete button clicked");
+      event.preventDefault();
+      document.getElementById("custom-confirm-modal").style.display = "flex";
+    });
 
-  document.getElementById('confirm-ok-button').addEventListener('click', function() {
-    console.log('Confirm OK button clicked');
-    document.getElementById('custom-confirm-modal').style.display = 'none';
-    document.getElementById('delete-form').submit();
-  });
+  document
+    .getElementById("confirm-ok-button")
+    .addEventListener("click", function () {
+      console.log("Confirm OK button clicked");
+      document.getElementById("custom-confirm-modal").style.display = "none";
+      document.getElementById("delete-form").submit();
+    });
 
-  document.getElementById('confirm-cancel-button').addEventListener('click', function() {
-    console.log('Confirm Cancel button clicked');
-    document.getElementById('custom-confirm-modal').style.display = 'none';
-  });
+  document
+    .getElementById("confirm-cancel-button")
+    .addEventListener("click", function () {
+      console.log("Confirm Cancel button clicked");
+      document.getElementById("custom-confirm-modal").style.display = "none";
+    });
 </script>
