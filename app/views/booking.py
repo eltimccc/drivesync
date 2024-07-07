@@ -177,7 +177,7 @@ def add_booking():
         db.session.add(new_booking)
         db.session.commit()
         current_app.logger.info(f"User {current_user.username} added new booking with ID: {new_booking.id}")
-        return redirect(url_for(BOOKING_MAIN_ROUTE))
+        return redirect(url_for(BOOKING_ALL_BOOKING_ROUTE))
     else:
         current_app.logger.warning(f"User {current_user.username} failed booking form validation")
 
