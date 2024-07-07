@@ -1,21 +1,42 @@
 from app import create_app, db
 from app.models import Car
 
+
 def add_cars():
     app = create_app()
     with app.app_context():
         cars_data = [
-            {"brand": "Hyundai Solaris", "car_number": "С515ТА", "transmission": "АКПП"},
+            {
+                "brand": "Hyundai Solaris",
+                "car_number": "С515ТА",
+                "transmission": "АКПП",
+            },
             {"brand": "Baic U5", "car_number": "Т748СМ", "transmission": "АКПП"},
             {"brand": "Hyundai Creta", "car_number": "Х467НУ", "transmission": "АКПП"},
             {"brand": "Kia Rio", "car_number": "В116ОУ", "transmission": "АКПП"},
             {"brand": "Kia Rio", "car_number": "У157РУ", "transmission": "АКПП"},
             {"brand": "Kia Rio", "car_number": "Т088МУ", "transmission": "АКПП"},
             {"brand": "Kia Rio", "car_number": "О355МУ", "transmission": "АКПП"},
-            {"brand": "Hyundai Solaris", "car_number": "Р181НУ", "transmission": "АКПП"},
-            {"brand": "Hyundai Solaris", "car_number": "К325НУ", "transmission": "МКПП"},
-            {"brand": "Hyundai Solaris", "car_number": "К645НУ", "transmission": "МКПП"},
-            {"brand": "Hyundai Solaris 1.4", "car_number": "Е627КУ", "transmission": "МКПП"},
+            {
+                "brand": "Hyundai Solaris",
+                "car_number": "Р181НУ",
+                "transmission": "АКПП",
+            },
+            {
+                "brand": "Hyundai Solaris",
+                "car_number": "К325НУ",
+                "transmission": "МКПП",
+            },
+            {
+                "brand": "Hyundai Solaris",
+                "car_number": "К645НУ",
+                "transmission": "МКПП",
+            },
+            {
+                "brand": "Hyundai Solaris 1.4",
+                "car_number": "Е627КУ",
+                "transmission": "МКПП",
+            },
             {"brand": "Renault Logan", "car_number": "С777ВС", "transmission": "МКПП"},
             {"brand": "Renault Logan", "car_number": "А017УУ", "transmission": "МКПП"},
             {"brand": "Renault Logan", "car_number": "Х371ОУ", "transmission": "МКПП"},
@@ -50,6 +71,7 @@ def add_cars():
 
         db.session.commit()
         print("Автомобили успешно добавлены.")
+
 
 if __name__ == "__main__":
     add_cars()

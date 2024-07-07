@@ -32,8 +32,12 @@ def register():
     current_app.logger.info("Accessed registration page.")
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode(
+            "utf-8"
+        )
+        user = User(
+            username=form.username.data, email=form.email.data, password=hashed_password
+        )
         db.session.add(user)
         db.session.commit()
         flash("Новый пользователь был создан!", "success")
@@ -47,7 +51,9 @@ def register():
 @auth_blueprint.route(AUTH_LOGIN_BP_ROUTE, methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        current_app.logger.info(f"User {current_user.username} is already authenticated.")
+        current_app.logger.info(
+            f"User {current_user.username} is already authenticated."
+        )
         return redirect(url_for(BOOKING_MAIN_ROUTE))
     form = LoginForm()
     if form.validate_on_submit():
@@ -79,12 +85,12 @@ def list_users():
     return render_template(AUTH_LIST_TEMPLATE, users=users, form=form)
 
 
-@auth_blueprint.route('/delete_user/<int:user_id>', methods=["POST"])
+@auth_blueprint.route("/delete_user/<int:user_id>", methods=["POST"])
 @login_required
 @superuser_required
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
-    flash('Пользователь был удален!', 'success')
-    return redirect(url_for('auth.list_users'))
+    flash("Пользователь был удален!", "success")
+    return redirect(url_for("auth.list_users"))

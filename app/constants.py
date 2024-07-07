@@ -69,9 +69,9 @@ SEARCH_CARS_BP_ROUTE = "/search_cars"
 AUTH_BP_NAME_ROUTE = "auth"
 AUTH_URL_PREFIX = "/auth"
 AUTH_REGISTER_BP_ROUTE = "/register"
-AUTH_LOGIN_BP_ROUTE=  "/login"
+AUTH_LOGIN_BP_ROUTE = "/login"
 AUTH_LOGOUT_BP_ROUTE = "/logout"
-AUTH_LIST_BP_ROUTE = '/users'
+AUTH_LIST_BP_ROUTE = "/users"
 
 # Именованные маршруты AUTH
 AUTH_REGISTER_ROUTE = "auth.register"
@@ -79,4 +79,4 @@ AUTH_REGISTER_ROUTE = "auth.register"
 # Имена шаблонов AUTH
 AUTH_REGISTER_TEMPLATE = "register.html"
 AUTH_LOGIN_TEMPLATE = "login.html"
-AUTH_LIST_TEMPLATE = 'list_users.html'
+AUTH_LIST_TEMPLATE = "list_users.html"

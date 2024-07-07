@@ -127,8 +127,8 @@ class BookingForm(FlaskForm):
                 Booking.car_id == field.data,
                 Booking.start_date < self.end_datetime.data,
                 Booking.end_date > self.start_datetime.data,
-                Booking.status != 'Отказ',
-                Booking.status != 'Завершено'
+                Booking.status != "Отказ",
+                Booking.status != "Завершено",
             ).first()
             if overlapping_bookings:
                 raise ValidationError(
@@ -188,7 +188,7 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     remember = BooleanField("Запомнить меня")
     submit = SubmitField("Login")

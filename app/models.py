@@ -24,7 +24,7 @@ class Booking(db.Model):
     description = db.Column(db.Text, nullable=True)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.String(50), nullable=False, default="Аренда")
+    status = db.Column(db.String(50), nullable=False, default="Бронь")
     created_at = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Бронирования на сегодня{% endblock %}
+
+{% block additional_styles %}
+<style>
+    /* Стили для секций выдачи и приема */
+    .pick-up-section {
+        background-color: #e3f2fd; /* Светло-синий */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .drop-off-section {
+        background-color: #ffebee; /* Светло-красный */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .table-container {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background: #2c3e50;
+        color: white;
+        z-index: 1;
+    }
+
+    /* Цвета для статусов */
+    .status-аренда {
+        background-color: rgba(0, 123, 255, 0.5); /* Синеватый с полупрозрачностью */
+    }
+
+    .status-завершено {
+        background-color: #28a745; /* Зеленый */
+    }
+
+    .status-отказ {
+        background-color: #dc3545; /* Красный */
+    }
+
+    .status-ожидание {
+        background-color: #ffc107; /* Желтый */
+    }
+
+    /* Стили для формы выбора даты */
+    .date-form {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .date-form input[type="date"] {
+        max-width: 200px;
+        margin-right: 10px;
+    }
+
+    .date-form button {
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row text-center">
+        <h4>
+            Бронирования на дату
+        </h4>
+        <form method="GET" action="{{ url_for('booking.bookings_today') }}" class="date-form d-inline-block">
+            <div class="form-group d-inline-block">
+                <input type="date" name="date" class="form-control" value="{{ request.args.get('date', today.strftime('%Y-%m-%d')) }}">
+            </div>
+            <button class="btn btn-primary" type="submit">Показать</button>
+        </form>
+    </div>
+</div>
+
+    <div class="row">
+        <div class="col-md-6 pick-up-section">
+            <h5 class="text-center">ВЫДАТЬ</h5>
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Автомобиль</th>
+                            <th>КПП</th>
+                            <th>Гос. номер</th>
+                            <th>Дата начала</th>
+                            <th>Телефон</th>
+                            <th>Заметка</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in pick_ups %}
+                        <tr id="booking-{{ booking.id }}" class="status-{{ booking.status | lower }}" onclick="location.href='{{ url_for('booking.view_booking', booking_id=booking.id) }}'">
+                            <td>{{ booking.id }}</td>
+                            <td>{{ booking.car.brand }}</td>
+                            <td>{{ booking.car.transmission }}</td>
+                            <td>{{ booking.car.car_number }}</td>
+                            <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
+                            <td>{{ booking.phone }}</td>
+                            <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6 drop-off-section">
+            <h5 class="text-center">ПРИНЯТЬ</h5>
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Автомобиль</th>
+                            <th>КПП</th>
+                            <th>Гос. номер</th>
+                            <th>Дата окончания</th>
+                            <th>Телефон</th>
+                            <th>Заметка</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in drop_offs %}
+                        <tr id="booking-{{ booking.id }}" class="status-{{ booking.status | lower }}" onclick="location.href='{{ url_for('booking.view_booking', booking_id=booking.id) }}'">
+                            <td>{{ booking.id }}</td>
+                            <td>{{ booking.car.brand }}</td>
+                            <td>{{ booking.car.transmission }}</td>
+                            <td>{{ booking.car.car_number }}</td>
+                            <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
+                            <td>{{ booking.phone }}</td>
+                            <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
+{% endblock %}
