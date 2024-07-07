@@ -3,7 +3,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import time
 
-from flask import Flask
+from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -40,6 +40,7 @@ def create_superuser():
 def create_app(config_class="config.Config"):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config_class)
+    app.secret_key = 'supersecretkey'
 
     try:
         os.makedirs(app.instance_path, exist_ok=True)
@@ -50,6 +51,12 @@ def create_app(config_class="config.Config"):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+    login_manager.remember_cookie_duration = app.config['REMEMBER_COOKIE_DURATION']
+
+    @app.before_request
+    def make_session_permanent():
+        session.permanent = True
+        app.permanent_session_lifetime = app.config['PERMANENT_SESSION_LIFETIME']
 
     from .views.main import main as main_blueprint
 
