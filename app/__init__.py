@@ -58,7 +58,7 @@ def create_app(config_class="config.Config"):
         session.permanent = True
         app.permanent_session_lifetime = app.config['PERMANENT_SESSION_LIFETIME']
 
-    from .views.main import main as main_blueprint
+    from app.views.main import main_blueprint
 
     app.register_blueprint(main_blueprint)
 

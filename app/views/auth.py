@@ -12,7 +12,6 @@ from app.constants import (
     AUTH_REGISTER_ROUTE,
     AUTH_REGISTER_TEMPLATE,
     AUTH_URL_PREFIX,
-    BOOKING_ALL_BOOKING_ROUTE,
     BOOKING_ALL_TEMPLATE,
     BOOKING_MAIN_ROUTE,
 )
@@ -56,14 +55,14 @@ def login():
         current_app.logger.info(
             f"User {current_user.username} is already authenticated."
         )
-        return redirect(url_for(BOOKING_ALL_BOOKING_ROUTE))
+        return redirect(url_for(BOOKING_MAIN_ROUTE))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             current_app.logger.info(f"User {user.username} logged in successfully.")
-            return redirect(url_for(BOOKING_ALL_BOOKING_ROUTE))
+            return redirect(url_for(BOOKING_MAIN_ROUTE))
         else:
             flash("Неполучилось, проверьте введенные данные", "danger")
             current_app.logger.warning("Failed login attempt.")
@@ -75,7 +74,7 @@ def login():
 def logout():
     current_app.logger.info(f"User {current_user.username} logged out.")
     logout_user()
-    return redirect(url_for(BOOKING_ALL_BOOKING_ROUTE))
+    return redirect(url_for(BOOKING_MAIN_ROUTE))
 
 
 @auth_blueprint.route(AUTH_LIST_BP_ROUTE, methods=["GET"])

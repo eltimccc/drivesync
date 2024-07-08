@@ -61,8 +61,19 @@
 {% block content %}
 <div class="container mt-4">
   <h4 class="text-center">Бронирования</h4>
-  <div class="d-flex justify-content-center mb-3">
-    <a href="{{ url_for('booking.bookings_today') }}" class="btn btn-outline-primary ml-2">Сегодня</a>
+
+  <!-- Фильтр над правой частью таблицы -->
+  <div class="row justify-content-end mb-3">
+    <div class="col-md-4">
+      <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
+        <div class="input-group">
+          <input type="text" name="filter" id="filterInput" placeholder="Введите текст для фильтрации" class="form-control" value="{{ filter }}">
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-sm btn-primary">Фильтр</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div class="table-container">
@@ -114,53 +125,89 @@
   </div>
 </div>
 
+<!-- Кастомное модальное окно -->
+<div class="custom-confirm-modal" style="display: none;">
+  <div class="custom-modal-content">
+    <p>Вы уверены, что хотите удалить это бронирование?</p>
+    <form class="delete-form" method="post">
+      <button type="button" class="confirm-ok-button btn btn-success">OK</button>
+      <button type="button" class="confirm-cancel-button btn btn-secondary">Отмена</button>
+    </form>
+  </div>
+</div>
+
 <script>
-function openBookingModal(bookingId) {
-  const modalContentPlaceholder = document.getElementById('modal-content-placeholder');
-  modalContentPlaceholder.innerHTML = 'Загрузка...';
+document.addEventListener('DOMContentLoaded', function() {
+  // Сохранение значения фильтрации в localStorage
+  const filterInput = document.getElementById('filterInput');
+  const filterForm = document.getElementById('filterForm');
 
-  fetch(`{{ url_for('booking.view_booking_modal', booking_id=0) }}`.replace('0', bookingId))
-    .then(response => response.text())
-    .then(data => {
-      modalContentPlaceholder.innerHTML = data;
-      attachDeleteEvent(); // Привязка событий к новым элементам
-      $('#bookingModal').modal('show');
-    })
-    .catch(error => {
-      modalContentPlaceholder.innerHTML = 'Ошибка загрузки данных';
-      console.error('Ошибка:', error);
-    });
-}
-
-function attachDeleteEvent() {
-  const deleteButton = document.getElementById('delete-button');
-  if (deleteButton) {
-    deleteButton.addEventListener('click', function(event) {
-      console.log('Delete button clicked');
-      event.preventDefault();
-      document.getElementById('custom-confirm-modal').style.display = 'flex';
-    });
+  // При загрузке страницы проверяем localStorage
+  const savedFilter = localStorage.getItem('bookingFilter');
+  if (savedFilter) {
+    filterInput.value = savedFilter;
   }
 
-  const confirmOkButton = document.getElementById('confirm-ok-button');
-  if (confirmOkButton) {
-    confirmOkButton.addEventListener('click', function() {
-      console.log('Confirm OK button clicked');
-      document.getElementById('custom-confirm-modal').style.display = 'none';
-      document.getElementById('delete-form').submit();
-    });
+  // При изменении значения фильтра сохраняем в localStorage
+  filterInput.addEventListener('input', function() {
+    localStorage.setItem('bookingFilter', filterInput.value);
+  });
+
+  // При отправке формы проверяем значение фильтра
+  filterForm.addEventListener('submit', function() {
+    if (filterInput.value.trim() === '') {
+      localStorage.removeItem('bookingFilter'); // Если фильтр пустой, удаляем из localStorage
+    }
+  });
+
+  // Модальное окно бронирования
+  window.openBookingModal = function(bookingId) {
+    const modalContentPlaceholder = document.getElementById('modal-content-placeholder');
+    modalContentPlaceholder.innerHTML = 'Загрузка...';
+
+    fetch(`{{ url_for('booking.view_booking_modal', booking_id=0) }}`.replace('0', bookingId))
+      .then(response => response.text())
+      .then(data => {
+        modalContentPlaceholder.innerHTML = data;
+        attachDeleteEvent(); // Привязка событий к новым элементам
+        $('#bookingModal').modal('show');
+      })
+      .catch(error => {
+        modalContentPlaceholder.innerHTML = 'Ошибка загрузки данных';
+        console.error('Ошибка:', error);
+      });
   }
 
-  const confirmCancelButton = document.getElementById('confirm-cancel-button');
-  if (confirmCancelButton) {
-    confirmCancelButton.addEventListener('click', function() {
-      console.log('Confirm Cancel button clicked');
-      document.getElementById('custom-confirm-modal').style.display = 'none';
-    });
+  function attachDeleteEvent() {
+    const deleteButton = document.querySelector('.delete-button');
+    if (deleteButton) {
+      deleteButton.addEventListener('click', function(event) {
+        console.log('Delete button clicked');
+        event.preventDefault();
+        document.querySelector('.custom-confirm-modal').style.display = 'flex';
+        document.querySelector('.delete-form').action = deleteButton.dataset.action;
+      });
+    }
+
+    const confirmOkButton = document.querySelector('.confirm-ok-button');
+    if (confirmOkButton) {
+      confirmOkButton.addEventListener('click', function() {
+        console.log('Confirm OK button clicked');
+        document.querySelector('.custom-confirm-modal').style.display = 'none';
+        document.querySelector('.delete-form').submit();
+      });
+    }
+
+    const confirmCancelButton = document.querySelector('.confirm-cancel-button');
+    if (confirmCancelButton) {
+      confirmCancelButton.addEventListener('click', function() {
+        console.log('Confirm Cancel button clicked');
+        document.querySelector('.custom-confirm-modal').style.display = 'none';
+      });
+    }
   }
-}
+});
 </script>
 
 <script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
 {% endblock %}
-
