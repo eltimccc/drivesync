@@ -32,13 +32,10 @@ BOOKING_ALL_TEMPLATE = "all_bookings.html"
 BOOKING_MODAL_TEMPLATE = "add_booking_modal.html"
 
 # Именованные маршруты BOOKING
-BOOKING_GET_ROUTE = "booking.get_bookings"
 BOOKING_VIEW_BOOKING_ROUTE = "booking.view_booking"
 BOOKING_EDIT_BOOKING_ROUTE = "booking.edit_booking"
-# BOOKING_MAIN_ROUTE = "main.get_bookings"
-BOOKING_MAIN_ROUTE = 'booking.all_bookings'
+BOOKING_MAIN_ROUTE = 'main.get_bookings'
 BOOKING = "booking.add_booking"
-BOOKING_ALL_BOOKING_ROUTE = "booking.all_bookings"
 
 # Blueprint маршруты BOOKING
 BOOKING_BP_NAME_ROUTE = "booking"

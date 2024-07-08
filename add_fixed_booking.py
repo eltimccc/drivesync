@@ -359,7 +359,7 @@ def add_bookings():
                 end_date=end_date,
                 phone=booking_info["phone"],
                 description=booking_info["description"],
-                status="Аренда",
+                status="Бронь",
             )
             db.session.add(booking)
 
