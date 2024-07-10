@@ -1,0 +1,83 @@
+/* styles.css */
+
+/* Цвета для выделения статусов */
+.status-аренда {
+    background-color: rgba(0, 123, 255, 0.5);
+}
+
+.status-завершено {
+    background-color: #00d92497;
+}
+
+.status-отказ {
+    background-color: #db355cd2;
+}
+
+.status-ожидание {
+    background-color: #ffc107;
+}
+
+/* Для доп цвета в доп столбике на главной */
+.status-pickup-cell {
+    background-color: rgba(0, 123, 255, 0.5) !important;
+}
+
+.status-dropoff-cell {
+    background-color: #ff0000 !important;
+}
+
+/* Стили для формы выбора даты */
+.date-form {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.date-form input[type="date"] {
+    max-width: 200px;
+    margin-right: 10px;
+}
+
+.date-form button {
+    white-space: nowrap;
+}
+
+/* Стили для секций выдачи и приема */
+.pick-up-section {
+    background-color: #e3f2fd;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.drop-off-section {
+    background-color: #ffebee;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Стили для таблицы на главной и на сегодняшние брони */
+.fixed-header {
+    max-height: 78vh;
+    overflow-y: auto;
+  }
+  .table-container {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  .table thead th {
+    position: sticky;
+    top: 0;
+    background: #2c3e50;
+    color: white;
+    z-index: 1;
+  }
