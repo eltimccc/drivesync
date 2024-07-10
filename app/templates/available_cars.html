@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% block title %} Доступные автомобили {% endblock %}
-{% block additional_styles %} 
+{% extends 'base.html' %} {% block title %}Доступные автомобили{% endblock %} {%
+block additional_styles %}
 <style>
   .xdsoft_datetimepicker {
     transform: scale(1.2);
@@ -11,42 +11,37 @@
     max-width: 370px;
   }
 </style>
-{% endblock %}
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-5">
   <h4 class="mb-4">Поиск доступных автомобилей</h4>
 
-<form method="POST">
+  <form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-row">
-        <div class="col-md-6 mb-3">
-            <div class="card p-3">
-                <div class="form-group">
-                    <label for="start_date">{{ form.start_date.label }}</label>
-                    {{ form.start_date(class="form-control", id="start_date") }}
-                </div>
-                <div class="form-group">
-                    <label for="end_date">{{ form.end_date.label }}</label>
-                    {{ form.end_date(class="form-control", id="end_date") }}
-                </div>
-            </div>
+      <div class="col-md-6 mb-3">
+        <div class="card p-3">
+          <div class="form-group">
+            <label for="start_date">{{ form.start_date.label }}</label>
+            {{ form.start_date(class="form-control", id="start_date") }}
+          </div>
+          <div class="form-group">
+            <label for="end_date">{{ form.end_date.label }}</label>
+            {{ form.end_date(class="form-control", id="end_date") }}
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="col-md-6">
-        <div class="errors mt-3">
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <div class="alert alert-danger" role="alert">{{ error }}</div>
-                {% endfor %}
-            {% endfor %}
-        </div>
+      <div class="errors mt-3">
+        {% for field in form %} {% for error in field.errors %}
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endfor %} {% endfor %}
+      </div>
     </div>
 
-    <div class="col-md-12 mt-3">
-        {{ form.submit(class="btn btn-primary") }}
-    </div>
-</form>
+    <div class="col-md-12 mt-3">{{ form.submit(class="btn btn-primary") }}</div>
+  </form>
 
   {% if cars %}
   <h4 class="mt-5">
@@ -62,73 +57,54 @@
           </h5>
           <a
             href="{{ url_for('booking.add_booking', car_id=car.id, start_date=start_date, end_date=end_date) }}"
-            >Забронировать</a
           >
-
+            Забронировать
+          </a>
           <p class="card-text availability-info alert alert-success">
             Доступен с {{ start_date }} по {{ end_date }}
           </p>
-
           {% if car.last_booking_info %}
           <div class="booking-info">
             <div>Последнее бронирование:</div>
             <div>
               <a
                 href="{{ url_for('booking.view_booking', booking_id=car.last_booking_info.id) }}"
-                >с {{ car.last_booking_info.start_date_formatted }} по {{
-                car.last_booking_info.end_date_formatted }}</a
               >
+                с {{ car.last_booking_info.start_date_formatted }} по {{
+                car.last_booking_info.end_date_formatted }}
+              </a>
             </div>
           </div>
-
           {% else %}
           <div class="booking-info">
             <p class="card-text">Нет предыдущих бронирований</p>
           </div>
-
           {% endif %} {% if car.next_booking_info %}
           <div class="booking-info">
             <div>Следующее бронирование:</div>
             <div>
               <a
                 href="{{ url_for('booking.view_booking', booking_id=car.next_booking_info.id) }}"
-                >с {{ car.next_booking_info.start_date_formatted }} по {{
-                car.next_booking_info.end_date_formatted }}</a
               >
+                с {{ car.next_booking_info.start_date_formatted }} по {{
+                car.next_booking_info.end_date_formatted }}
+              </a>
             </div>
           </div>
-
           {% else %}
           <div class="booking-info">
             <p class="card-text">Нет следующих бронирований</p>
           </div>
-
           {% endif %}
         </div>
       </div>
     </div>
-
     {% endfor %}
   </div>
-
   {% else %}
-
   <p>Нет доступных автомобилей на выбранные даты.</p>
-
   {% endif %}
 </div>
-
-<script>
-  $(document).ready(function () {
-    $("#start_date").datetimepicker({
-      format: "Y-m-d H:i",
-      step: 30,
-    });
-    $("#end_date").datetimepicker({
-      format: "Y-m-d H:i",
-      step: 30,
-    });
-  });
-</script>
-
+{% endblock %} {% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/show_date_selected_avaiable_cars.js') }}"></script>
 {% endblock %}
