@@ -1,8 +1,6 @@
-{% extends 'base.html' %} {% block content %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/car_input_styles.css') }}"
-/>
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/car_input_styles.css') }}" />
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
@@ -14,107 +12,60 @@
           <form method="POST">
             {{ form.hidden_tag() }}
             <div class="form-group row">
-              <label for="start_date" class="col-sm-4 col-form-label"
-                >Дата и время начала:</label
-              >
+              <label for="start_date" class="col-sm-4 col-form-label">Дата и время начала:</label>
               <div class="col-sm-8">
-                <input
-                  type="text"
-                  class="form-control datetimepicker"
-                  id="start_date"
-                  name="start_date"
-                  value="{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}"
-                  required
-                />
+                <input type="text" class="form-control datetimepicker" id="start_date" name="start_date" value="{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}" required />
               </div>
             </div>
             <div class="form-group row">
-              <label for="end_date" class="col-sm-4 col-form-label"
-                >Дата и время окончания:</label
-              >
+              <label for="end_date" class="col-sm-4 col-form-label">Дата и время окончания:</label>
               <div class="col-sm-8">
-                <input
-                  type="text"
-                  class="form-control datetimepicker"
-                  id="end_date"
-                  name="end_date"
-                  value="{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}"
-                  required
-                />
+                <input type="text" class="form-control datetimepicker" id="end_date" name="end_date" value="{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}" required />
               </div>
             </div>
             <div class="form-group row">
-              <label for="car" class="col-sm-4 col-form-label"
-                >Автомобиль:</label
-              >
+              <label for="car" class="col-sm-4 col-form-label">Автомобиль:</label>
               <div class="col-sm-8">
                 <div class="input-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="selectedCar"
-                    name="selectedCar"
-                    readonly
-                  />
+                  <input type="text" class="form-control" id="selectedCar" name="selectedCar" readonly />
                   <input type="hidden" id="selectedCarId" name="car" readonly />
                   <div class="input-group-append">
-                    <button
-                      type="button"
-                      class="btn btn-info btn-sm"
-                      onclick="openCarModal()"
-                    >
-                      Выбрать автомобиль
-                    </button>
+                    <button type="button" class="btn btn-info btn-sm" onclick="openCarModal()">Выбрать автомобиль</button>
                   </div>
                 </div>
               </div>
             </div>
             <div class="form-group row">
-              <label for="phone" class="col-sm-4 col-form-label"
-                >Телефон:</label
-              >
+              <label for="phone" class="col-sm-4 col-form-label">Телефон:</label>
               <div class="col-sm-8">
-                {{ form.phone(class_="form-control") }} {% if form.phone.errors
-                %}
+                {{ form.phone(class_="form-control") }}
+                {% if form.phone.errors %}
                 <div class="text-danger">{{ form.phone.errors[0] }}</div>
                 {% endif %}
               </div>
             </div>
             <div class="form-group row">
-              <label for="description" class="col-sm-4 col-form-label"
-                >Заметка:</label
-              >
+              <label for="description" class="col-sm-4 col-form-label">Заметка:</label>
               <div class="col-sm-8">
-                {{ form.description(class_="form-control", rows=2) }} {% if
-                form.description.errors %}
+                {{ form.description(class_="form-control", rows=2) }}
+                {% if form.description.errors %}
                 <div class="text-danger">{{ form.description.errors[0] }}</div>
                 {% endif %}
               </div>
             </div>
             <div class="form-group row">
-              <label for="status" class="col-sm-4 col-form-label"
-                >Статус:</label
-              >
+              <label for="status" class="col-sm-4 col-form-label">Статус:</label>
               <div class="col-sm-8">
-                {{ form.status(class_="form-control") }} {% if
-                form.status.errors %}
+                {{ form.status(class_="form-control") }}
+                {% if form.status.errors %}
                 <div class="text-danger">{{ form.status.errors[0] }}</div>
                 {% endif %}
               </div>
             </div>
             <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-primary btn-sm">
-                Сохранить
-              </button>
-              <form
-                method="post"
-                action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}"
-                onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');"
-                class="d-inline-block"
-              >
-                <button type="submit" class="btn btn-sm btn-danger">
-                  Удалить
-                </button>
+              <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
+              <form method="post" action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');" class="d-inline-block">
+                <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
               </form>
             </div>
           </form>
@@ -137,9 +88,7 @@
       </thead>
       <tbody>
         {% for car in cars %}
-        <tr
-          onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')"
-        >
+        <tr onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')">
           <td>{{ car.brand }}</td>
           <td>{{ car.car_number }}</td>
         </tr>
@@ -158,31 +107,9 @@
   });
 
   document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("selectedCar").value =
-      "{{ booking.car.brand }} {{ booking.car.car_number }}";
+    document.getElementById("selectedCar").value = "{{ booking.car.brand }} {{ booking.car.car_number }}";
     document.getElementById("selectedCarId").value = "{{ booking.car.id }}";
   });
-
-  function openCarModal() {
-    document.getElementById("carModal").style.display = "block";
-  }
-
-  function closeCarModal() {
-    document.getElementById("carModal").style.display = "none";
-  }
-
-  function closeIfOutside(event) {
-    if (event.target == document.getElementById("carModal")) {
-      closeCarModal();
-    }
-  }
-
-  function selectCar(id, display) {
-    document.getElementById("selectedCar").value = display;
-    document.getElementById("selectedCarId").value = id;
-    closeCarModal();
-  }
 </script>
-
 <script src="{{ url_for('static', filename='js/car_input.js') }}"></script>
 {% endblock %}
