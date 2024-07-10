@@ -11,6 +11,7 @@ from app.constants import BOOKING_ALL_TEMPLATE, MAIN_BP_NAME_ROUTE
 
 main_blueprint = Blueprint(MAIN_BP_NAME_ROUTE, __name__, url_prefix="/")
 
+
 @main_blueprint.route("/", methods=["GET"])
 @login_required
 def get_bookings():
@@ -22,7 +23,7 @@ def get_bookings():
 
     query = db.session.query(Booking).join(Car).order_by(sort_direction)
 
-    if len(filter_text) >= 2:
+    if filter_text and len(filter_text) >= 2:  # Применяем фильтр только если введено два и более символов
         query = query.filter(
             or_(
                 Booking.phone.like(f'%{filter_text}%'),

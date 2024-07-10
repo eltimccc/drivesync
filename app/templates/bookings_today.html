@@ -3,76 +3,7 @@
 {% block title %}Бронирования на сегодня{% endblock %}
 
 {% block additional_styles %}
-<style>
-    /* Стили для секций выдачи и приема */
-    .pick-up-section {
-        background-color: #e3f2fd; /* Светло-синий */
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-    }
-
-    .drop-off-section {
-        background-color: #ffebee; /* Светло-красный */
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-    }
-
-    .table-container {
-        max-height: 60vh;
-        overflow-y: auto;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: #f1f1f1;
-        cursor: pointer;
-    }
-
-    .table thead th {
-        position: sticky;
-        top: 0;
-        background: #2c3e50;
-        color: white;
-        z-index: 1;
-    }
-
-    /* Цвета для статусов */
-    .status-аренда {
-        background-color: rgba(0, 123, 255, 0.5); /* Синеватый с полупрозрачностью */
-    }
-
-    .status-завершено {
-        background-color: #28a745; /* Зеленый */
-    }
-
-    .status-отказ {
-        background-color: #dc3545; /* Красный */
-    }
-
-    .status-ожидание {
-        background-color: #ffc107; /* Желтый */
-    }
-
-    /* Стили для формы выбора даты */
-    .date-form {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-
-    .date-form input[type="date"] {
-        max-width: 200px;
-        margin-right: 10px;
-    }
-
-    .date-form button {
-        white-space: nowrap;
-    }
-</style>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 {% endblock %}
 
 {% block content %}
