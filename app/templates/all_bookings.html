@@ -36,6 +36,7 @@
     border-radius: 8px;
     text-align: center;
   }
+  
 </style>
 {% endblock %}
 
@@ -49,9 +50,6 @@
       <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
         <div class="input-group">
           <input type="text" name="filter" id="filterInput" placeholder="Введите текст для фильтрации" class="form-control" value="{{ filter }}">
-          <div class="input-group-append">
-            <button type="submit" class="btn btn-sm btn-primary">Фильтр</button>
-          </div>
         </div>
       </form>
     </div>
@@ -143,21 +141,29 @@ document.addEventListener('DOMContentLoaded', function() {
   // Функция фильтрации таблицы
   function filterTableRows() {
     const filterText = filterInput.value.trim().toLowerCase(); // Приводим текст фильтра к нижнему регистру
-    const tableRows = document.querySelectorAll('.table-hover tbody tr');
-
-    tableRows.forEach(row => {
-      let rowMatches = false;
-
-      Array.from(row.cells).forEach(cell => {
-        const cellText = cell.textContent.trim().toLowerCase();
-        if (cellText.includes(filterText)) {
-          rowMatches = true;
-        }
+    if (filterText.length < 2) {
+      // Если текст фильтра короче двух символов, показываем все строки
+      document.querySelectorAll('.table-hover tbody tr').forEach(row => {
+        row.style.display = '';
       });
+      return;
+    }
 
-      row.style.display = rowMatches ? '' : 'none'; // Показываем или скрываем строку
+  const tableRows = document.querySelectorAll('.table-hover tbody tr');
+
+  tableRows.forEach(row => {
+    let rowMatches = false;
+
+    Array.from(row.cells).forEach(cell => {
+      const cellText = cell.textContent.trim().toLowerCase();
+      if (cellText.includes(filterText)) {
+        rowMatches = true;
+      }
     });
-  }
+
+    row.style.display = rowMatches ? '' : 'none'; // Показываем или скрываем строку
+  });
+}
 
   // Вызываем функцию фильтрации при загрузке страницы
   filterTableRows();
