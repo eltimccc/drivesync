@@ -110,9 +110,19 @@ def bookings_today():
         selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
     else:
         selected_date = datetime.today().date()
-        
-    pick_ups = db.session.query(Booking).join(Car).filter(db.func.date(Booking.start_date) == selected_date).all()
-    drop_offs = db.session.query(Booking).join(Car).filter(db.func.date(Booking.end_date) == selected_date).all()
+
+    pick_ups = (
+        db.session.query(Booking)
+        .join(Car)
+        .filter(db.func.date(Booking.start_date) == selected_date, Booking.status != "Отказ")
+        .all()
+    )
+    drop_offs = (
+        db.session.query(Booking)
+        .join(Car)
+        .filter(db.func.date(Booking.end_date) == selected_date, Booking.status != "Отказ")
+        .all()
+    )
 
     return render_template('bookings_today.html', pick_ups=pick_ups, drop_offs=drop_offs, today=selected_date)
 
