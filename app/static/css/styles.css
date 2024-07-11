@@ -72,8 +72,10 @@
     margin-top: 20px;
   }
   .table-hover tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: transparent !important; /* Отключаем изменение фона */
+    box-shadow: -2px 0 0 0 #007bff, 2px 0 0 0 #007bff;
   }
+
   .table thead th {
     position: sticky;
     top: 0;
