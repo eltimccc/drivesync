@@ -90,6 +90,9 @@ def create_app(config_class="config.Config"):
         if not os.path.exists(db_path):
             db.create_all()
             create_superuser()
+        else:
+            app.logger.info("Database already exists! Skipping creation.")
+            print("Database already exists. Skipping creation.")
 
     if not app.debug:
         if not os.path.exists("logs"):
