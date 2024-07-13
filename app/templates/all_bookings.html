@@ -4,40 +4,6 @@
 
 {% block additional_styles %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
-<style>
-  .highlight {
-    animation: highlight 2s ease-in-out;
-  }
-  @keyframes highlight {
-    0% {
-      background-color: purple;
-      transform: scale(1.05);
-    }
-    100% {
-      background-color: white;
-      transform: scale(1);
-    }
-  }
-  .custom-confirm-modal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1050;
-  }
-  .custom-modal-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-  }
-  
-</style>
 {% endblock %}
 
 {% block content %}
@@ -104,7 +70,7 @@
   </div>
 </div>
 
-<!-- Кастомное модальное окно -->
+<!-- Кастомное модальное окно для удаления -->
 <div id="custom-confirm-modal" class="custom-confirm-modal" style="display: none;">
   <div class="custom-modal-content">
     <p>Вы уверены, что хотите удалить это бронирование?</p>
@@ -217,7 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   }
-
   // Вызываем привязку событий удаления
   attachDeleteEvent();
 

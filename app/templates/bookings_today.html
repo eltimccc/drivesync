@@ -1,90 +1,180 @@
-{% extends 'base.html' %}
-
-{% block title %}Бронирования на сегодня{% endblock %}
-
+{% extends 'base.html' %} {% block title %}Бронирования на сегодня{% endblock %}
 {% block additional_styles %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
-{% endblock %}
-
-{% block content %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/styles.css') }}"
+/>
+{% endblock %} {% block content %}
 <div class="container mt-4">
-    <div class="row text-center">
-        <h4>
-            Бронирования на дату
-        </h4>
-        <form method="GET" action="{{ url_for('booking.bookings_today') }}" class="date-form d-inline-block">
-            <div class="form-group d-inline-block">
-                <input type="date" name="date" class="form-control" value="{{ request.args.get('date', today.strftime('%Y-%m-%d')) }}">
-            </div>
-            <button class="btn btn-primary" type="submit">Показать</button>
-        </form>
-    </div>
+  <div class="row text-center">
+    <h4>Бронирования на дату</h4>
+    <form
+      method="GET"
+      action="{{ url_for('booking.bookings_today') }}"
+      class="date-form d-inline-block"
+    >
+      <div class="form-group d-inline-block">
+        <input
+          type="date"
+          name="date"
+          class="form-control"
+          value="{{ request.args.get('date', today.strftime('%Y-%m-%d')) }}"
+        />
+      </div>
+      <button class="btn btn-primary" type="submit">Показать</button>
+    </form>
+  </div>
 </div>
 
-    <div class="row">
-        <div class="col-md-6 pick-up-section">
-            <h5 class="text-center">ВЫДАТЬ</h5>
-            <div class="table-container">
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Автомобиль</th>
-                            <th>КПП</th>
-                            <th>Гос. номер</th>
-                            <th>Дата начала</th>
-                            <th>Телефон</th>
-                            <th>Заметка</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in pick_ups %}
-                        <tr id="booking-{{ booking.id }}" class="status-{{ booking.status | lower }}" onclick="location.href='{{ url_for('booking.view_booking', booking_id=booking.id) }}'">
-                            <td>{{ booking.id }}</td>
-                            <td>{{ booking.car.brand }}</td>
-                            <td>{{ booking.car.transmission }}</td>
-                            <td>{{ booking.car.car_number }}</td>
-                            <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
-                            <td>{{ booking.phone }}</td>
-                            <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-6 drop-off-section">
-            <h5 class="text-center">ПРИНЯТЬ</h5>
-            <div class="table-container">
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Автомобиль</th>
-                            <th>КПП</th>
-                            <th>Гос. номер</th>
-                            <th>Дата окончания</th>
-                            <th>Телефон</th>
-                            <th>Заметка</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in drop_offs %}
-                        <tr id="booking-{{ booking.id }}" class="status-{{ booking.status | lower }}" onclick="location.href='{{ url_for('booking.view_booking', booking_id=booking.id) }}'">
-                            <td>{{ booking.id }}</td>
-                            <td>{{ booking.car.brand }}</td>
-                            <td>{{ booking.car.transmission }}</td>
-                            <td>{{ booking.car.car_number }}</td>
-                            <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
-                            <td>{{ booking.phone }}</td>
-                            <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="row">
+  <div class="col-md-6 pick-up-section">
+    <h5 class="text-center">ВЫДАТЬ</h5>
+    <div class="table-container">
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Автомобиль</th>
+            <th>КПП</th>
+            <th>Гос. номер</th>
+            <th>Дата начала</th>
+            <th>Телефон</th>
+            <th>Заметка</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in pick_ups %}
+          <tr
+            id="booking-{{ booking.id }}"
+            class="status-{{ booking.status | lower }}"
+            onclick="openBookingModal({{ booking.id }})"
+          >
+            <td>{{ booking.id }}</td>
+            <td>{{ booking.car.brand }}</td>
+            <td>{{ booking.car.transmission }}</td>
+            <td>{{ booking.car.car_number }}</td>
+            <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
+            <td>{{ booking.phone }}</td>
+            <td>
+              {{ booking.description[:20] }}{% if booking.description|length >
+              20 %}...{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
+  <div class="col-md-6 drop-off-section">
+    <h5 class="text-center">ПРИНЯТЬ</h5>
+    <div class="table-container">
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Автомобиль</th>
+            <th>КПП</th>
+            <th>Гос. номер</th>
+            <th>Дата окончания</th>
+            <th>Телефон</th>
+            <th>Заметка</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in drop_offs %}
+          <tr
+            id="booking-{{ booking.id }}"
+            class="status-{{ booking.status | lower }}"
+            onclick="openBookingModal({{ booking.id }})"
+          >
+            <td>{{ booking.id }}</td>
+            <td>{{ booking.car.brand }}</td>
+            <td>{{ booking.car.transmission }}</td>
+            <td>{{ booking.car.car_number }}</td>
+            <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
+            <td>{{ booking.phone }}</td>
+            <td>
+              {{ booking.description[:20] }}{% if booking.description|length >
+              20 %}...{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
+
+<!-- Модальное окно для бронирования -->
+{% include 'includes/modal_booking_window.html' %}
+
+<!-- Кастомное модальное окно для удаления -->
+{% include 'includes/custom_delete_modal.html' %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Модальное окно бронирования
+    window.openBookingModal = function (bookingId) {
+      const modalContentPlaceholder = document.getElementById(
+        "modal-content-placeholder"
+      );
+      modalContentPlaceholder.innerHTML = "Загрузка...";
+
+      fetch(
+        `{{ url_for('booking.view_booking_modal', booking_id=0) }}`.replace(
+          "0",
+          bookingId
+        )
+      )
+        .then((response) => response.text())
+        .then((data) => {
+          modalContentPlaceholder.innerHTML = data;
+          attachDeleteEvent(); // Привязка событий к новым элементам
+          $("#bookingModal").modal("show");
+        })
+        .catch((error) => {
+          modalContentPlaceholder.innerHTML = "Ошибка загрузки данных";
+          console.error("Ошибка:", error);
+        });
+    };
+
+    // Функция привязки событий удаления
+    function attachDeleteEvent() {
+      const deleteButton = document.getElementById("delete-button");
+      const confirmOkButton = document.getElementById("confirm-ok-button");
+      const confirmCancelButton = document.getElementById(
+        "confirm-cancel-button"
+      );
+
+      if (deleteButton) {
+        deleteButton.addEventListener("click", function (event) {
+          event.preventDefault();
+          document.getElementById("custom-confirm-modal").style.display =
+            "flex";
+        });
+      }
+
+      if (confirmOkButton) {
+        confirmOkButton.addEventListener("click", function () {
+          document.getElementById("custom-confirm-modal").style.display =
+            "none";
+          document.getElementById("delete-form").submit();
+        });
+      }
+
+      if (confirmCancelButton) {
+        confirmCancelButton.addEventListener("click", function () {
+          document.getElementById("custom-confirm-modal").style.display =
+            "none";
+        });
+      }
+    }
+
+    // Вызываем привязку событий удаления
+    attachDeleteEvent();
+  });
+</script>
+
 <script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
 {% endblock %}
