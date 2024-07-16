@@ -16,6 +16,7 @@ from app.constants import (
     BOOKING_ADD_TEMPLATE,
     BOOKING_BP_NAME_ROUTE,
     BOOKING_DELETE_BP_ROUTE,
+    BOOKING_DETAIL_MODAL_ROUTE,
     BOOKING_DETAIL_MODAL_TEMPLATE,
     BOOKING_DETAIL_TEMPLATE,
     BOOKING_EDIT_BP_ROUTE,
@@ -63,7 +64,7 @@ def view_booking(booking_id):
         )
 
 
-@booking_blueprint.route("/modal/view_booking/<int:booking_id>", methods=["GET"])
+@booking_blueprint.route(BOOKING_DETAIL_MODAL_ROUTE, methods=["GET"])
 @login_required
 def view_booking_modal(booking_id):
     current_app.logger.info(
@@ -76,7 +77,7 @@ def view_booking_modal(booking_id):
     current_app.logger.debug(
         f"Rendering booking detail modal for booking ID: {booking_id}")
     return render_template(
-        "view_booking_modal.html",
+        BOOKING_DETAIL_MODAL_TEMPLATE,
         booking=booking,
         status_color=status_color,
         formatted_created_at=formatted_created_at,

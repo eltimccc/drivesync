@@ -39,11 +39,12 @@ BOOKING = "booking.add_booking"
 
 # Blueprint маршруты BOOKING
 BOOKING_BP_NAME_ROUTE = "booking"
-BOOKING_VIEW_BP_ROUTE = "/<int:booking_id>"
+BOOKING_VIEW_BP_ROUTE = "/<int:booking_id>/"
 BOOKING_ADD_BP_ROUTE = "/add_booking"
 BOOKING_EDIT_BP_ROUTE = "/<int:booking_id>/edit"
 BOOKING_DELETE_BP_ROUTE = "/delete_booking/<int:booking_id>/"
 BOOKING_ALL_ROUTE = "/all_bookings"
+BOOKING_DETAIL_MODAL_ROUTE = "/modal/view_booking/<int:booking_id>"
 BOOKING_URL_PREFIX = "/booking"
 
 
