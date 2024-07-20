@@ -9,6 +9,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
+from .utils.utils_db import register_event_listeners
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -19,7 +20,6 @@ login_manager.login_message_category = "info"
 
 os.environ["TZ"] = "Europe/Moscow"
 time.tzset()
-
 
 def create_superuser():
     from .models import User
@@ -35,7 +35,6 @@ def create_superuser():
         db.session.add(superuser)
         db.session.commit()
         print("Superuser created.")
-
 
 def create_app(config_class="config.Config"):
     app = Flask(__name__, instance_relative_config=True)
@@ -83,16 +82,15 @@ def create_app(config_class="config.Config"):
     app.register_blueprint(errors_blueprint)
 
     with app.app_context():
-        db_path = os.path.join(
-            app.instance_path,
-            app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""),
-        )
+        db_path = os.path.join(app.instance_path, app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""))
         if not os.path.exists(db_path):
             db.create_all()
             create_superuser()
         else:
             app.logger.info("Database already exists! Skipping creation.")
             print("Database already exists. Skipping creation.")
+
+        register_event_listeners(app, db)
 
     if not app.debug:
         if not os.path.exists("logs"):
