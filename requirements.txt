@@ -9,6 +9,7 @@ Flask-Bcrypt==1.0.1
 Flask-Login==0.6.3
 Flask-Migrate==4.0.7
 Flask-SQLAlchemy==3.1.1
+flask-talisman==1.1.0
 Flask-Testing==0.8.1
 Flask-WTF==1.2.1
 idna==3.7
