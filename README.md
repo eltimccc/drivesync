@@ -40,7 +40,7 @@ DriveSync - это система для менеджеров организац
     FLASK_APP=run.py
     FLASK_ENV=development
     SECRET_KEY=my_secret_key_here
-    WTF_CSRF_SECRET_KEY = your_csrf_secret_key
+    WTF_CSRF_SECRET_KEY=your_csrf_secret_key
 5. Создай базу данных и запусти миграции:
     ```bash
     flask db init
