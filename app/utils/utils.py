@@ -1,5 +1,4 @@
 from app.models import Booking, Car
-from app import db
 
 BOOKING_STATUSES = {
     "Аренда": "#007bff",  # Синий цвет
