@@ -1,6 +1,6 @@
+from logging.handlers import RotatingFileHandler
 import os
 import logging
-from logging.handlers import RotatingFileHandler
 import time
 
 from flask import Flask, session
@@ -9,7 +9,10 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
-from .utils.utils_db import register_event_listeners
+from flask_limiter.util import get_remote_address
+from app.utils.security import create_superuser
+from app.utils.security.limiter_config import limiter
+from app.utils.utils_db import register_event_listeners
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -21,25 +24,11 @@ login_manager.login_message_category = "info"
 os.environ["TZ"] = "Europe/Moscow"
 time.tzset()
 
-def create_superuser():
-    from .models import User
-
-    if not User.query.filter_by(is_superuser=True).first():
-        hashed_password = bcrypt.generate_password_hash("superpassword").decode("utf-8")
-        superuser = User(
-            username="admin",
-            email="admin@example.com",
-            password=hashed_password,
-            is_superuser=True,
-        )
-        db.session.add(superuser)
-        db.session.commit()
-        print("Superuser created.")
 
 def create_app(config_class="config.Config"):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config_class)
-    app.secret_key = 'supersecretkey'
+    app.secret_key = "supersecretkey"
 
     try:
         os.makedirs(app.instance_path, exist_ok=True)
@@ -50,12 +39,22 @@ def create_app(config_class="config.Config"):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
-    login_manager.remember_cookie_duration = app.config['REMEMBER_COOKIE_DURATION']
+    login_manager.remember_cookie_duration = app.config["REMEMBER_COOKIE_DURATION"]
 
     @app.before_request
     def make_session_permanent():
         session.permanent = True
-        app.permanent_session_lifetime = app.config['PERMANENT_SESSION_LIFETIME']
+        app.permanent_session_lifetime = app.config["PERMANENT_SESSION_LIFETIME"]
+
+    limiter.init_app(app)
+
+    @app.after_request
+    def log_limit_exceeded(response):
+        # Проверяем, есть ли у ответа ошибка превышения лимита
+        if response.status_code == 429:  # 429 Too Many Requests
+            ip_address = get_remote_address()
+            app.logger.warning(f"Rate limit exceeded by IP: {ip_address}")
+        return response
 
     from app.views.main import main_blueprint
 
@@ -82,10 +81,13 @@ def create_app(config_class="config.Config"):
     app.register_blueprint(errors_blueprint)
 
     with app.app_context():
-        db_path = os.path.join(app.instance_path, app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""))
+        db_path = os.path.join(
+            app.instance_path,
+            app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""),
+        )
         if not os.path.exists(db_path):
             db.create_all()
-            create_superuser()
+            create_superuser(db, bcrypt)
         else:
             app.logger.info("Database already exists! Skipping creation.")
             print("Database already exists. Skipping creation.")

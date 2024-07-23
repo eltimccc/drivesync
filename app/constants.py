@@ -34,7 +34,7 @@ BOOKING_MODAL_TEMPLATE = "add_booking_modal.html"
 # Именованные маршруты BOOKING
 BOOKING_VIEW_BOOKING_ROUTE = "booking.view_booking"
 BOOKING_EDIT_BOOKING_ROUTE = "booking.edit_booking"
-BOOKING_MAIN_ROUTE = 'main.get_bookings'
+BOOKING_MAIN_ROUTE = "main.get_bookings"
 BOOKING = "booking.add_booking"
 
 # Blueprint маршруты BOOKING
@@ -80,3 +80,6 @@ AUTH_REGISTER_ROUTE = "auth.register"
 AUTH_REGISTER_TEMPLATE = "register.html"
 AUTH_LOGIN_TEMPLATE = "login.html"
 AUTH_LIST_TEMPLATE = "list_users.html"
+
+# limiter_config.py
+LIMITS = 50

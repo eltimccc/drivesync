@@ -13,6 +13,7 @@ from sqlalchemy import event
 BACKUP_DIR = "db_backups"
 MAX_BACKUPS = 3
 
+
 def create_backup(db_path):
     if not os.path.exists(BACKUP_DIR):
         os.makedirs(BACKUP_DIR)
@@ -28,8 +29,12 @@ def create_backup(db_path):
     shutil.copy2(db_path, backup_path)
     print(f"Backup created at {backup_path}")
 
+
 def register_event_listeners(app, db):
-    @event.listens_for(db.session, 'before_commit')
+    @event.listens_for(db.session, "before_commit")
     def before_commit(session):
-        db_path = os.path.join(app.instance_path, app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""))
+        db_path = os.path.join(
+            app.instance_path,
+            app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""),
+        )
         create_backup(db_path)

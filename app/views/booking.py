@@ -32,7 +32,8 @@ from app.utils.utils import BOOKING_STATUSES
 
 
 booking_blueprint = Blueprint(
-    BOOKING_BP_NAME_ROUTE, __name__, url_prefix=BOOKING_URL_PREFIX)
+    BOOKING_BP_NAME_ROUTE, __name__, url_prefix=BOOKING_URL_PREFIX
+)
 
 
 @booking_blueprint.route(BOOKING_VIEW_BP_ROUTE, methods=["GET"])
@@ -46,7 +47,8 @@ def view_booking(booking_id):
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         current_app.logger.debug(
-            f"Rendering booking detail modal for booking ID: {booking_id}")
+            f"Rendering booking detail modal for booking ID: {booking_id}"
+        )
         return render_template(
             BOOKING_DETAIL_MODAL_TEMPLATE,
             booking=booking,
@@ -55,7 +57,8 @@ def view_booking(booking_id):
         )
     else:
         current_app.logger.debug(
-            f"Rendering booking detail page for booking ID: {booking_id}")
+            f"Rendering booking detail page for booking ID: {booking_id}"
+        )
         return render_template(
             BOOKING_DETAIL_TEMPLATE,
             booking=booking,
@@ -67,15 +70,15 @@ def view_booking(booking_id):
 @booking_blueprint.route(BOOKING_DETAIL_MODAL_ROUTE, methods=["GET"])
 @login_required
 def view_booking_modal(booking_id):
-    current_app.logger.info(
-        f"Accessed view booking modal with ID: {booking_id}")
+    current_app.logger.info(f"Accessed view booking modal with ID: {booking_id}")
     booking = Booking.query.get_or_404(booking_id)
     status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
 
     formatted_created_at = booking.created_at.strftime("%d.%m.%Y %H:%M")
 
     current_app.logger.debug(
-        f"Rendering booking detail modal for booking ID: {booking_id}")
+        f"Rendering booking detail modal for booking ID: {booking_id}"
+    )
     return render_template(
         BOOKING_DETAIL_MODAL_TEMPLATE,
         booking=booking,
@@ -84,29 +87,38 @@ def view_booking_modal(booking_id):
     )
 
 
-@booking_blueprint.route('/bookings/today', methods=['GET'])
+@booking_blueprint.route("/bookings/today", methods=["GET"])
 @login_required
 def bookings_today():
-    date_str = request.args.get('date')
+    date_str = request.args.get("date")
     if date_str:
-        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     else:
         selected_date = datetime.today().date()
 
     pick_ups = (
         db.session.query(Booking)
         .join(Car)
-        .filter(db.func.date(Booking.start_date) == selected_date, Booking.status != "Отказ")
+        .filter(
+            db.func.date(Booking.start_date) == selected_date, Booking.status != "Отказ"
+        )
         .all()
     )
     drop_offs = (
         db.session.query(Booking)
         .join(Car)
-        .filter(db.func.date(Booking.end_date) == selected_date, Booking.status != "Отказ")
+        .filter(
+            db.func.date(Booking.end_date) == selected_date, Booking.status != "Отказ"
+        )
         .all()
     )
 
-    return render_template('bookings_today.html', pick_ups=pick_ups, drop_offs=drop_offs, today=selected_date)
+    return render_template(
+        "bookings_today.html",
+        pick_ups=pick_ups,
+        drop_offs=drop_offs,
+        today=selected_date,
+    )
 
 
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET"])
@@ -121,7 +133,8 @@ def get_booking():
     cars = None
     if car_id and start_datetime and end_datetime:
         current_app.logger.debug(
-            "Rendering add booking form with specific car and datetime")
+            "Rendering add booking form with specific car and datetime"
+        )
         cars = Car.query.filter_by(is_deleted=False).all()
         return render_template(
             BOOKING_ADD_TEMPLATE,
@@ -147,7 +160,8 @@ def get_booking():
 @login_required
 def add_booking():
     current_app.logger.info(
-        f"User {current_user.username} accessed add booking endpoint.")
+        f"User {current_user.username} accessed add booking endpoint."
+    )
     form = BookingForm()
     cars = Car.query.filter_by(is_deleted=False).all()
 
@@ -156,20 +170,21 @@ def add_booking():
         end_date = request.args.get("end_date")
         car_id = request.args.get("car_id")
         current_app.logger.debug(
-            f"User {current_user.username} received GET request with start_date: {start_date}, end_date: {end_date}, car_id: {car_id}")
+            f"User {current_user.username} received GET request with start_date: {start_date}, end_date: {end_date}, car_id: {car_id}"
+        )
 
         if start_date:
             try:
                 form.start_datetime.data = datetime.strptime(
-                    start_date, "%d.%m.%Y %H:%M")
+                    start_date, "%d.%m.%Y %H:%M"
+                )
                 current_app.logger.debug("Parsed start_date successfully")
             except ValueError:
                 form.start_datetime.data = None
                 current_app.logger.error("Failed to parse start_date")
         if end_date:
             try:
-                form.end_datetime.data = datetime.strptime(
-                    end_date, "%d.%m.%Y %H:%M")
+                form.end_datetime.data = datetime.strptime(end_date, "%d.%m.%Y %H:%M")
                 current_app.logger.debug("Parsed end_date successfully")
             except ValueError:
                 form.end_datetime.data = None
@@ -179,7 +194,8 @@ def add_booking():
 
     if form.validate_on_submit():
         current_app.logger.info(
-            f"User {current_user.username} validated booking form successfully")
+            f"User {current_user.username} validated booking form successfully"
+        )
         new_booking = Booking(
             start_date=form.start_datetime.data,
             end_date=form.end_datetime.data,
@@ -191,11 +207,13 @@ def add_booking():
         db.session.add(new_booking)
         db.session.commit()
         current_app.logger.info(
-            f"User {current_user.username} added new booking with ID: {new_booking.id}")
+            f"User {current_user.username} added new booking with ID: {new_booking.id}"
+        )
         return redirect(url_for(BOOKING_MAIN_ROUTE))
     else:
         current_app.logger.warning(
-            f"User {current_user.username} failed booking form validation")
+            f"User {current_user.username} failed booking form validation"
+        )
 
     return render_template(BOOKING_ADD_TEMPLATE, form=form, cars=cars)
 
@@ -204,7 +222,8 @@ def add_booking():
 @login_required
 def edit_booking(booking_id):
     current_app.logger.info(
-        f"User {current_user.username} accessed edit booking page with ID: {booking_id}")
+        f"User {current_user.username} accessed edit booking page with ID: {booking_id}"
+    )
     booking = Booking.query.get_or_404(booking_id)
     form = BookingUpdateForm(obj=booking)
     form.status.choices = [(key, key) for key in BOOKING_STATUSES.keys()]
@@ -212,7 +231,8 @@ def edit_booking(booking_id):
 
     if form.validate_on_submit():
         current_app.logger.info(
-            f"User {current_user.username} validated booking form for update of booking ID: {booking_id}")
+            f"User {current_user.username} validated booking form for update of booking ID: {booking_id}"
+        )
         booking.description = form.description.data
         booking.phone = form.phone.data
         booking.start_date = form.start_date.data
@@ -229,11 +249,13 @@ def edit_booking(booking_id):
         db.session.commit()
         flash("Бронирование успешно обновлено", "success")
         current_app.logger.info(
-            f"User {current_user.username} updated booking with ID: {booking_id}")
+            f"User {current_user.username} updated booking with ID: {booking_id}"
+        )
         return redirect(url_for(BOOKING_MAIN_ROUTE, edited_booking_id=booking.id))
     else:
         current_app.logger.warning(
-            f"User {current_user.username} failed booking form validation for booking ID: {booking_id}")
+            f"User {current_user.username} failed booking form validation for booking ID: {booking_id}"
+        )
 
     return render_template(BOOKING_EDIT_TEMPLATE, form=form, booking=booking, cars=cars)
 
@@ -242,10 +264,12 @@ def edit_booking(booking_id):
 @login_required
 def delete_booking(booking_id):
     current_app.logger.info(
-        f"User {current_user.username} accessed delete booking with ID: {booking_id}")
+        f"User {current_user.username} accessed delete booking with ID: {booking_id}"
+    )
     booking = Booking.query.get_or_404(booking_id)
     db.session.delete(booking)
     db.session.commit()
     current_app.logger.warning(
-        f"User {current_user.username} deleted booking with ID: {booking_id}")
+        f"User {current_user.username} deleted booking with ID: {booking_id}"
+    )
     return redirect(url_for(BOOKING_MAIN_ROUTE))
