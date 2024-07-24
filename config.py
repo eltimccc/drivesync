@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -14,5 +15,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     FLASK_ENV = os.getenv("FLASK_ENV")
     TEMPLATES_AUTO_RELOAD = True
-    PERMANENT_SESSION_LIFETIME = 86400
-    REMEMBER_COOKIE_DURATION = 86400
+    PERMANENT_SESSION_LIFETIME = timedelta(days=2)
+    REMEMBER_COOKIE_DURATION = timedelta(days=2)
