@@ -62,18 +62,10 @@
                 {% endif %}
               </div>
             </div>
-            <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
-              <form method="post" action="{{ url_for('booking.delete_booking', booking_id=booking.id) }}" onsubmit="return confirm('Вы уверены, что хотите удалить это бронирование?');" class="d-inline-block">
-                <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
-              </form>
+            <div class="d-flex">
+              <button type="submit" formmethod="POST" class="btn btn-primary btn-sm">Сохранить</button>
+              <button type="submit" formmethod="POST" formaction="{{ url_for('booking.delete_booking', booking_id=booking.id) }}" onclick="return confirm('Вы уверены, что хотите удалить это бронирование?');" class="btn btn-danger btn-sm ms-2">Удалить</button>
             </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Модальное окно для выбора автомобиля -->
 <div id="carModal" class="modal" onclick="closeIfOutside(event)">
