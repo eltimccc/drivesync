@@ -1,4 +1,3 @@
-from logging.handlers import RotatingFileHandler
 import os
 import logging
 import time
@@ -8,11 +7,15 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_migrate import Migrate
-
+from flask_talisman import Talisman
 from flask_limiter.util import get_remote_address
+from logging.handlers import RotatingFileHandler
+
 from app.utils.security import create_superuser
 from app.utils.security.limiter_config import limiter
 from app.utils.utils_db import register_event_listeners
+from app.utils.security.csp_config import csp
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -23,6 +26,8 @@ login_manager.login_message_category = "info"
 
 os.environ["TZ"] = "Europe/Moscow"
 time.tzset()
+
+csp_directives = {k: " ".join(v) for k, v in csp.items()}
 
 
 def create_app(config_class="config.Config"):
@@ -50,11 +55,12 @@ def create_app(config_class="config.Config"):
 
     @app.after_request
     def log_limit_exceeded(response):
-        # Проверяем, есть ли у ответа ошибка превышения лимита
-        if response.status_code == 429:  # 429 Too Many Requests
+        if response.status_code == 429:
             ip_address = get_remote_address()
             app.logger.warning(f"Rate limit exceeded by IP: {ip_address}")
         return response
+
+    Talisman(app, content_security_policy=csp_directives)
 
     from app.views.main import main_blueprint
 
