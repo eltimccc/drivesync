@@ -13,9 +13,20 @@
   <!-- Фильтр над правой частью таблицы -->
   <div class="row justify-content-end mb-3">
     <div class="col-md-4">
-      <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
+      <form
+        id="filterForm"
+        method="GET"
+        action="{{ url_for('main.get_bookings') }}"
+      >
         <div class="input-group">
-          <input type="text" name="filter" id="filterInput" placeholder="Введите текст для фильтрации" class="form-control" value="{{ filter }}">
+          <input
+            type="text"
+            name="filter"
+            id="filterInput"
+            placeholder="Введите текст для фильтрации"
+            class="form-control"
+            value="{{ filter }}"
+          />
         </div>
       </form>
     </div>
@@ -40,8 +51,15 @@
         </thead>
         <tbody>
           {% for booking in bookings %}
-          <tr id="booking-{{ booking.id }}" class="status-{{ booking.status | lower }}" onclick="openBookingModal({{ booking.id }})">
-            <td class="{% if booking.start_date.date() == today %}status-pickup-cell{% elif booking.end_date.date() == today %}status-dropoff-cell{% endif %}"></td>
+          <tr
+            id="booking-{{ booking.id }}"
+            class="status-{{ booking.status | lower }}"
+            onclick="openBookingModal({{ booking.id }}, this.getAttribute('data-url'))"
+            data-url="{{ url_for('booking.view_booking_modal', booking_id=booking.id) }}"
+          >
+            <td
+              class="{% if booking.start_date.date() == today %}status-pickup-cell{% elif booking.end_date.date() == today %}status-dropoff-cell{% endif %}"
+            ></td>
             <td>{{ booking.id }}</td>
             <td>{{ booking.car.brand }}</td>
             <td>{{ booking.car.transmission }}</td>
@@ -49,7 +67,10 @@
             <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
             <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
             <td>{{ booking.phone }}</td>
-            <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
+            <td>
+              {{ booking.description[:20] }}{% if booking.description|length >
+              20 %}...{% endif %}
+            </td>
             <td>{{ booking.user.username }}</td>
           </tr>
           {% endfor %}
@@ -60,7 +81,13 @@
 </div>
 
 <!-- Модальное окно для бронирования -->
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="bookingModal"
+  tabindex="-1"
+  aria-labelledby="bookingModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body">
@@ -71,123 +98,31 @@
 </div>
 
 <!-- Кастомное модальное окно для удаления -->
-<div id="custom-confirm-modal" class="custom-confirm-modal" style="display: none;">
+<div
+  id="custom-confirm-modal"
+  class="custom-confirm-modal"
+  style="display: none"
+>
   <div class="custom-modal-content">
     <p>Вы уверены, что хотите удалить это бронирование?</p>
     <form id="delete-form" method="post">
-      <button type="button" id="confirm-ok-button" class="btn btn-success">OK</button>
-      <button type="button" id="confirm-cancel-button" class="btn btn-secondary">Отмена</button>
+      <button type="button" id="confirm-ok-button" class="btn btn-success">
+        OK
+      </button>
+      <button
+        type="button"
+        id="confirm-cancel-button"
+        class="btn btn-secondary"
+      >
+        Отмена
+      </button>
     </form>
   </div>
 </div>
+{% endblock %} 
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const filterInput = document.getElementById('filterInput');
-  const filterForm = document.getElementById('filterForm');
-
-  // Загрузка сохраненного фильтра из localStorage
-  const savedFilter = localStorage.getItem('bookingFilter');
-  if (savedFilter) {
-    filterInput.value = savedFilter;
-  }
-
-  // Обработчик изменения значения фильтра
-  filterInput.addEventListener('input', function() {
-    localStorage.setItem('bookingFilter', filterInput.value);
-    filterTableRows(); // Вызываем функцию фильтрации
-  });
-
-  // Обработчик отправки формы
-  filterForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Отменяем стандартное поведение формы
-    filterTableRows(); // Вызываем функцию фильтрации
-  });
-
-  // Функция фильтрации таблицы
-  function filterTableRows() {
-    const filterText = filterInput.value.trim().toLowerCase(); // Приводим текст фильтра к нижнему регистру
-    if (filterText.length < 2) {
-      // Если текст фильтра короче двух символов, показываем все строки
-      document.querySelectorAll('.table-hover tbody tr').forEach(row => {
-        row.style.display = '';
-      });
-      return;
-    }
-
-  const tableRows = document.querySelectorAll('.table-hover tbody tr');
-
-  tableRows.forEach(row => {
-    let rowMatches = false;
-
-    Array.from(row.cells).forEach(cell => {
-      const cellText = cell.textContent.trim().toLowerCase();
-      if (cellText.includes(filterText)) {
-        rowMatches = true;
-      }
-    });
-
-    row.style.display = rowMatches ? '' : 'none'; // Показываем или скрываем строку
-  });
-}
-
-  // Вызываем функцию фильтрации при загрузке страницы
-  filterTableRows();
-
-  // Очистка сохраненного фильтра при обновлении страницы
-  window.addEventListener('beforeunload', function() {
-    localStorage.removeItem('bookingFilter');
-  });
-
-  // Модальное окно бронирования
-  window.openBookingModal = function(bookingId) {
-    const modalContentPlaceholder = document.getElementById('modal-content-placeholder');
-    modalContentPlaceholder.innerHTML = 'Загрузка...';
-
-    fetch(`{{ url_for('booking.view_booking_modal', booking_id=0) }}`.replace('0', bookingId))
-      .then(response => response.text())
-      .then(data => {
-        modalContentPlaceholder.innerHTML = data;
-        attachDeleteEvent(); // Привязка событий к новым элементам
-        $('#bookingModal').modal('show');
-      })
-      .catch(error => {
-        modalContentPlaceholder.innerHTML = 'Ошибка загрузки данных';
-        console.error('Ошибка:', error);
-      });
-  }
-
-  // Функция привязки событий удаления
-  function attachDeleteEvent() {
-    const deleteButton = document.getElementById('delete-button');
-    const confirmOkButton = document.getElementById('confirm-ok-button');
-    const confirmCancelButton = document.getElementById('confirm-cancel-button');
-
-    if (deleteButton) {
-      deleteButton.addEventListener('click', function(event) {
-        event.preventDefault();
-        document.getElementById('custom-confirm-modal').style.display = 'flex';
-      });
-    }
-
-    if (confirmOkButton) {
-      confirmOkButton.addEventListener('click', function() {
-        document.getElementById('custom-confirm-modal').style.display = 'none';
-        document.getElementById('delete-form').submit();
-      });
-    }
-
-    if (confirmCancelButton) {
-      confirmCancelButton.addEventListener('click', function() {
-        document.getElementById('custom-confirm-modal').style.display = 'none';
-      });
-    }
-  }
-  // Вызываем привязку событий удаления
-  attachDeleteEvent();
-
-});
-</script>
-
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/all_booking_filter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/all_booking_modal.js') }}"></script>
 <script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
 {% endblock %}
