@@ -4,7 +4,7 @@ from app import create_app, db
 from app.models import Booking
 
 
-def generate_dates(start_date, num_days=30):
+def generate_dates(start_date, num_days=130):
     bookings = []
     available_cars = list(range(1, 38))
 

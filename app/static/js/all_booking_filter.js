@@ -1,58 +1,59 @@
 document.addEventListener('DOMContentLoaded', function() {
     const filterInput = document.getElementById('filterInput');
+    const statusFilter = document.getElementById('statusFilter');
     const filterForm = document.getElementById('filterForm');
+    const tableRows = document.querySelectorAll('.table-hover tbody tr');
   
-    // Загрузка сохраненного фильтра из localStorage
-    const savedFilter = localStorage.getItem('bookingFilter');
-    if (savedFilter) {
-      filterInput.value = savedFilter;
-    }
+    const loadFilterFromLocalStorage = (key, element) => {
+      const savedValue = localStorage.getItem(key);
+      if (savedValue) element.value = savedValue;
+    };
   
-    // Обработчик изменения значения фильтра
-    filterInput.addEventListener('input', function() {
-      localStorage.setItem('bookingFilter', filterInput.value);
-      filterTableRows(); // Вызываем функцию фильтрации
-    });
+    const saveFilterToLocalStorage = (key, value) => {
+      localStorage.setItem(key, value);
+    };
   
-    // Обработчик отправки формы
-    filterForm.addEventListener('submit', function(event) {
-      event.preventDefault(); // Отменяем стандартное поведение формы
-      filterTableRows(); // Вызываем функцию фильтрации
-    });
-  
-    // Функция фильтрации таблицы
-    function filterTableRows() {
-      const filterText = filterInput.value.trim().toLowerCase(); // Приводим текст фильтра к нижнему регистру
-      if (filterText.length < 2) {
-        // Если текст фильтра короче двух символов, показываем все строки
-        document.querySelectorAll('.table-hover tbody tr').forEach(row => {
-          row.style.display = '';
-        });
-        return;
-      }
-  
-      const tableRows = document.querySelectorAll('.table-hover tbody tr');
+    const filterTableRows = () => {
+      const filterText = filterInput.value.trim().toLowerCase();
+      const statusText = statusFilter.value.trim().toLowerCase();
   
       tableRows.forEach(row => {
-        let rowMatches = false;
+        const rowMatchesFilter = Array.from(row.cells).some(cell =>
+          cell.textContent.trim().toLowerCase().includes(filterText)
+        );
   
-        Array.from(row.cells).forEach(cell => {
-          const cellText = cell.textContent.trim().toLowerCase();
-          if (cellText.includes(filterText)) {
-            rowMatches = true;
-          }
-        });
+        const rowStatus = row.className.split('-').pop();
+        const rowMatchesStatus = !statusText || rowStatus === statusText;
   
-        row.style.display = rowMatches ? '' : 'none'; // Показываем или скрываем строку
+        row.style.display = rowMatchesFilter && rowMatchesStatus ? '' : 'none';
       });
-    }
+    };
   
-    // Вызываем функцию фильтрации при загрузке страницы
+    loadFilterFromLocalStorage('bookingFilter', filterInput);
+    loadFilterFromLocalStorage('statusFilter', statusFilter);
+  
+    filterInput.addEventListener('input', () => {
+      saveFilterToLocalStorage('bookingFilter', filterInput.value);
+      if (filterInput.value.length >= 2 || filterInput.value.length === 0) {
+        filterTableRows();
+      }
+    });
+  
+    statusFilter.addEventListener('change', () => {
+      saveFilterToLocalStorage('statusFilter', statusFilter.value);
+      filterTableRows();
+    });
+  
+    filterForm.addEventListener('submit', event => {
+      event.preventDefault();
+      filterTableRows();
+    });
+  
     filterTableRows();
   
-    // Очистка сохраненного фильтра при обновлении страницы
-    window.addEventListener('beforeunload', function() {
+    window.addEventListener('beforeunload', () => {
       localStorage.removeItem('bookingFilter');
+      localStorage.removeItem('statusFilter');
     });
   });
   

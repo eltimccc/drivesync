@@ -1,5 +1,8 @@
-{% extends 'base.html' %} {% block title %}Доступные автомобили{% endblock %} {%
-block additional_styles %}
+{% extends 'base.html' %}
+
+{% block title %}Доступные автомобили{% endblock %}
+
+{% block additional_styles %}
 <style>
   .xdsoft_datetimepicker {
     transform: scale(1.2);
@@ -11,7 +14,9 @@ block additional_styles %}
     max-width: 370px;
   }
 </style>
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 <div class="container mt-5">
   <h4 class="mb-4">Поиск доступных автомобилей</h4>
 
@@ -48,16 +53,19 @@ block additional_styles %}
     Доступные автомобили с {{ start_date }} по {{ end_date }}
   </h4>
   <div class="row">
-    {% for car in cars %}
     <div class="col-md-6 mb-4">
-      <div class="card car-card" style="max-width: 500px">
+      <input type="text" id="filterInput" class="form-control" placeholder="Фильтр по марке, номеру или КПП">
+    </div>
+  </div>
+  <div class="row" id="carContainer">
+    {% for car in cars %}
+    <div class="col-md-6 mb-4 car-card">
+      <div class="card" style="max-width: 500px">
         <div class="card-body">
           <h5 class="card-title">
             {{ car.brand }} {{ car.car_number }}; {{ car.transmission }}
           </h5>
-          <a
-            href="{{ url_for('booking.add_booking', car_id=car.id, start_date=start_date, end_date=end_date) }}"
-          >
+          <a href="{{ url_for('booking.add_booking', car_id=car.id, start_date=start_date, end_date=end_date) }}">
             Забронировать
           </a>
           <p class="card-text availability-info alert alert-success">
@@ -67,11 +75,8 @@ block additional_styles %}
           <div class="booking-info">
             <div>Последнее бронирование:</div>
             <div>
-              <a
-                href="{{ url_for('booking.view_booking', booking_id=car.last_booking_info.id) }}"
-              >
-                с {{ car.last_booking_info.start_date_formatted }} по {{
-                car.last_booking_info.end_date_formatted }}
+              <a href="{{ url_for('booking.view_booking', booking_id=car.last_booking_info.id) }}">
+                с {{ car.last_booking_info.start_date_formatted }} по {{ car.last_booking_info.end_date_formatted }}
               </a>
             </div>
           </div>
@@ -83,11 +88,8 @@ block additional_styles %}
           <div class="booking-info">
             <div>Следующее бронирование:</div>
             <div>
-              <a
-                href="{{ url_for('booking.view_booking', booking_id=car.next_booking_info.id) }}"
-              >
-                с {{ car.next_booking_info.start_date_formatted }} по {{
-                car.next_booking_info.end_date_formatted }}
+              <a href="{{ url_for('booking.view_booking', booking_id=car.next_booking_info.id) }}">
+                с {{ car.next_booking_info.start_date_formatted }} по {{ car.next_booking_info.end_date_formatted }}
               </a>
             </div>
           </div>
@@ -105,6 +107,9 @@ block additional_styles %}
   <p>Нет доступных автомобилей на выбранные даты.</p>
   {% endif %}
 </div>
-{% endblock %} {% block additional_scripts %}
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/available_cars_filter.js') }}"></script>
 <script src="{{ url_for('static', filename='js/show_date_selected_avaiable_cars.js') }}"></script>
 {% endblock %}
