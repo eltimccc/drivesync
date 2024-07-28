@@ -6,6 +6,7 @@ from app import db
 from app.models import Booking, Car
 from app.utils.booking_filters import get_sorting_parameters
 from app.constants import BOOKING_ALL_TEMPLATE, MAIN_BP_NAME_ROUTE
+from app.utils.utils import BOOKING_STATUSES
 
 
 main_blueprint = Blueprint(MAIN_BP_NAME_ROUTE, __name__, url_prefix="/")
@@ -30,4 +31,5 @@ def get_bookings():
         sort_by=request.args.get("sort_by", "created_at"),
         sort_order=request.args.get("sort_order", "desc"),
         today=today,
+        BOOKING_STATUSES=BOOKING_STATUSES,
     )
