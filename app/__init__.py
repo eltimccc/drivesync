@@ -60,7 +60,7 @@ def create_app(config_class="config.Config"):
             app.logger.warning(f"Rate limit exceeded by IP: {ip_address}")
         return response
 
-    Talisman(app, content_security_policy=csp_directives)
+    # Talisman(app, content_security_policy=csp_directives)
 
     from app.views.main import main_blueprint
 
