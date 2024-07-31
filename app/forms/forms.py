@@ -196,3 +196,12 @@ class LoginForm(FlaskForm):
 
 class HiddenForm(FlaskForm):
     pass
+
+
+class EditUserForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password')
+    confirm = PasswordField('Confirm Password')
+    is_superuser = BooleanField('Superuser')
+    submit = SubmitField('Update')

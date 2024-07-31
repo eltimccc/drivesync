@@ -17,7 +17,7 @@ from app.constants import (
 )
 from app.utils.decorators import superuser_required
 from app.models import User
-from app.forms.forms import HiddenForm, RegistrationForm, LoginForm
+from app.forms.forms import EditUserForm, HiddenForm, RegistrationForm, LoginForm
 
 auth_blueprint = Blueprint(AUTH_BP_NAME_ROUTE, __name__, url_prefix=AUTH_URL_PREFIX)
 
@@ -95,3 +95,21 @@ def delete_user(user_id):
     db.session.commit()
     flash("Пользователь был удален!", "success")
     return redirect(url_for("auth.list_users"))
+
+
+@auth_blueprint.route("/edit_user/<int:user_id>", methods=["GET", "POST"])
+@login_required
+@superuser_required
+def edit_user(user_id):
+    user = User.query.get_or_404(user_id)
+    form = EditUserForm(obj=user)
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data
+        if form.password.data:
+            user.password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+        user.is_superuser = form.is_superuser.data
+        db.session.commit()
+        flash("Информация пользователя была обновлена!", "success")
+        return redirect(url_for("auth.list_users"))
+    return render_template("edit_user.html", form=form, user=user)
