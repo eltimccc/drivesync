@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import current_app
 from app.models import Booking, User
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import IntegerField, StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
@@ -174,6 +174,7 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField(
         "Confirm Password", validators=[DataRequired(), EqualTo("password")]
     )
+    telegram_id = IntegerField("Телеграм айди при наличии")
     submit = SubmitField("Sign Up")
 
     def validate_username(self, username):
@@ -203,5 +204,6 @@ class EditUserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password')
     confirm = PasswordField('Confirm Password')
+    telegram_id = IntegerField("Телеграм айди при наличии")
     is_superuser = BooleanField('Superuser')
     submit = SubmitField('Update')

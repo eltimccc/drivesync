@@ -3,6 +3,7 @@ import logging
 import time
 
 from flask import Flask, session
+from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -11,7 +12,6 @@ from flask_talisman import Talisman
 from flask_limiter.util import get_remote_address
 from logging.handlers import RotatingFileHandler
 
-from app.utils.security import create_superuser
 from app.utils.security.limiter_config import limiter
 from app.utils.utils_db import register_event_listeners
 from app.utils.security.csp_config import csp
@@ -33,7 +33,8 @@ csp_directives = {k: " ".join(v) for k, v in csp.items()}
 def create_app(config_class="config.Config"):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config_class)
-    app.secret_key = "supersecretkey"
+
+    jwt = JWTManager(app)
 
     try:
         os.makedirs(app.instance_path, exist_ok=True)
@@ -86,17 +87,20 @@ def create_app(config_class="config.Config"):
 
     app.register_blueprint(errors_blueprint)
 
+    from app.api.login_api import login_api
+
+    app.register_blueprint(login_api)
+
+    from app.api.bookings_api import bookings_api
+
+    app.register_blueprint(bookings_api)
+
+    from app.utils.security.create_superuser import create_superuser
+
     with app.app_context():
-        db_path = os.path.join(
-            app.instance_path,
-            app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""),
-        )
-        if not os.path.exists(db_path):
-            db.create_all()
-            create_superuser(db, bcrypt)
-        else:
-            app.logger.info("Database already exists! Skipping creation.")
-            print("Database already exists. Skipping creation.")
+        db.create_all()
+
+        create_superuser(db, bcrypt)
 
         register_event_listeners(app, db)
 
