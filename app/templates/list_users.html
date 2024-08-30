@@ -77,7 +77,7 @@
                     <th>ID</th>
                     <th>Username</th>
                     <th>Email</th>
-                    <th>Name</th>
+                    <th>telegram_id</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -87,7 +87,7 @@
                     <td>{{ user.id }}</td>
                     <td><a href="{{ url_for('auth.edit_user', user_id=user.id) }}" class="text-white">{{ user.username }}</a></td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.name }}</td>
+                    <td>{{ user.telegram_id }}</td>
                     <td>
                       <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmDeleteModal" data-username="{{ user.username }}" data-userid="{{ user.id }}">Delete</button>
                     </td>

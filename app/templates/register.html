@@ -31,6 +31,13 @@
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+                <p>
+            {{ form.telegram_id.label }}<br>
+            {{ form.telegram_id(size=10) }}<br>
+            {% for error in form.telegram_id.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}

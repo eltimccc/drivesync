@@ -37,7 +37,10 @@ def register():
             "utf-8"
         )
         user = User(
-            username=form.username.data, email=form.email.data, password=hashed_password
+            username=form.username.data,
+            email=form.email.data,
+            telegram_id=form.telegram_id.data,
+            password=hashed_password,
         )
         db.session.add(user)
         db.session.commit()
@@ -106,8 +109,11 @@ def edit_user(user_id):
     if form.validate_on_submit():
         user.username = form.username.data
         user.email = form.email.data
+        user.telegram_id = form.telegram_id.data
         if form.password.data:
-            user.password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+            user.password = bcrypt.generate_password_hash(form.password.data).decode(
+                "utf-8"
+            )
         user.is_superuser = form.is_superuser.data
         db.session.commit()
         flash("Информация пользователя была обновлена!", "success")

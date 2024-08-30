@@ -41,6 +41,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(60), nullable=False)
+    telegram_id = db.Column(db.String(100), unique=True, nullable=True)
     is_superuser = db.Column(db.Boolean, default=False)
 
     def repr(self):
