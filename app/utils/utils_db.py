@@ -4,17 +4,20 @@ import shutil
 from sqlalchemy import event
 
 BACKUP_DIR = "db_backups"
-
-import os
-import time
-import shutil
-from sqlalchemy import event
-
-BACKUP_DIR = "db_backups"
 MAX_BACKUPS = 3
 
-
 def create_backup(db_path):
+    """
+    Создает резервную копию базы данных.
+
+    Если директория для резервных копий не существует, она будет создана. 
+    Если количество резервных копий превышает MAX_BACKUPS, самая старая из них будет удалена. 
+    Новая резервная копия будет создана с именем, содержащим текущую дату и время.
+
+    Args:
+        db_path (str): Путь к файлу базы данных, который нужно скопировать.
+    """
+
     if not os.path.exists(BACKUP_DIR):
         os.makedirs(BACKUP_DIR)
 
@@ -29,8 +32,18 @@ def create_backup(db_path):
     shutil.copy2(db_path, backup_path)
     print(f"Backup created at {backup_path}")
 
-
 def register_event_listeners(app, db):
+    """
+    Регистрирует обработчики событий для базы данных.
+
+    Добавляет слушателя события 'before_commit' для SQLAlchemy, который создаёт резервную копию 
+    базы данных перед каждым коммитом в сессии.
+
+    Args:
+        app: Flask приложение, содержащее конфигурацию и путь к базе данных.
+        db: Объект базы данных SQLAlchemy.
+    """
+    
     @event.listens_for(db.session, "before_commit")
     def before_commit(session):
         db_path = os.path.join(

@@ -15,6 +15,15 @@ main_blueprint = Blueprint(MAIN_BP_NAME_ROUTE, __name__, url_prefix="/")
 @main_blueprint.route("/", methods=["GET"])
 @login_required
 def get_bookings():
+    """
+    Для главной страницы.
+    Отображает список всех бронирований с возможностью сортировки.
+
+    Маршрут доступен только для аутентифицированных пользователей. 
+    Сортировка бронирований производится на основе GET-параметров 'sort_by' и 'sort_order'.
+    В шаблон передаются список бронирований, параметры сортировки, текущая дата и статусы бронирований.
+    """
+
     current_app.logger.info("Accessed all bookings page.")
     sort_direction = get_sorting_parameters()
     current_app.logger.debug(f"Sorting bookings in {sort_direction} order")
