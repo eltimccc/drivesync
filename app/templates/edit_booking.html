@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/car_input_styles.css') }}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" />
+
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
@@ -11,31 +13,31 @@
         <div class="card-body">
           <form method="POST">
             {{ form.hidden_tag() }}
-            <div class="form-group row">
+            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
               <label for="start_date" class="col-sm-4 col-form-label">Дата и время начала:</label>
               <div class="col-sm-8">
                 <input type="text" class="form-control datetimepicker" id="start_date" name="start_date" value="{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}" required />
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
               <label for="end_date" class="col-sm-4 col-form-label">Дата и время окончания:</label>
               <div class="col-sm-8">
                 <input type="text" class="form-control datetimepicker" id="end_date" name="end_date" value="{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}" required />
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
               <label for="car" class="col-sm-4 col-form-label">Автомобиль:</label>
               <div class="col-sm-8">
                 <div class="input-group">
-                  <input type="text" class="form-control" id="selectedCar" name="selectedCar" readonly />
+                  <input type="text" class="form-control" id="selectedCar" readonly />
                   <input type="hidden" id="selectedCarId" name="car" readonly />
                   <div class="input-group-append">
-                    <button type="button" class="btn btn-info btn-sm" onclick="openCarModal()">Выбрать автомобиль</button>
+                    <button type="button" class="btn btn-info btn-sm" onclick="openCarModal()">...</button>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
               <label for="phone" class="col-sm-4 col-form-label">Телефон:</label>
               <div class="col-sm-8">
                 {{ form.phone(class_="form-control") }}
@@ -44,7 +46,7 @@
                 {% endif %}
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
               <label for="description" class="col-sm-4 col-form-label">Заметка:</label>
               <div class="col-sm-8">
                 {{ form.description(class_="form-control", rows=2) }}
@@ -53,7 +55,7 @@
                 {% endif %}
               </div>
             </div>
-            <div class="form-group row">
+            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
               <label for="status" class="col-sm-4 col-form-label">Статус:</label>
               <div class="col-sm-8">
                 {{ form.status(class_="form-control") }}
@@ -66,6 +68,12 @@
               <button type="submit" formmethod="POST" class="btn btn-primary btn-sm">Сохранить</button>
               <button type="submit" formmethod="POST" formaction="{{ url_for('booking.delete_booking', booking_id=booking.id) }}" onclick="return confirm('Вы уверены, что хотите удалить это бронирование?');" class="btn btn-danger btn-sm ms-2">Удалить</button>
             </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Модальное окно для выбора автомобиля -->
 <div id="carModal" class="modal" onclick="closeIfOutside(event)">
@@ -91,17 +99,11 @@
 </div>
 
 <script>
-  $(document).ready(function () {
-    $(".datetimepicker").datetimepicker({
-      format: "d.m.Y H:i",
-      step: 15,
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("selectedCar").value = "{{ booking.car.brand }} {{ booking.car.car_number }}";
-    document.getElementById("selectedCarId").value = "{{ booking.car.id }}";
-  });
+    var bookingCar = {
+        brand: "{{ booking.car.brand }}",
+        number: "{{ booking.car.car_number }}",
+        id: "{{ booking.car.id }}"
+    };
 </script>
 <script src="{{ url_for('static', filename='js/car_input.js') }}"></script>
 {% endblock %}

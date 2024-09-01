@@ -1,3 +1,21 @@
+document.addEventListener("DOMContentLoaded", function () {
+    var selectedCarElement = document.getElementById("selectedCar");
+    var selectedCarId = document.getElementById("selectedCarId");
+
+    if (bookingCar && bookingCar.brand && bookingCar.number && bookingCar.id) {
+        selectedCarElement.value = bookingCar.brand + " " + bookingCar.number;
+        selectedCarId.value = bookingCar.id;
+    } else {
+        selectedCarElement.value = "";
+        selectedCarId.value = "";
+    }
+
+    $(".datetimepicker").datetimepicker({
+        format: "d.m.Y H:i",
+        step: 15,
+    });
+});
+
 function openCarModal() {
     var modal = document.getElementById("carModal");
     modal.style.display = "block";
