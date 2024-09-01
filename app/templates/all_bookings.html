@@ -12,27 +12,27 @@
 
   <!-- Фильтр над правой частью таблицы -->
   <div class="row justify-content-end mb-3">
-    <div class="col-md-4">
-      <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
-        <div class="input-group">
-          <input
-            type="text"
-            name="filter"
-            id="filterInput"
-            placeholder="Текст для фильтра"
-            class="form-control"
-            value="{{ filter }}"
-          />
-          <select id="statusFilter" class="form-select ms-2">
-            <option value="">Все статусы</option>
-            {% for status, color in BOOKING_STATUSES.items() %}
-            <option value="{{ status }}">{{ status }}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </form>
+      <div class="col-md-4">
+        <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
+          <div class="input-group input-group-sm"> <!-- Добавлен класс input-group-sm -->
+            <input
+              type="text"
+              name="filter"
+              id="filterInput"
+              placeholder="Текст для фильтра"
+              class="form-control form-control-sm"
+              value="{{ filter }}"
+            />
+            <select id="statusFilter" name="status" class="form-select form-select-sm ms-2"> <!-- Добавлен класс form-select-sm -->
+              <option value="">Все статусы</option>
+              {% for status, color in BOOKING_STATUSES.items() %}
+              <option value="{{ status }}">{{ status }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
 
   <div class="table-container">
     <div class="fixed-header">
