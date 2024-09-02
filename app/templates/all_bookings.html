@@ -23,11 +23,12 @@
               class="form-control form-control-sm"
               value="{{ filter }}"
             />
-            <select id="statusFilter" name="status" class="form-select form-select-sm ms-2"> <!-- Добавлен класс form-select-sm -->
-              <option value="">Все статусы</option>
-              {% for status, color in BOOKING_STATUSES.items() %}
-              <option value="{{ status }}">{{ status }}</option>
-              {% endfor %}
+            <select id="statusFilter" name="status" class="form-select form-select-sm ms-2">
+            <option value="in_work">В работе</option>
+            {% for status, color in BOOKING_STATUSES.items() %}
+            <option value="{{ status }}">{{ status }}</option>
+            {% endfor %}
+            <option value="">Все</option>
             </select>
           </div>
         </form>
