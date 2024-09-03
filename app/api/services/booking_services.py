@@ -1,5 +1,6 @@
 from datetime import datetime
-from app.models import Booking, Car
+from app.models import Booking
+from app.models import Car
 from app import db
 
 

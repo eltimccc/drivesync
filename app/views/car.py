@@ -23,7 +23,8 @@ from app.constants import (
     CARS_GET_ROUTE,
 )
 from app.forms.forms import CarForm, EditCarForm
-from app.models import Booking, Car
+from app.models import Booking
+from app.models import Car
 from app import db
 
 

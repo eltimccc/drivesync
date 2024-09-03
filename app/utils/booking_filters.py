@@ -1,6 +1,7 @@
 from flask import request
 
-from app.models import Booking, Car
+from app.models import Booking
+from app.models import Car
 
 
 def get_sorting_parameters():

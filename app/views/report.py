@@ -18,7 +18,8 @@ from app.constants import (
     SEARCH_CARS_BP_ROUTE,
 )
 from app.forms.forms import SearchCarsForm
-from app.models import Booking, Car
+from app.models import Booking
+from app.models import Car
 from app.utils.utils import BOOKING_STATUSES
 
 report_blueprint = Blueprint("report", __name__, url_prefix="/report")
