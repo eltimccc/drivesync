@@ -27,7 +27,8 @@ from app.constants import (
     BOOKING_VIEW_BP_ROUTE,
 )
 from app.forms.forms import BookingForm, BookingUpdateForm
-from app.models import Booking, Car
+from app.models import Booking
+from app.models import Car
 from app.utils.utils import BOOKING_STATUSES
 
 

@@ -3,7 +3,8 @@ from flask import Blueprint, render_template, request, current_app
 from flask_login import login_required
 
 from app import db
-from app.models import Booking, Car
+from app.models import Booking
+from app.models import Car
 from app.utils.booking_filters import get_sorting_parameters
 from app.constants import BOOKING_ALL_TEMPLATE, MAIN_BP_NAME_ROUTE
 from app.utils.utils import BOOKING_STATUSES
