@@ -38,8 +38,8 @@ def get_bookings():
     return render_template(
         BOOKING_ALL_TEMPLATE,
         bookings=bookings,
-        sort_by=request.args.get("sort_by", "created_at"),
-        sort_order=request.args.get("sort_order", "desc"),
+        sort_by=request.args.get("sort_by", "start_date"),
+        sort_order=request.args.get("sort_order", "asc"),
         today=today,
         BOOKING_STATUSES=BOOKING_STATUSES,
     )

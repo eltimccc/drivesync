@@ -122,41 +122,6 @@ def bookings_today():
     )
 
 
-@booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["GET"])
-@login_required
-def get_booking():
-    current_app.logger.info("Accessed add booking page.")
-    form = BookingForm()
-    car_id = request.args.get("car_id")
-    start_datetime = request.args.get("start_datetime")
-    end_datetime = request.args.get("end_datetime")
-
-    cars = None
-    if car_id and start_datetime and end_datetime:
-        current_app.logger.debug(
-            "Rendering add booking form with specific car and datetime"
-        )
-        cars = Car.query.filter_by(is_deleted=False).all()
-        return render_template(
-            BOOKING_ADD_TEMPLATE,
-            cars=cars,
-            car_id=car_id,
-            start_datetime=start_datetime,
-            end_datetime=end_datetime,
-        )
-    elif request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        current_app.logger.debug("Rendering booking modal for AJAX request")
-        cars = Car.query.filter_by(is_deleted=False).all()
-        return render_template(BOOKING_MODAL_TEMPLATE, cars=cars)
-    else:
-        if cars is None:
-            cars = Car.query.filter_by(is_deleted=False).all()
-        current_app.logger.debug("Rendering add booking form")
-        return render_template(
-            BOOKING_ADD_TEMPLATE, cars=cars, bootstrap=True, form=form
-        )
-
-
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["POST", "GET"])
 @login_required
 def add_booking():
