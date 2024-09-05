@@ -10,14 +10,14 @@ def get_sorting_parameters():
 
     Параметры сортировки берутся из GET-параметров 'sort_by' и 'sort_order'. 
     Если указанные параметры невалидны, используется сортировка по умолчанию 
-    по полю 'created_at' в порядке убывания.
+    по полю 'start_date' в порядке убывания.
 
     Returns:
         sqlalchemy.sql.elements.UnaryExpression: Объект для сортировки запроса.
     """
 
-    sort_by = request.args.get("sort_by", "created_at")
-    sort_order = request.args.get("sort_order", "desc")
+    sort_by = request.args.get("sort_by", "start_date")
+    sort_order = request.args.get("sort_order", "asc")
 
     valid_sort_columns = {
         "created_at": Booking.created_at,
@@ -32,7 +32,7 @@ def get_sorting_parameters():
     }
 
     if sort_by not in valid_sort_columns:
-        sort_by = "created_at"
+        sort_by = "start_date"
 
     sort_column = valid_sort_columns[sort_by]
     sort_direction = sort_column.desc() if sort_order == "desc" else sort_column.asc()
