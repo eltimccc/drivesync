@@ -1,43 +1,68 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <h4 class="text-center mb-3">
-        Редактирование информации о машине {{ car.brand }} {{ car.car_number }}
-      </h4>
-      <form method="POST">
-        {{ form.csrf_token }}
-        <div class="form-group">
-          {{ form.brand.label(class="form-label") }}
-          {{ form.brand(class="form-control") }}
-          {% for error in form.brand.errors %}
-          <span class="text-danger">{{ error }}</span>
-          {% endfor %}
+      <div class="card">
+        <div class="card-header text-center">
+          <i class="fa fa-pencil-square fa-lg"></i>
+          <span class="mx-2" style="font-size: 1.4rem; font-weight: 300"
+            >Редактирование {{ car.brand }} {{ car.car_number }}</span
+          >
         </div>
-        <div class="form-group">
-          {{ form.car_number.label(class="form-label") }}
-          {{ form.car_number(class="form-control") }}
-          {% for error in form.car_number.errors %}
-          <span class="text-danger">{{ error }}</span>
-          {% endfor %}
+        <div class="card-body">
+          <form method="POST">
+            {{ form.csrf_token }}
+
+            <div class="form-group row mb-3">
+              <label for="brand" class="col-sm-4 col-form-label"
+                >{{ form.brand.label }}</label
+              >
+              <div class="col-sm-8">
+                {{ form.brand(class="form-control") }} {% for error in
+                form.brand.errors %}
+                <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="form-group row mb-3">
+              <label for="car_number" class="col-sm-4 col-form-label"
+                >{{ form.car_number.label }}</label
+              >
+              <div class="col-sm-8">
+                {{ form.car_number(class="form-control") }} {% for error in
+                form.car_number.errors %}
+                <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="form-group row mb-3">
+              <label for="transmission" class="col-sm-4 col-form-label"
+                >{{ form.transmission.label }}</label
+              >
+              <div class="col-sm-8">
+                {{ form.transmission(class="form-control") }} {% for error in
+                form.transmission.errors %}
+                <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="d-flex">
+              {{ form.submit(class="btn btn-primary btn-sm") }}
+              <button
+                type="submit"
+                formaction="{{ url_for('car.delete_car', car_id=car.id) }}"
+                onclick="return confirm('Вы точно уверены, что хотите удалить этот автомобиль?');"
+                class="btn btn-danger btn-sm ms-2"
+              >
+                Удалить
+              </button>
+            </div>
+          </form>
         </div>
-        <div class="form-group">
-          {{ form.transmission.label(class="form-label") }}
-          {{ form.transmission(class="form-control") }}
-          {% for error in form.transmission.errors %}
-          <span class="text-danger">{{ error }}</span>
-          {% endfor %}
-        </div>
-        {{ form.submit(class="btn btn-primary btn-sm") }}
-      </form>
-      <form
-        method="post"
-        action="{{ url_for('car.delete_car', car_id=car.id) }}"
-        onsubmit="return confirm('Вы точно уверены, что хотите удалить этот автомобиль?');"
-      >
-        <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-      </form>
+      </div>
     </div>
   </div>
 </div>

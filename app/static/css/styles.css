@@ -45,7 +45,7 @@
 
 /* Стили для секций выдачи и приема */
 .pick-up-section {
-    background-color: #e3f2fd;
+    background-color: #e9f3f7;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -66,10 +66,10 @@
     overflow-y: auto;
   }
   .table-container {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
-    margin-top: 20px;
+    margin-top: 1px;
   }
   .table-hover tbody tr:hover {
     background-color: transparent !important; /* Отключаем изменение фона */

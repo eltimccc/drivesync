@@ -1,10 +1,16 @@
 {% extends 'base.html' %} {% block title %}Добавление бронирования{% endblock %}
 {% block content %}
 <div class="container mt-4">
-  <div class="row justify-content-center">
+  <div class="row">
     <div class="col-md-6">
-      <h4 class="text-center mb-3">Добавить бронирование</h4>
-
+      <div class="d-flex align-items-center mb-3">
+        <i class="fa fa-calendar-plus me-1 fa-lg"></i>
+        <span class="mx-2" style="font-size: 1.4rem; font-weight: 300">
+          Новое бронирование
+        </span>
+      </div>
+    </div>
+    <div class="col-md-10">
       <form method="POST" action="{{ url_for('booking.add_booking') }}">
         {{ form.hidden_tag() }}
 
@@ -22,7 +28,9 @@
                 value="{{ form.start_datetime.data.strftime('%d.%m.%Y %H:%M') if form.start_datetime.data else request.args.get('start_date', '') }}"
               />
               {% if form.start_datetime.errors %}
-              <span style="color: red">{{ form.start_datetime.errors[0] }}</span>
+              <span style="color: red"
+                >{{ form.start_datetime.errors[0] }}</span
+              >
               {% endif %}
             </div>
           </div>
@@ -36,7 +44,7 @@
                 class="form-control datetimepicker"
                 required="required"
                 placeholder="дд.мм.гггг чч:мм"
-                value="{{ form.end_datetime.data.strftime('%d.%м.%Y %H:%M') if form.end_datetime.data else request.args.get('end_date', '') }}"
+                value="{{ form.end_datetime.data.strftime('%d.%m.%Y %H:%M') if form.end_datetime.data else request.args.get('end_date', '') }}"
               />
               {% if form.end_datetime.errors %}
               <span style="color: red">{{ form.end_datetime.errors[0] }}</span>
@@ -92,7 +100,6 @@
       </form>
     </div>
   </div>
-</div>
   <!-- Модальное окно для выбора автомобиля -->
   <div id="carModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">

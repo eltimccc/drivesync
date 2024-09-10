@@ -131,6 +131,8 @@ def add_booking():
     form = BookingForm()
     cars = Car.query.filter_by(is_deleted=False).all()
 
+    car_id = None
+
     if request.method == "GET":
         start_date = request.args.get("start_date")
         end_date = request.args.get("end_date")
@@ -146,17 +148,23 @@ def add_booking():
                 )
                 current_app.logger.debug("Parsed start_date successfully")
             except ValueError:
-                form.start_datetime.data = None
+                form.start_datetime.errors.append(
+                    "Неверный формат даты начала. Используйте дд.мм.гггг чч:мм"
+                )
                 current_app.logger.error("Failed to parse start_date")
+
         if end_date:
             try:
                 form.end_datetime.data = datetime.strptime(end_date, "%d.%m.%Y %H:%M")
                 current_app.logger.debug("Parsed end_date successfully")
             except ValueError:
-                form.end_datetime.data = None
+                form.end_datetime.errors.append(
+                    "Неверный формат даты окончания. Используйте дд.мм.гггг чч:мм"
+                )
                 current_app.logger.error("Failed to parse end_date")
-        if car_id:
-            form.car.data = car_id
+
+    if car_id:
+        form.car.data = car_id
 
     if form.validate_on_submit():
         current_app.logger.info(
