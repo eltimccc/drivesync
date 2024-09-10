@@ -1,82 +1,93 @@
 {% extends 'base.html' %} {% block additional_styles %}
 <style>
-
   .fixed-header {
     max-height: 78vh;
   }
-
 </style>
-{% endblock %} 
-{% block title %}Автомобили{% endblock %}
-{% block content %}
+{% endblock %} {% block title %}Автомобили{% endblock %} {% block content %}
 <title>Автомобили Прокат Псков</title>
 <div class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <h4 class="text-center mb-3">Список автомобилей</h4>
+  <div class="row justify-content-center align-items-center mb-3">
+    <div class="col-md-6 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-car fa-lg"></i>
+        <span class="mx-2" style="font-size: 1.4rem; font-weight: 300"
+          >Список автомобилей</span
+        >
+      </div>
 
-      <div class="text-center mt-3">
+      <div>
         <a
           href="{{ url_for('car.add_car') }}"
-          class="btn btn-success btn-sm text-white"
+          class="btn btn-success btn-sm text-white mx-1"
           >Добавить</a
         >
 
-        <form method="get" action="{{ url_for('car.get_cars') }}" class="d-inline">
+        <form
+          method="get"
+          action="{{ url_for('car.get_cars') }}"
+          class="d-inline"
+        >
           <button
             type="submit"
             name="is_deleted"
             value="false"
-            class="btn btn-info btn-sm text-white"
+            class="btn btn-info btn-sm text-white mx-1"
           >
             Активные
           </button>
         </form>
 
-        <form method="get" action="{{ url_for('car.get_cars') }}" class="d-inline">
+        <form
+          method="get"
+          action="{{ url_for('car.get_cars') }}"
+          class="d-inline"
+        >
           <button
             type="submit"
             name="is_deleted"
             value="true"
-            class="btn btn-danger btn-sm text-white"
+            class="btn btn-danger btn-sm text-white mx-1"
           >
             Удаленные
           </button>
         </form>
       </div>
+    </div>
+  </div>
 
-    <div class="fixed-header">
+  <!-- Таблица автомобилей -->
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="fixed-header">
         <table class="table table-hover">
-            <thead class="table-dark">
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Марка, модель</th>
-                <th scope="col">КПП</th>
-                <th scope="col">Гос. номер</th>
-                <th scope="col">Ред.</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for car in cars %}
-              <tr>
-                <td>{{ car.id }}</td>
-                <td>
-                  <a href="{{ url_for('car.car_detail', car_id=car.id) }}"
-                    >{{ car.brand }}</a
-                  >
-                </td>
-                <td>{{ car.transmission }}
-                <td>{{ car.car_number }}</td>
-                <td>
-                  <a href="{{ url_for('car.edit_car', car_id=car.id) }}"
-                    >Ред.</a
-                  >
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Марка, модель</th>
+              <th scope="col">КПП</th>
+              <th scope="col">Гос. номер</th>
+              <th scope="col">Ред.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for car in cars %}
+            <tr>
+              <td>{{ car.id }}</td>
+              <td>
+                <a href="{{ url_for('car.car_detail', car_id=car.id) }}"
+                  >{{ car.brand }}</a
+                >
+              </td>
+              <td>{{ car.transmission }}</td>
+              <td>{{ car.car_number }}</td>
+              <td>
+                <a href="{{ url_for('car.edit_car', car_id=car.id) }}">Ред.</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

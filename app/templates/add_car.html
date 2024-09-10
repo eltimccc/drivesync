@@ -1,35 +1,56 @@
-{% extends 'base.html' %} {% block title %} Добавить автомобиль {% endblock %}
+{% extends 'base.html' %}
+
+{% block title %} Добавить автомобиль {% endblock %}
+
 {% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <h4 class="text-center mb-3">Добавить автомобиль</h4>
-      <form method="POST" novalidate>
-        {{ form.csrf_token }} 
-        Марка: 
-        {{ form.brand(class="form-control
-        py-3 mb-3", placeholder=form.brand.label.text) }}
-        <p>
-          {% if form.brand.errors %} {% for error in form.brand.errors %}
-          <span style="color: red">{{ error }}</span>
-          {% endfor %} {% endif %}
-        </p>
-        Регистрационный знак: 
-        {{ form.car_number(class="form-control py-3 mb-3",
-        placeholder=form.car_number.label.text) }}
-        <p>
-          {% if form.car_number.errors %} {% for error in form.car_number.errors
-          %}
-          <span style="color: red">{{ error }}</span>
-          {% endfor %} {% endif %}
-        </p>
-Коробка передач:
-<p>
- {{ form.transmission }}
-</p>
+      <div class="card">
+        <div class="card-header text-center">
+        <i class="fa fa-plus me-1 fa-lg"></i>
+        <span class="mx-1" style="font-size: 1.4rem; font-weight: 300">
+          Добавить автомобиль</span>
+        </div>
+        <div class="card-body">
+          <form method="POST" novalidate>
+            {{ form.csrf_token }}
+            
+            <div class="form-group mb-3">
+              <label for="brand">Марка:</label>
+              {{ form.brand(class="form-control py-3", placeholder=form.brand.label.text) }}
+              {% if form.brand.errors %}
+                <div class="text-danger">
+                  {% for error in form.brand.errors %}
+                  <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="car_number">Регистрационный знак:</label>
+              {{ form.car_number(class="form-control py-3", placeholder=form.car_number.label.text) }}
+              {% if form.car_number.errors %}
+                <div class="text-danger">
+                  {% for error in form.car_number.errors %}
+                  <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
 
-        {{ form.submit(class="button px-1 btn btn-info") }}
-      </form>
+            <div class="form-group mb-3">
+              <label for="transmission">Коробка передач:</label>
+              {{ form.transmission(class="form-control") }}
+            </div>
+
+            <div class="d-flex justify-content-center">
+              {{ form.submit(class="btn btn-info btn-sm") }}
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>

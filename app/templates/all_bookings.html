@@ -8,32 +8,33 @@
 
 {% block content %}
 <div class="container mt-4">
-  <h4 class="text-center">Бронирования</h4>
-
-  <!-- Фильтр над правой частью таблицы -->
-  <div class="row justify-content-end mb-3">
-      <div class="col-md-4">
-        <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
-          <div class="input-group input-group-sm"> <!-- Добавлен класс input-group-sm -->
-            <input
-              type="text"
-              name="filter"
-              id="filterInput"
-              placeholder="Текст для фильтра"
-              class="form-control form-control-sm"
-              value="{{ filter }}"
-            />
-            <select id="statusFilter" name="status" class="form-select form-select-sm ms-2">
-            <option value="in_work">В работе</option>
-            {% for status, color in BOOKING_STATUSES.items() %}
-            <option value="{{ status }}">{{ status }}</option>
-            {% endfor %}
-            <option value="">Все</option>
-            </select>
-          </div>
-        </form>
+<div class="row justify-content-between align-items-center mb-3">
+  <div class="col-md-8 d-flex align-items-center">
+    <i class="far fa-calendar-check me-1 fa-lg"></i>
+    <span class="mx-2" style="font-size: 1.4rem; font-weight: 300;">Бронирования</span>
+  </div>
+  <div class="col-md-4">
+    <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
+      <div class="input-group input-group-sm">
+        <input
+          type="text"
+          name="filter"
+          id="filterInput"
+          placeholder="Фильтр"
+          class="form-control form-control-sm"
+          value="{{ filter }}"
+        />
+        <select id="statusFilter" name="status" class="form-select form-select-sm ms-2">
+          <option value="in_work">В работе</option>
+          {% for status, color in BOOKING_STATUSES.items() %}
+          <option value="{{ status }}">{{ status }}</option>
+          {% endfor %}
+          <option value="">Все</option>
+        </select>
       </div>
-    </div>
+    </form>
+  </div>
+</div>
 
   <div class="table-container">
     <div class="fixed-header">

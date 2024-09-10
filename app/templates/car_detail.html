@@ -1,97 +1,120 @@
-{% extends 'base.html' %}
-
-{% block title %}{{ car.brand }} {{ car.car_number }}{% endblock %}
-
-{% block additional_styles %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% extends 'base.html' %} {% block title %}{{ car.brand }} {{ car.car_number
+}}{% endblock %} {% block additional_styles %}
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
 <style>
-    .fixed-header {
-        max-height: 78vh;
-        overflow-y: auto;
-    }
-    .table-container {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 20px;
-    }
-    .table-hover tbody tr:hover {
-        background-color: #f1f1f1;
-    }
-    .completed {
-        background-color: #00d92497 !important;
-    }
-    .canceled {
-        background-color: #ff4c4c33 !important;
-    }
-    .pending {
-        background-color: #ffff0097 !important;
-    }
-    .status-icon {
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        border-radius: 50%;
-    }
-    .status-completed {
-        background-color: #00d924;
-    }
-    .status-rental {
-        background-color: #007bff;
-    }
-    .status-canceled {
-        background-color: #ff4c4c;
-    }
-    .status-pending {
-        background-color: #ffeb3b;
-    }
-    .table thead th {
-        position: sticky;
-        top: 0;
-        background: #2c3e50;
-        color: white;
-        z-index: 1;
-        cursor: pointer; /* добавляем курсор при наведении для указания на возможность сортировки */
-    }
-    .table tbody td:first-child {
-        white-space: nowrap;
-        width: 1%;
-    }
+  .fixed-header {
+    max-height: 78vh;
+    overflow-y: auto;
+  }
+  .table-container {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  .completed {
+    background-color: #00d92497 !important;
+  }
+  .canceled {
+    background-color: #ff4c4c33 !important;
+  }
+  .pending {
+    background-color: #ffff0097 !important;
+  }
+  .status-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border-radius: 50%;
+  }
+  .status-completed {
+    background-color: #00d924;
+  }
+  .status-rental {
+    background-color: #007bff;
+  }
+  .status-canceled {
+    background-color: #ff4c4c;
+  }
+  .status-pending {
+    background-color: #ffeb3b;
+  }
+  .table thead th {
+    position: sticky;
+    top: 0;
+    background: #2c3e50;
+    color: white;
+    z-index: 1;
+    cursor: pointer; /* добавляем курсор при наведении для указания на возможность сортировки */
+  }
+  .table tbody td:first-child {
+    white-space: nowrap;
+    width: 1%;
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-4">
-    <h4 class="text-center">Список бронирований {{ car.brand }} {{ car.transmission }} {{ car.car_number }}</h4>
-    <div class="table-container">
-        <div class="fixed-header">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th data-sort="id">ID</th>
-                        <th data-sort="start_date">Начало</th>
-                        <th data-sort="end_date">Окончание</th>
-                        <th data-sort="phone">Телефон</th>
-                        <th data-sort="description">Заметка</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for booking in bookings %}
-                    <tr id="booking-{{ booking.id }}" class="{% if booking.status == 'Завершено' %}completed{% elif booking.status == 'Аренда' %}rental{% elif booking.status == 'Отказ' %}canceled{% elif booking.status == 'Ожидание' %}pending{% endif %}">
-                        <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.id }}</a></td>
-                        <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
-                        <td><a href="{{ url_for('booking.view_booking', booking_id=booking.id) }}">{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a></td>
-                        <td>{{ booking.phone }}</td>
-                        <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <div class="col-md-8 d-flex align-items-center">
+    <i class="fa fa-list-alt me-1 fa-lg"></i>
+    <span class="mx-2" style="font-size: 1.4rem; font-weight: 300"
+      >Бронирования {{ car.brand }} {{ car.transmission }} {{ car.car_number
+      }}</span
+    >
+  </div>
+  <div class="table-container">
+    <div class="fixed-header">
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th data-sort="id">ID</th>
+            <th data-sort="start_date">Начало</th>
+            <th data-sort="end_date">Окончание</th>
+            <th data-sort="phone">Телефон</th>
+            <th data-sort="description">Заметка</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr
+            id="booking-{{ booking.id }}"
+            class="{% if booking.status == 'Завершено' %}completed{% elif booking.status == 'Аренда' %}rental{% elif booking.status == 'Отказ' %}canceled{% elif booking.status == 'Ожидание' %}pending{% endif %}"
+          >
+            <td>
+              <a
+                href="{{ url_for('booking.view_booking', booking_id=booking.id) }}"
+                >{{ booking.id }}</a
+              >
+            </td>
+            <td>
+              <a
+                href="{{ url_for('booking.view_booking', booking_id=booking.id) }}"
+                >{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}</a
+              >
+            </td>
+            <td>
+              <a
+                href="{{ url_for('booking.view_booking', booking_id=booking.id) }}"
+                >{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}</a
+              >
+            </td>
+            <td>{{ booking.phone }}</td>
+            <td>
+              {{ booking.description[:20] }}{% if booking.description|length >
+              20 %}...{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block additional_scripts %}
+{% endblock %} {% block additional_scripts %}
 <script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
 {% endblock %}
