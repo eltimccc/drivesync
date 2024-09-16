@@ -26,6 +26,7 @@ from app.constants import (
     BOOKING_URL_PREFIX,
     BOOKING_VIEW_BP_ROUTE,
 )
+from app.utils.booking_helpers import handle_successful_booking, log_form_errors, prepopulate_form_from_request
 from app.forms.forms import BookingForm, BookingUpdateForm
 from app.models import Booking
 from app.models import Car
@@ -131,63 +132,13 @@ def add_booking():
     form = BookingForm()
     cars = Car.query.filter_by(is_deleted=False).all()
 
-    car_id = None
-
     if request.method == "GET":
-        start_date = request.args.get("start_date")
-        end_date = request.args.get("end_date")
-        car_id = request.args.get("car_id")
-        current_app.logger.debug(
-            f"User {current_user.username} received GET request with start_date: {start_date}, end_date: {end_date}, car_id: {car_id}"
-        )
-
-        if start_date:
-            try:
-                form.start_datetime.data = datetime.strptime(
-                    start_date, "%d.%m.%Y %H:%M"
-                )
-                current_app.logger.debug("Parsed start_date successfully")
-            except ValueError:
-                form.start_datetime.errors.append(
-                    "Неверный формат даты начала. Используйте дд.мм.гггг чч:мм"
-                )
-                current_app.logger.error("Failed to parse start_date")
-
-        if end_date:
-            try:
-                form.end_datetime.data = datetime.strptime(end_date, "%d.%m.%Y %H:%M")
-                current_app.logger.debug("Parsed end_date successfully")
-            except ValueError:
-                form.end_datetime.errors.append(
-                    "Неверный формат даты окончания. Используйте дд.мм.гггг чч:мм"
-                )
-                current_app.logger.error("Failed to parse end_date")
-
-    if car_id:
-        form.car.data = car_id
+        prepopulate_form_from_request(form)
 
     if form.validate_on_submit():
-        current_app.logger.info(
-            f"User {current_user.username} validated booking form successfully"
-        )
-        new_booking = Booking(
-            start_date=form.start_datetime.data,
-            end_date=form.end_datetime.data,
-            car_id=form.car.data,
-            phone=form.phone.data,
-            description=form.description.data,
-            user=current_user,
-        )
-        db.session.add(new_booking)
-        db.session.commit()
-        current_app.logger.info(
-            f"User {current_user.username} added new booking with ID: {new_booking.id}"
-        )
-        return redirect(url_for(BOOKING_MAIN_ROUTE))
+        return handle_successful_booking(form, current_user)
     else:
-        current_app.logger.warning(
-            f"User {current_user.username} failed booking form validation"
-        )
+        log_form_errors(form, current_user)
 
     return render_template(BOOKING_ADD_TEMPLATE, form=form, cars=cars)
 
