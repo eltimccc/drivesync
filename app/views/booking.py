@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from collections import defaultdict
 from flask import (
     Blueprint,
     flash,
@@ -15,6 +16,7 @@ from app.constants import (
     BOOKING_ADD_BP_ROUTE,
     BOOKING_ADD_TEMPLATE,
     BOOKING_BP_NAME_ROUTE,
+    BOOKING_CALENDAR_TEMPLATE,
     BOOKING_DELETE_BP_ROUTE,
     BOOKING_DETAIL_MODAL_ROUTE,
     BOOKING_DETAIL_MODAL_TEMPLATE,
@@ -30,7 +32,7 @@ from app.utils.booking_helpers import handle_successful_booking, log_form_errors
 from app.forms.forms import BookingForm, BookingUpdateForm
 from app.models import Booking
 from app.models import Car
-from app.utils.utils import BOOKING_STATUSES
+from app.utils.utils import BOOKING_STATUSES, RU_MONTHS, RU_WEEKDAYS
 
 
 booking_blueprint = Blueprint(
@@ -198,3 +200,67 @@ def delete_booking(booking_id):
         f"User {current_user.username} deleted booking with ID: {booking_id}"
     )
     return redirect(url_for(BOOKING_MAIN_ROUTE))
+
+
+@booking_blueprint.route('/calendar', methods=["GET"])
+@login_required
+def calendar_view():
+    cars = Car.query.filter_by(is_deleted=False).all()
+    
+    # Получение параметра start_date из строки запроса
+    start_date_str = request.args.get('start_date')
+    if start_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        except ValueError:
+            start_date = datetime.today()
+    else:
+        start_date = datetime.today()
+    
+    start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    current_week_title = f"{RU_MONTHS[start_date.month]} {start_date.year}"
+    
+    dates = []
+    for i in range(7):
+        day = start_date + timedelta(days=i)
+        dates.append({
+            'day': day.day,
+            'weekday': RU_WEEKDAYS[day.weekday()],
+            'date': day,
+            'month_name': RU_MONTHS[day.month]
+        })
+
+    last_day = start_date + timedelta(days=7)
+    bookings = Booking.query.filter(
+        Booking.start_date < last_day,
+        Booking.end_date >= start_date
+    ).all()
+
+    bookings_dict = defaultdict(dict)  # car_id -> date -> {'booking_id': id, 'end_date': date}
+    for booking in bookings:
+        current = booking.start_date
+        while current.date() <= booking.end_date.date():
+            if start_date.date() <= current.date() < last_day.date():
+                if current.date() not in bookings_dict[booking.car_id]:
+                    bookings_dict[booking.car_id][current.date()] = {
+                        'booking_id': booking.id,
+                        'end_date': booking.end_date
+                    }
+            current += timedelta(days=1)
+
+    for car in cars:
+        bookings_dict.setdefault(car.id, {})
+
+    prev_start_date = start_date - timedelta(days=7)
+    next_start_date = start_date + timedelta(days=7)
+    
+    return render_template(
+        BOOKING_CALENDAR_TEMPLATE,
+        cars=cars,
+        dates=dates,
+        current_week=current_week_title,
+        bookings_dict=bookings_dict,
+        prev_start_date=prev_start_date.strftime('%Y-%m-%d'),
+        next_start_date=next_start_date.strftime('%Y-%m-%d')
+    )

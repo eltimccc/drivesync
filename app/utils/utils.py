@@ -9,6 +9,31 @@ BOOKING_STATUSES = {
     "Отказ": "#dc3545",  # Красный цвет для отмененных бронирований
 }
 
+# Словарь для русских названий дней недели
+RU_WEEKDAYS = {
+    0: 'Пн',
+    1: 'Вт',
+    2: 'Ср',
+    3: 'Чт',
+    4: 'Пт',
+    5: 'Сб',
+    6: 'Вс'
+}
+RU_MONTHS = {
+    1: 'Январь',
+    2: 'Февраль',
+    3: 'Марть',
+    4: 'Апрель',
+    5: 'Май',
+    6: 'Июнь',
+    7: 'Июль',
+    8: 'Август',
+    9: 'Сентябрь',
+    10: 'Октябрь',
+    11: 'Ноябрь',
+    12: 'Декабрь'
+}
+
 
 def get_available_cars(start_date, end_date):
     """
@@ -50,23 +75,27 @@ def enrich_car_with_bookings(car, start_date, end_date):
     """
 
     last_booking = (
-        Booking.query.filter(Booking.car_id == car.id, Booking.end_date <= start_date)
+        Booking.query.filter(Booking.car_id == car.id,
+                             Booking.end_date <= start_date)
         .order_by(Booking.end_date.desc())
         .first()
     )
 
     next_booking = (
-        Booking.query.filter(Booking.car_id == car.id, Booking.start_date >= end_date)
+        Booking.query.filter(Booking.car_id == car.id,
+                             Booking.start_date >= end_date)
         .order_by(Booking.start_date)
         .first()
     )
 
     car.last_booking_end = (
-        last_booking.end_date.strftime("%d.%m.%Y %H:%M") if last_booking else None
+        last_booking.end_date.strftime(
+            "%d.%m.%Y %H:%M") if last_booking else None
     )
 
     car.next_booking_start = (
-        next_booking.start_date.strftime("%d.%m.%Y %H:%M") if next_booking else None
+        next_booking.start_date.strftime(
+            "%d.%m.%Y %H:%M") if next_booking else None
     )
 
 
