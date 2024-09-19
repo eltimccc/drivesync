@@ -104,7 +104,6 @@
             bookings_dict[car.id].get(date.date.date()) %} {% if booking %}
             <td
               class="table-danger"
-              data-label="{{ date.day }} {{ date.month_name }}"
             >
               <a
                 href="{{ url_for('booking.view_booking', booking_id=booking.booking_id) }}"
@@ -116,7 +115,6 @@
             {% else %}
             <td
               class="table-success"
-              data-label="{{ date.day }} {{ date.month_name }}"
             >
               <a
                 href="{{ url_for('booking.add_booking') }}?{{ {'car_id': car.id, 'start_date': date.date.strftime('%d.%m.%Y %H:%M')} | urlencode }}"
