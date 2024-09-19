@@ -30,6 +30,7 @@ BOOKING_EDIT_TEMPLATE = "edit_booking.html"
 BOOKING_ADD_TEMPLATE = "add_booking.html"
 BOOKING_ALL_TEMPLATE = "all_bookings.html"
 BOOKING_MODAL_TEMPLATE = "add_booking_modal.html"
+BOOKING_CALENDAR_TEMPLATE = "calendar.html"
 
 # Именованные маршруты BOOKING
 BOOKING_VIEW_BOOKING_ROUTE = "booking.view_booking"

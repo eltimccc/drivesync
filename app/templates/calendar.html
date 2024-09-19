@@ -1,0 +1,135 @@
+<head>
+  <meta charset="UTF-8" />
+  <title>Календарь бронирования автомобилей</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    .table-container {
+      display: block;
+      height: calc(100vh - 130px);
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .table thead th {
+      position: sticky;
+      top: 0;
+      background-color: #f8f9fa;
+      z-index: 1;
+      font-size: 0.875rem; /* Уменьшенный размер шрифта заголовков */
+    }
+
+    .table tbody tr td {
+      white-space: nowrap; /* Чтобы текст не переносился */
+      font-size: 0.875rem; /* Уменьшенный размер шрифта ячеек */
+    }
+
+    .table tbody tr td a {
+      font-size: 0.75rem; /* Уменьшенный размер шрифта ссылок */
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    @media (max-width: 600px) {
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% include '/includes/navbar.html' %}
+
+<div class="container-fluid mt-5">
+  <div class="d-flex justify-content-center align-items-center mb-3 position-relative">
+    <i class="far fa-bar-chart me-1 fa-lg"></i>
+    <span class="mx-2" style="font-size: 1.4rem; font-weight: 200;">{{ current_week }}</span>
+    <div class="position-absolute end-0 d-flex">
+      <a
+        href="{{ url_for('booking.calendar_view', start_date=prev_start_date) }}"
+        class="btn btn-outline-primary btn-sm me-2"
+      >
+        &#8592; Назад
+      </a>
+      <a
+        href="{{ url_for('booking.calendar_view', start_date=next_start_date) }}"
+        class="btn btn-sm btn-outline-primary"
+      >
+        Далее &#8594;
+      </a>
+    </div>
+  </div>
+</div>
+
+  <!-- Календарь бронирований -->
+  <div class="table-wrapper">
+    <div class="table-container">
+      <table class="table table-hover align-middle text-center">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Автомобиль</th>
+            {% for date in dates %}
+            <th scope="col">
+              {{ date.day }}
+              <small>{{ date.weekday }}</small>
+            </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for car in cars %}
+          <tr>
+            <td data-label="Автомобиль">
+              <strong>{{ car.brand }}</strong><br />
+              <small>{{ car.car_number }}</small>
+            </td>
+            {% for date in dates %} {% set booking =
+            bookings_dict[car.id].get(date.date.date()) %} {% if booking %}
+            <td
+              class="table-danger"
+              data-label="{{ date.day }} {{ date.month_name }}"
+            >
+              <a
+                href="{{ url_for('booking.view_booking', booking_id=booking.booking_id) }}"
+                class="text-dark text-decoration-none"
+              >
+                Бронь до {{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}
+              </a>
+            </td>
+            {% else %}
+            <td
+              class="table-success"
+              data-label="{{ date.day }} {{ date.month_name }}"
+            >
+              <a
+                href="{{ url_for('booking.add_booking') }}?{{ {'car_id': car.id, 'start_date': date.date.strftime('%d.%m.%Y %H:%M')} | urlencode }}"
+                class="text-success text-decoration-none"
+              >
+                Свободно
+              </a>
+            </td>
+            {% endif %} {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
