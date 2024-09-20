@@ -74,7 +74,8 @@ def view_booking(booking_id):
 @booking_blueprint.route(BOOKING_DETAIL_MODAL_ROUTE, methods=["GET"])
 @login_required
 def view_booking_modal(booking_id):
-    current_app.logger.info(f"Accessed view booking modal with ID: {booking_id}")
+    current_app.logger.info(
+        f"Accessed view booking modal with ID: {booking_id}")
     booking = Booking.query.get_or_404(booking_id)
     status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
 
@@ -104,7 +105,8 @@ def bookings_today():
         db.session.query(Booking)
         .join(Car)
         .filter(
-            db.func.date(Booking.start_date) == selected_date, Booking.status != "Отказ"
+            db.func.date(
+                Booking.start_date) == selected_date, Booking.status != "Отказ"
         )
         .all()
     )
@@ -112,7 +114,8 @@ def bookings_today():
         db.session.query(Booking)
         .join(Car)
         .filter(
-            db.func.date(Booking.end_date) == selected_date, Booking.status != "Отказ"
+            db.func.date(
+                Booking.end_date) == selected_date, Booking.status != "Отказ"
         )
         .all()
     )
@@ -206,7 +209,7 @@ def delete_booking(booking_id):
 @login_required
 def calendar_view():
     cars = Car.query.filter_by(is_deleted=False).all()
-    
+
     # Получение параметра start_date из строки запроса
     start_date_str = request.args.get('start_date')
     if start_date_str:
@@ -216,11 +219,11 @@ def calendar_view():
             start_date = datetime.today()
     else:
         start_date = datetime.today()
-    
+
     start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    
+
     current_week_title = f"{RU_MONTHS[start_date.month]} {start_date.year}"
-    
+
     dates = []
     for i in range(7):
         day = start_date + timedelta(days=i)
@@ -232,12 +235,15 @@ def calendar_view():
         })
 
     last_day = start_date + timedelta(days=7)
+
     bookings = Booking.query.filter(
         Booking.start_date < last_day,
-        Booking.end_date >= start_date
+        Booking.end_date >= start_date,
+        Booking.status != "Отказ"
     ).all()
 
-    bookings_dict = defaultdict(dict)  # car_id -> date -> {'booking_id': id, 'end_date': date}
+    # car_id -> date -> {'booking_id': id, 'end_date': date}
+    bookings_dict = defaultdict(dict)
     for booking in bookings:
         current = booking.start_date
         while current.date() <= booking.end_date.date():
@@ -254,7 +260,7 @@ def calendar_view():
 
     prev_start_date = start_date - timedelta(days=7)
     next_start_date = start_date + timedelta(days=7)
-    
+
     return render_template(
         BOOKING_CALENDAR_TEMPLATE,
         cars=cars,
