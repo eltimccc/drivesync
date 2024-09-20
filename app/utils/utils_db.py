@@ -4,7 +4,7 @@ import shutil
 from sqlalchemy import event
 
 BACKUP_DIR = "db_backups"
-MAX_BACKUPS = 3
+MAX_BACKUPS = 7
 
 def create_backup(db_path):
     """
