@@ -41,7 +41,7 @@
     .nav-item a {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100%;
     }
     @media (max-width: 600px) {
@@ -57,26 +57,30 @@
 <body>
   {% include '/includes/navbar.html' %}
 
-<div class="container-fluid mt-5">
-  <div class="d-flex justify-content-center align-items-center mb-3 position-relative">
-    <i class="far fa-bar-chart me-1 fa-lg"></i>
-    <span class="mx-2" style="font-size: 1.4rem; font-weight: 200;">{{ current_week }}</span>
-    <div class="position-absolute end-0 d-flex">
-      <a
-        href="{{ url_for('booking.calendar_view', start_date=prev_start_date) }}"
-        class="btn btn-outline-primary btn-sm me-2"
+  <div class="container-fluid mt-5">
+    <div
+      class="d-flex justify-content-center align-items-center mb-3 position-relative"
+    >
+      <i class="far fa-bar-chart me-1 fa-lg"></i>
+      <span class="mx-2" style="font-size: 1.4rem; font-weight: 200"
+        >{{ current_week }}</span
       >
-        &#8592; Назад
-      </a>
-      <a
-        href="{{ url_for('booking.calendar_view', start_date=next_start_date) }}"
-        class="btn btn-sm btn-outline-primary"
-      >
-        Далее &#8594;
-      </a>
+      <div class="position-absolute end-0 d-flex">
+        <a
+          href="{{ url_for('booking.calendar_view', start_date=prev_start_date) }}"
+          class="btn btn-outline-primary btn-sm me-2"
+        >
+          &#8592; Назад
+        </a>
+        <a
+          href="{{ url_for('booking.calendar_view', start_date=next_start_date) }}"
+          class="btn btn-sm btn-outline-primary"
+        >
+          Далее &#8594;
+        </a>
+      </div>
     </div>
   </div>
-</div>
 
   <!-- Календарь бронирований -->
   <div class="table-wrapper">
@@ -96,15 +100,13 @@
         <tbody>
           {% for car in cars %}
           <tr>
-            <td data-label="Автомобиль">
+            <td>
               <strong>{{ car.brand }}</strong><br />
               <small>{{ car.car_number }}</small>
             </td>
             {% for date in dates %} {% set booking =
             bookings_dict[car.id].get(date.date.date()) %} {% if booking %}
-            <td
-              class="table-danger"
-            >
+            <td class="table-danger">
               <a
                 href="{{ url_for('booking.view_booking', booking_id=booking.booking_id) }}"
                 class="text-dark text-decoration-none"
@@ -113,9 +115,7 @@
               </a>
             </td>
             {% else %}
-            <td
-              class="table-success"
-            >
+            <td class="table-success">
               <a
                 href="{{ url_for('booking.add_booking') }}?{{ {'car_id': car.id, 'start_date': date.date.strftime('%d.%m.%Y %H:%M')} | urlencode }}"
                 class="text-success text-decoration-none"
@@ -130,4 +130,7 @@
       </table>
     </div>
   </div>
+  <!-- Подключаем Popper.js и Bootstrap JS в конце body -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
