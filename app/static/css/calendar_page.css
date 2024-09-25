@@ -1,0 +1,88 @@
+.table-container {
+    display: block;
+    height: calc(100vh - 130px);
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  
+  .table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 1;
+    font-size: 0.875rem;
+  }
+  
+  .table tbody tr td {
+    font-size: 0.875rem;
+  }
+  
+  .table tbody tr td a {
+    font-size: 0.75rem;
+  }
+  
+  .nav-item a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+  }
+  
+  @media (max-width: 600px) {
+    td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      display: block;
+    }
+  }
+  
+  .status-аренда {
+    background-color: rgba(0, 123, 255, 0.5) !important;
+    border: 1px solid #000;
+  }
+  
+  .status-завершено {
+    background-color: #00d92497 !important;
+    border: 1px solid #000;
+  }
+  
+  .status-отказ {
+    background-color: #db355cd2 !important;
+    border: 1px solid #000;
+  }
+  
+  .status-ожидание {
+    background-color: #ffc107 !important;
+    border: 1px solid #000;
+  }
+  
+  .status-бронь {
+    background-color: #f7e6fa !important;
+    border: 1px solid #000;
+  }
+  
+  /* Дополнительно можно настроить всю таблицу, чтобы рамки применялись к ячейкам */
+  .table td, .table th {
+    border: 1px solid #000;
+    box-sizing: border-box;
+  }
+  
+  /* Стили для выделения столбца автомобилей */
+  .table th:first-child,  
+  .table td:first-child {
+      background-color: #e9f7fe; /* Светло-голубой фон */
+      width: 200px;             /* Фиксируем ширину */
+      min-width: 200px;
+      max-width: 200px;
+      white-space: nowrap;      /* Отключаем перенос текста */
+      overflow: hidden;
+      text-overflow: ellipsis;  /* Троеточие для длинного текста */
+      border: 1px solid #000;   /* Черная рамка */
+      font-weight: bold;        /* Жирный шрифт для заголовков */
+  }

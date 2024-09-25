@@ -1,57 +1,14 @@
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+
   <title>Календарь бронирования автомобилей</title>
 
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/calendar_page.css') }}">
 
-  <style>
-    .table-container {
-      display: block;
-      height: calc(100vh - 130px);
-      overflow-y: auto;
-      border: 1px solid #dee2e6;
-    }
-
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-
-    .table thead th {
-      position: sticky;
-      top: 0;
-      background-color: #f8f9fa;
-      z-index: 1;
-      font-size: 0.875rem; /* Уменьшенный размер шрифта заголовков */
-    }
-
-    .table tbody tr td {
-      white-space: nowrap; /* Чтобы текст не переносился */
-      font-size: 0.875rem; /* Уменьшенный размер шрифта ячеек */
-    }
-
-    .table tbody tr td a {
-      font-size: 0.75rem; /* Уменьшенный размер шрифта ссылок */
-    }
-
-    .nav-item a {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100%;
-    }
-    @media (max-width: 600px) {
-      td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        display: block;
-      }
-    }
-  </style>
 </head>
 
 <body>
@@ -98,35 +55,38 @@
           </tr>
         </thead>
         <tbody>
-          {% for car in cars %}
-          <tr>
-            <td>
-              <strong>{{ car.brand }}</strong><br />
-              <small>{{ car.car_number }}</small>
-            </td>
-            {% for date in dates %} {% set booking =
-            bookings_dict[car.id].get(date.date.date()) %} {% if booking %}
-            <td class="table-danger">
-              <a
-                href="{{ url_for('booking.view_booking', booking_id=booking.booking_id) }}"
-                class="text-dark text-decoration-none"
-              >
-                Бронь до {{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}
-              </a>
-            </td>
-            {% else %}
-            <td class="table-success">
-              <a
-                href="{{ url_for('booking.add_booking') }}?{{ {'car_id': car.id, 'start_date': date.date.strftime('%d.%m.%Y %H:%M')} | urlencode }}"
-                class="text-success text-decoration-none"
-              >
-                Свободно
-              </a>
-            </td>
-            {% endif %} {% endfor %}
-          </tr>
-          {% endfor %}
-        </tbody>
+  {% for car in cars %}
+  <tr>
+    <td>
+      <strong>{{ car.brand }}</strong><br />
+      <small>{{ car.car_number }}</small>
+    </td>
+    {% for date in dates %}
+      {% set booking = bookings_dict[car.id].get(date.date.date()) %}
+      {% if booking %}
+        <!-- Применяем класс в зависимости от статуса -->
+        <td class="status-{{ booking.status | lower }}">
+          <a
+            href="{{ url_for('booking.view_booking', booking_id=booking.booking_id) }}"
+            class="text-dark text-decoration-none"
+          >
+            {{ booking.status }} до {{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}
+          </a>
+        </td>
+      {% else %}
+        <td class="table-success">
+          <a
+            href="{{ url_for('booking.add_booking') }}?{{ {'car_id': car.id, 'start_date': date.date.strftime('%d.%m.%Y %H:%M')} | urlencode }}"
+            class="text-success text-decoration-none"
+          >
+            Свободно
+          </a>
+        </td>
+      {% endif %}
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</tbody>
       </table>
     </div>
   </div>

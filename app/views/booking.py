@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from collections import defaultdict
 from flask import (
     Blueprint,
     flash,
@@ -32,7 +31,8 @@ from app.utils.booking_helpers import handle_successful_booking, log_form_errors
 from app.forms.forms import BookingForm, BookingUpdateForm
 from app.models import Booking
 from app.models import Car
-from app.utils.utils import BOOKING_STATUSES, RU_MONTHS, RU_WEEKDAYS
+from app.utils.calendar_utils import get_available_cars, get_bookings_in_range, get_start_date_from_request, get_week_dates, get_week_title, map_bookings_to_dates
+from app.utils.utils import BOOKING_STATUSES
 
 
 booking_blueprint = Blueprint(
@@ -208,53 +208,18 @@ def delete_booking(booking_id):
 @booking_blueprint.route('/calendar', methods=["GET"])
 @login_required
 def calendar_view():
-    cars = Car.query.filter_by(is_deleted=False).all()
+    cars = get_available_cars()
 
-    # Получение параметра start_date из строки запроса
-    start_date_str = request.args.get('start_date')
-    if start_date_str:
-        try:
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-        except ValueError:
-            start_date = datetime.today()
-    else:
-        start_date = datetime.today()
+    start_date = get_start_date_from_request()
+    current_week_title = get_week_title(start_date)
 
-    start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-
-    current_week_title = f"{RU_MONTHS[start_date.month]} {start_date.year}"
-
-    dates = []
-    for i in range(7):
-        day = start_date + timedelta(days=i)
-        dates.append({
-            'day': day.day,
-            'weekday': RU_WEEKDAYS[day.weekday()],
-            'date': day,
-            'month_name': RU_MONTHS[day.month]
-        })
-
+    dates = get_week_dates(start_date)
     last_day = start_date + timedelta(days=7)
 
-    bookings = Booking.query.filter(
-        Booking.start_date < last_day,
-        Booking.end_date >= start_date,
-        Booking.status != "Отказ"
-    ).all()
+    bookings = get_bookings_in_range(start_date, last_day)
+    bookings_dict = map_bookings_to_dates(bookings, start_date, last_day)
 
-    # car_id -> date -> {'booking_id': id, 'end_date': date}
-    bookings_dict = defaultdict(dict)
-    for booking in bookings:
-        current = booking.start_date
-        while current.date() <= booking.end_date.date():
-            if start_date.date() <= current.date() < last_day.date():
-                if current.date() not in bookings_dict[booking.car_id]:
-                    bookings_dict[booking.car_id][current.date()] = {
-                        'booking_id': booking.id,
-                        'end_date': booking.end_date
-                    }
-            current += timedelta(days=1)
-
+    # Убедимся, что для каждой машины есть хотя бы пустой слот
     for car in cars:
         bookings_dict.setdefault(car.id, {})
 
@@ -268,5 +233,6 @@ def calendar_view():
         current_week=current_week_title,
         bookings_dict=bookings_dict,
         prev_start_date=prev_start_date.strftime('%Y-%m-%d'),
-        next_start_date=next_start_date.strftime('%Y-%m-%d')
+        next_start_date=next_start_date.strftime('%Y-%m-%d'),
+        BOOKING_STATUSES=BOOKING_STATUSES  # Передаем статусы в шаблон
     )
