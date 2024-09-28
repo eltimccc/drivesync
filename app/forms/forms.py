@@ -18,6 +18,8 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Length, Regexp
 
+from app.utils.utils import BOOKING_STATUSES
+
 
 class CarForm(FlaskForm):
     brand = StringField(
@@ -92,6 +94,11 @@ class BookingForm(FlaskForm):
     )
     phone = StringField("Телефон")
     description = TextAreaField("Описание")
+    status = SelectField(
+        "Статус", choices=[(status, status) for status in BOOKING_STATUSES.keys()], 
+        validators=[DataRequired()],
+        default="Бронь"
+    )
     submit = SubmitField("Забронировать")
 
     def __init__(self, *args, **kwargs):
