@@ -45,6 +45,7 @@ def handle_successful_booking(form, current_user):
         phone=form.phone.data,
         description=form.description.data,
         user=current_user,
+        status=form.status.data,
     )
 
     db.session.add(new_booking)

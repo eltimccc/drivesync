@@ -1,16 +1,13 @@
 {% extends 'base.html' %} {% block title %}Добавление бронирования{% endblock %}
 {% block content %}
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-md-6">
-      <div class="d-flex align-items-center mb-3">
-        <i class="fa fa-calendar-plus me-1 fa-lg"></i>
-        <span class="mx-2" style="font-size: 1.4rem; font-weight: 300">
-          Новое бронирование
-        </span>
-      </div>
-    </div>
-    <div class="col-md-10">
+<div class="container mt-5 d-flex justify-content-center">
+  <div class="card shadow-sm" style="max-width: 600px; width: 100%;">
+    <div class="card-body">
+      <h5 class="card-title text-center mb-4">
+        <i class="fa fa-calendar-plus me-2 fa-lg"></i>
+        Новое бронирование
+      </h5>
+
       <form method="POST" action="{{ url_for('booking.add_booking') }}">
         {{ form.hidden_tag() }}
 
@@ -22,15 +19,13 @@
                 type="text"
                 name="start_datetime"
                 id="start_datetime"
-                class="form-control datetimepicker"
+                class="form-control form-control-sm datetimepicker"
                 required="required"
                 placeholder="дд.мм.гггг чч:мм"
                 value="{{ form.start_datetime.data.strftime('%d.%m.%Y %H:%M') if form.start_datetime.data else request.args.get('start_date', '') }}"
               />
               {% if form.start_datetime.errors %}
-              <span style="color: red"
-                >{{ form.start_datetime.errors[0] }}</span
-              >
+              <span class="text-danger">{{ form.start_datetime.errors[0] }}</span>
               {% endif %}
             </div>
           </div>
@@ -41,13 +36,13 @@
                 type="text"
                 name="end_datetime"
                 id="end_datetime"
-                class="form-control datetimepicker"
+                class="form-control form-control-sm datetimepicker"
                 required="required"
                 placeholder="дд.мм.гггг чч:мм"
                 value="{{ form.end_datetime.data.strftime('%d.%m.%Y %H:%M') if form.end_datetime.data else request.args.get('end_date', '') }}"
               />
               {% if form.end_datetime.errors %}
-              <span style="color: red">{{ form.end_datetime.errors[0] }}</span>
+              <span class="text-danger">{{ form.end_datetime.errors[0] }}</span>
               {% endif %}
             </div>
           </div>
@@ -59,7 +54,7 @@
               {{ form.car.label(class="form-control-label") }}
               <input
                 type="text"
-                class="form-control car-input"
+                class="form-control form-control-sm car-input"
                 onclick="openCarModal()"
                 readonly
                 placeholder="Выберите автомобиль"
@@ -72,15 +67,16 @@
                 value="{{ form.car.data or request.args.get('car_id', '') }}"
               />
               {% if form.car.errors %}
-              <span style="color: red">{{ form.car.errors[0] }}</span>
+              <span class="text-danger">{{ form.car.errors[0] }}</span>
               {% endif %}
             </div>
           </div>
           <div class="col">
             <div class="form-group">
               {{ form.phone.label(class="form-control-label") }} {{
-              form.phone(class="form-control") }} {% if form.phone.errors %}
-              <span style="color: red">{{ form.phone.errors[0] }}</span>
+              form.phone(class="form-control form-control-sm") }}
+              {% if form.phone.errors %}
+              <span class="text-danger">{{ form.phone.errors[0] }}</span>
               {% endif %}
             </div>
           </div>
@@ -88,18 +84,29 @@
 
         <div class="form-group mb-3">
           {{ form.description.label(class="form-control-label") }} {{
-          form.description(class="form-control", rows="3") }} {% if
-          form.description.errors %}
-          <span style="color: red">{{ form.description.errors[0] }}</span>
+          form.description(class="form-control form-control-sm", rows="2") }}
+          {% if form.description.errors %}
+          <span class="text-danger">{{ form.description.errors[0] }}</span>
           {% endif %}
         </div>
 
-        <button type="submit" class="btn btn-primary btn-sm">
-          Добавить бронирование
-        </button>
+        <div class="form-group mb-3">
+          {{ form.status.label(class="form-control-label") }}
+          {{ form.status(class="form-control form-control-sm") }}
+          {% if form.status.errors %}
+          <span class="text-danger">{{ form.status.errors[0] }}</span>
+          {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-primary btn-sm">
+            Добавить бронирование
+          </button>
+        </div>
       </form>
     </div>
   </div>
+
   <!-- Модальное окно для выбора автомобиля -->
   <div id="carModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
@@ -116,7 +123,7 @@
           </button>
         </div>
         <div class="modal-body" style="max-height: 50vh; overflow-y: auto">
-          <table id="carTable" class="table">
+          <table id="carTable" class="table table-sm">
             <thead>
               <tr>
                 <th>Марка</th>
