@@ -214,17 +214,16 @@ def calendar_view():
     current_week_title = get_week_title(start_date)
 
     dates = get_week_dates(start_date)
-    last_day = start_date + timedelta(days=7)
+    last_day = start_date + timedelta(days=10)
 
     bookings = get_bookings_in_range(start_date, last_day)
     bookings_dict = map_bookings_to_dates(bookings, start_date, last_day)
 
-    # Убедимся, что для каждой машины есть хотя бы пустой слот
     for car in cars:
         bookings_dict.setdefault(car.id, {})
 
-    prev_start_date = start_date - timedelta(days=7)
-    next_start_date = start_date + timedelta(days=7)
+    prev_start_date = start_date - timedelta(days=10)
+    next_start_date = start_date + timedelta(days=10)
 
     return render_template(
         BOOKING_CALENDAR_TEMPLATE,

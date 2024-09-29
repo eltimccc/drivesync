@@ -34,7 +34,7 @@ def get_week_title(start_date: datetime) -> str:
 def get_week_dates(start_date: datetime) -> list:
     """Генерируем список дней недели для отображения в календаре."""
     dates = []
-    for i in range(7):
+    for i in range(10):
         day = start_date + timedelta(days=i)
         dates.append({
             'day': day.day,
