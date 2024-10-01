@@ -3,95 +3,150 @@
 {% block title %}Бронирования{% endblock %}
 
 {% block additional_styles %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<style>
+
+.phone-column {
+  max-width: 95px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.description-column {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.date-column {
+  max-width: 80px;
+}
+.car-column {
+  max-width: 90px;
+}
+
+.transmission-column {
+  max-width: 40px;
+}
+.car-number-column {
+  max-width: 60px;
+  white-space: nowrap;
+  text-align: center;
+}
+/* Основной контейнер */
+.table-container {
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
+  overflow-x: auto; /* Добавлено для горизонтальной прокрутки */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background-color: #f8f9fa;
+}
+
+/* Таблица */
+.table {
+  border-spacing: 0;
+  border-collapse: separate;
+  width: 100%;
+  min-width: 900px; /* Добавлено минимальная ширина для таблицы */
+}
+
+.table thead {
+  background-color: #6c757d;
+  color: white;
+  text-align: left;
+  font-weight: 600;
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #dee2e6;
+  white-space: nowrap;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+/* Вспомогательные стили для фильтров */
+input.form-control-sm,
+select.form-select-sm {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+}
+
+input.form-control-sm:focus,
+select.form-select-sm:focus {
+  box-shadow: none;
+  border-color: #80bdff;
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-<div class="row justify-content-between align-items-center mb-3">
-  <div class="col-md-8 d-flex align-items-center">
-    <i class="far fa-calendar-check me-1 fa-lg"></i>
-    <span class="mx-2" style="font-size: 1.4rem; font-weight: 300;">Бронирования</span>
+  <div class="row justify-content-between align-items-center mb-3">
+    <div class="col-md-8 d-flex align-items-center">
+      <i class="far fa-calendar-check me-1 fa-lg"></i>
+      <span class="mx-2 fs-4 fw-light">Бронирования</span>
+    </div>
+    <div class="col-md-4">
+      <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
+        <div class="input-group input-group-sm">
+          <input type="text" name="filter" id="filterInput" placeholder="Фильтр" class="form-control form-control-sm" value="{{ filter }}">
+          <select id="statusFilter" name="status" class="form-select form-select-sm ms-2">
+            <option value="in_work">В работе</option>
+            {% for status in BOOKING_STATUSES %}
+            <option value="{{ status }}">{{ status }}</option>
+            {% endfor %}
+            <option value="">Все</option>
+          </select>
+        </div>
+      </form>
+    </div>
   </div>
-  <div class="col-md-4">
-    <form id="filterForm" method="GET" action="{{ url_for('main.get_bookings') }}">
-      <div class="input-group input-group-sm">
-        <input
-          type="text"
-          name="filter"
-          id="filterInput"
-          placeholder="Фильтр"
-          class="form-control form-control-sm"
-          value="{{ filter }}"
-        />
-        <select id="statusFilter" name="status" class="form-select form-select-sm ms-2">
-          <option value="in_work">В работе</option>
-          {% for status, color in BOOKING_STATUSES.items() %}
-          <option value="{{ status }}">{{ status }}</option>
-          {% endfor %}
-          <option value="">Все</option>
-        </select>
-      </div>
-    </form>
-  </div>
-</div>
 
   <div class="table-container">
-    <div class="fixed-header">
-      <table class="table table-hover">
-        <thead class="table-dark">
-          <tr>
-            <th></th>
-            <th data-sort="id">ID</th>
-            <th data-sort="car_id">Автомобиль</th>
-            <th data-sort="transmission">КПП</th>
-            <th data-sort="car_number">Гос. номер</th>
-            <th data-sort="start_date">Дата начала</th>
-            <th data-sort="end_date">Дата окончания</th>
-            <th data-sort="phone">Телефон</th>
-            <th data-sort="description">Заметка</th>
-            <th data-sort="user_id">Добавил</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for booking in bookings %}
-          <tr
-            id="booking-{{ booking.id }}"
-            class="status-{{ booking.status | lower }}"
-            onclick="openBookingModal({{ booking.id }}, this.getAttribute('data-url'))"
-            data-url="{{ url_for('booking.view_booking_modal', booking_id=booking.id) }}"
-          >
-            <td
-              class="{% if booking.start_date.date() == today %}status-pickup-cell{% elif booking.end_date.date() == today %}status-dropoff-cell{% endif %}"
-            ></td>
-            <td>{{ booking.id }}</td>
-            <td>{{ booking.car.brand }}</td>
-            <td>{{ booking.car.transmission }}</td>
-            <td>{{ booking.car.car_number }}</td>
-            <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
-            <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
-            <td>{{ booking.phone }}</td>
-            <td>
-              {{ booking.description[:20] }}{% if booking.description|length >
-              20 %}...{% endif %}
-            </td>
-            <td>{{ booking.user.username }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <table class="table table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th></th>
+          <th data-sort="id">ID</th>
+          <th data-sort="car_id" class="car-column">Автомобиль</th>
+          <th data-sort="transmission" class="transmission-column">КПП</th>
+          <th data-sort="car_number" class="car-number-column">Гос. номер</th>
+          <th data-sort="start_date" class="date-column">Дата начала</th>
+          <th data-sort="end_date" class="date-column">Дата окончания</th>
+          <th data-sort="phone" class="phone-column">Телефон</th>
+          <th data-sort="description" class="description-column">Заметка</th>
+          <th data-sort="user_id">Добавил</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr id="booking-{{ booking.id }}" class="status-{{ booking.status | lower }}"
+          onclick="openBookingModal({{ booking.id }}, this.getAttribute('data-url'))"
+          data-url="{{ url_for('booking.view_booking_modal', booking_id=booking.id) }}">
+          <td class="{% if booking.start_date.date() == today %}status-pickup-cell{% elif booking.end_date.date() == today %}status-dropoff-cell{% endif %}"></td>
+          <td>{{ booking.id }}</td>
+          <td class="car-column">{{ booking.car.brand }}</td>
+          <td class="transmission-column">{{ booking.car.transmission }}</td>
+          <td class="car-number-column">{{ booking.car.car_number }}</td>
+          <td class="date-column">{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
+          <td class="date-column">{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
+          <td class="phone-column">{{ booking.phone }}</td>
+          <td class="description-column">{{ booking.description }}</td>
+          <td>{{ booking.user.username }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 
 <!-- Модальное окно для бронирования -->
-<div
-  class="modal fade"
-  id="bookingModal"
-  tabindex="-1"
-  aria-labelledby="bookingModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-body">
@@ -102,24 +157,12 @@
 </div>
 
 <!-- Кастомное модальное окно для удаления -->
-<div
-  id="custom-confirm-modal"
-  class="custom-confirm-modal"
-  style="display: none"
->
+<div id="custom-confirm-modal" class="custom-confirm-modal d-none">
   <div class="custom-modal-content">
     <p>Вы уверены, что хотите удалить это бронирование?</p>
     <form id="delete-form" method="post">
-      <button type="button" id="confirm-ok-button" class="btn btn-success">
-        OK
-      </button>
-      <button
-        type="button"
-        id="confirm-cancel-button"
-        class="btn btn-secondary"
-      >
-        Отмена
-      </button>
+      <button type="button" id="confirm-ok-button" class="btn btn-success">OK</button>
+      <button type="button" id="confirm-cancel-button" class="btn btn-secondary">Отмена</button>
     </form>
   </div>
 </div>
