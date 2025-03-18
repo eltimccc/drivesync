@@ -1,17 +1,7 @@
-document.addEventListener('DOMContentLoaded', function() {
-  const filterInput = document.getElementById('filterInput');
-  const statusFilter = document.getElementById('statusFilter');
-  const filterForm = document.getElementById('filterForm');
-  const tableRows = document.querySelectorAll('.table-hover tbody tr');
-
-  const loadFilterFromLocalStorage = (key, element) => {
-    const savedValue = localStorage.getItem(key);
-    if (savedValue) element.value = savedValue;
-  };
-
-  const saveFilterToLocalStorage = (key, value) => {
-    localStorage.setItem(key, value);
-  };
+document.addEventListener("DOMContentLoaded", function () {
+  const filterInput = document.getElementById("filterInput");
+  const statusFilter = document.getElementById("statusFilter");
+  const tableRows = document.querySelectorAll("tbody tr");
 
   const filterTableRows = () => {
     const filterText = filterInput.value.trim().toLowerCase();
@@ -22,44 +12,41 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.textContent.trim().toLowerCase().includes(filterText)
       );
 
-      const rowStatus = row.className.split('-').pop();
+      // Определяем статус строки по классу (например, status-аренда, status-бронь)
+      const match = row.className.match(/status-(\S+)/);
+      const rowStatus = match ? match[1] : "";
+      const isOverdue = row.classList.contains('overdue-booking');
+
       let rowMatchesStatus = true;
 
       if (statusText === "in_work") {
+        // Только "аренда", "бронь", "ожидание" (НЕ "завершено" и т.д.)
         const workingStatuses = ["аренда", "бронь", "ожидание"];
         rowMatchesStatus = workingStatuses.includes(rowStatus);
+
+        // Подсвечиваем просроченные "аренда" и "бронь"
+        if (isOverdue && (rowStatus === "аренда" || rowStatus === "бронь")) {
+          row.classList.add("overdue-highlight");
+        } else {
+          row.classList.remove("overdue-highlight");
+        }
       } else {
+        // Остальные фильтры работают как раньше
         rowMatchesStatus = !statusText || rowStatus === statusText;
+
+        // Убираем подсветку при смене фильтра
+        row.classList.remove("overdue-highlight");
       }
 
-      row.style.display = rowMatchesFilter && rowMatchesStatus ? '' : 'none';
+      // Отображаем строку только если совпадает с фильтром и статусом
+      row.style.display = rowMatchesFilter && rowMatchesStatus ? "" : "none";
     });
   };
 
-  loadFilterFromLocalStorage('bookingFilter', filterInput);
-  loadFilterFromLocalStorage('statusFilter', statusFilter);
+  // Вызываем фильтрацию при изменении поля фильтра и статуса
+  filterInput.addEventListener("input", filterTableRows);
+  statusFilter.addEventListener("change", filterTableRows);
 
-  filterInput.addEventListener('input', () => {
-    saveFilterToLocalStorage('bookingFilter', filterInput.value);
-    if (filterInput.value.length >= 2 || filterInput.value.length === 0) {
-      filterTableRows();
-    }
-  });
-
-  statusFilter.addEventListener('change', () => {
-    saveFilterToLocalStorage('statusFilter', statusFilter.value);
-    filterTableRows();
-  });
-
-  filterForm.addEventListener('submit', event => {
-    event.preventDefault();
-    filterTableRows();
-  });
-
+  // Запускаем фильтрацию при загрузке страницы
   filterTableRows();
-
-  window.addEventListener('beforeunload', () => {
-    localStorage.removeItem('bookingFilter');
-    localStorage.removeItem('statusFilter');
-  });
 });

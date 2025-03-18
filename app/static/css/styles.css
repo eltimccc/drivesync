@@ -119,3 +119,9 @@
       transform: scale(1);
     }
   }
+
+  /* Выделение строки бронирования после того, как прошел конец брони */
+  .overdue-booking {
+    background-color: #9400D3 !important; /* Фиолетовый */
+    color: white; /* Чтобы текст был виден */
+}

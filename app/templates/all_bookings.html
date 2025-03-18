@@ -121,9 +121,10 @@ select.form-select-sm:focus {
       </thead>
       <tbody>
         {% for booking in bookings %}
-        <tr id="booking-{{ booking.id }}" class="status-{{ booking.status | lower }}"
-          onclick="openBookingModal({{ booking.id }}, this.getAttribute('data-url'))"
-          data-url="{{ url_for('booking.view_booking_modal', booking_id=booking.id) }}">
+        <tr id="booking-{{ booking.id }}" 
+    class="status-{{ booking.status | lower }} {% if booking.end_date.date() < today and booking.status in ['Аренда', 'Бронь'] %} overdue-booking {% endif %}"
+    onclick="openBookingModal({{ booking.id }}, this.getAttribute('data-url'))"
+    data-url="{{ url_for('booking.view_booking_modal', booking_id=booking.id) }}">
           <td class="{% if booking.start_date.date() == today %}status-pickup-cell{% elif booking.end_date.date() == today %}status-dropoff-cell{% endif %}"></td>
           <td>{{ booking.id }}</td>
           <td class="car-column">{{ booking.car.brand }}</td>
