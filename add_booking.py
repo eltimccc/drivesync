@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 import random
 from app import create_app, db
-from models.booking import Booking
+from app.models.booking import Booking
 
 
 def generate_dates(start_date, num_days=130):
