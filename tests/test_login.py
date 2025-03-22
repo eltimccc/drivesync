@@ -31,6 +31,7 @@ def test_user(db_session, app):
     "username, password, expected_status, expected_message",
     [
         ("testuser", "wrongpassword", 200, "Неполучилось"),
+        ("wrongtestuser", "wrongpassword", 200, "Неполучилось"),
         ("testuser", "password123", 200, "Бронирования"),
     ],
 )
@@ -78,14 +79,18 @@ def test_logout(client, db_session, test_user):
     assert response.status_code == 200
 
     response = client.get(url_for("main.get_bookings"))
-    assert response.status_code == 200  # Доступно
-
+    assert response.status_code == 200
+    
     response = client.get(url_for("auth.logout"), follow_redirects=True)
     assert response.status_code == 200
 
-    # После выхода защищенная страница недоступна (должен быть редирект на логин)
     response = client.get(url_for("main.get_bookings"), follow_redirects=False)
     assert response.status_code in [
         302,
         401,
+    ]
+
+    response = client.get(url_for("auth.register"), follow_redirects=False)
+    assert response.status_code in [
+        403
     ]
