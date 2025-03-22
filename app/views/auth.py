@@ -12,7 +12,6 @@ from app.constants import (
     AUTH_REGISTER_ROUTE,
     AUTH_REGISTER_TEMPLATE,
     AUTH_URL_PREFIX,
-    BOOKING_ALL_TEMPLATE,
     BOOKING_MAIN_ROUTE,
 )
 from app.utils.decorators import superuser_required
@@ -24,7 +23,7 @@ auth_blueprint = Blueprint(AUTH_BP_NAME_ROUTE, __name__, url_prefix=AUTH_URL_PRE
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.session.get(User, int(user_id))
 
 
 @auth_blueprint.route(AUTH_REGISTER_BP_ROUTE, methods=["GET", "POST"])

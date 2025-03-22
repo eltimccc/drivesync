@@ -46,8 +46,13 @@ def register_event_listeners(app, db):
     
     @event.listens_for(db.session, "before_commit")
     def before_commit(session):
+        db_uri = app.config["SQLALCHEMY_DATABASE_URI"]
+        if "sqlite:///:memory:" in db_uri:
+            # База данных в памяти, резервную копию не делать
+            return
+
         db_path = os.path.join(
             app.instance_path,
-            app.config["SQLALCHEMY_DATABASE_URI"].replace("sqlite:///", ""),
+            db_uri.replace("sqlite:///", ""),
         )
         create_backup(db_path)
