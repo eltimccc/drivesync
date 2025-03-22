@@ -1,96 +1,54 @@
 import pytest
-import random
-from flask_bcrypt import Bcrypt
-from flask import url_for
-from app.models import User
-
-
-@pytest.fixture
-def test_user(db_session, app):
-    """Очищает таблицу пользователей и создает нового тестового пользователя."""
-    db_session.query(User).delete()
-    db_session.commit()
-
-    bcrypt = Bcrypt(app)
-    password = "password123"
-    hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-
-    user = User(
-        username="testuser",
-        email="testuser@example.com",
-        telegram_id=str(random.randint(10000, 99999)),
-        password=hashed_password,
-    )
-    db_session.add(user)
-    db_session.commit()
-
-    return user
+from flask import url_for, get_flashed_messages
 
 
 @pytest.mark.parametrize(
-    "username, password, expected_status, expected_message",
+    "username, password, expected_redirect",
     [
-        ("testuser", "wrongpassword", 200, "Неполучилось"),
-        ("wrongtestuser", "wrongpassword", 200, "Неполучилось"),
-        ("testuser", "password123", 200, "Бронирования"),
+        ("testuser", "wrongpassword", "auth.login"),
+        ("wrongtestuser", "wrongpassword", "auth.login"),
+        ("testuser", "password123", "main.get_bookings"),
     ],
 )
-def test_login(
-    client, db_session, test_user, username, password, expected_status, expected_message
-):
+def test_login(client, test_user, username, password, expected_redirect):
     """Параметризованный тест входа в систему."""
+
+    client.get(url_for("auth.logout"))
+
     response = client.post(
         url_for("auth.login"),
         data={"username": username, "password": password},
         follow_redirects=True,
     )
 
-    assert response.status_code == expected_status
-    assert (
-        expected_message.encode("utf-8") in response.data
-    )
+    assert url_for(expected_redirect) in response.request.path
 
-    if password == "password123":
-        response = client.get(url_for("main.get_bookings"))
-        assert response.status_code == 200
+    assert response.status_code == 200
+        
 
-
-def test_authenticated_session(client, db_session, test_user):
+def test_authenticated_session(authenticated_user):
     """Проверка, что после успешного входа пользователь аутентифицирован."""
-    response = client.post(
-        url_for("auth.login"),
-        data={"username": "testuser", "password": "password123"},
-        follow_redirects=True,
-    )
-    assert response.status_code == 200
-
+    client = authenticated_user
     response = client.get(url_for("main.get_bookings"))
     assert response.status_code == 200
 
 
-def test_logout(client, db_session, test_user):
+def test_logout(authenticated_user):
     """Проверка выхода из системы и недоступности защищенных страниц."""
+    client = authenticated_user
 
-    response = client.post(
-        url_for("auth.login"),
-        data={"username": "testuser", "password": "password123"},
-        follow_redirects=True,
-    )
-    assert response.status_code == 200
-
+    # Проверка доступа к защищенной странице до выхода
     response = client.get(url_for("main.get_bookings"))
     assert response.status_code == 200
-    
+
+    # Выход из системы
     response = client.get(url_for("auth.logout"), follow_redirects=True)
     assert response.status_code == 200
 
+    # Проверка недоступности защищенной страницы после выхода
     response = client.get(url_for("main.get_bookings"), follow_redirects=False)
-    assert response.status_code in [
-        302,
-        401,
-    ]
+    assert response.status_code in [302, 401]
 
+    # Проверка недоступности страницы регистрации после выхода
     response = client.get(url_for("auth.register"), follow_redirects=False)
-    assert response.status_code in [
-        403
-    ]
+    assert response.status_code == 403
