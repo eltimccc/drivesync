@@ -1,5 +1,6 @@
 from flask import (
     Blueprint,
+    abort,
     redirect,
     render_template,
     request,
@@ -7,6 +8,7 @@ from flask import (
     current_app,
 )
 from flask_login import login_required
+from sqlalchemy import select
 
 from app.constants import (
     CAR_ADD_BP_ROUTE,
@@ -52,13 +54,12 @@ def add_car():
 @car_blueprint.route(CARS_BP_ROUTE)
 @login_required
 def get_cars():
-    current_app.logger.info(f"Accessed get cars page")
+    current_app.logger.info("Accessed get cars page")
     is_deleted_param = request.args.get("is_deleted")
 
-    if is_deleted_param == "true":
-        cars = Car.query.filter_by(is_deleted=True).all()
-    else:
-        cars = Car.query.filter_by(is_deleted=False).all()
+    cars = db.session.scalars(
+        select(Car).where(Car.is_deleted == (is_deleted_param == "true"))
+    ).all()
 
     return render_template(CARS_GET, cars=cars)
 
@@ -70,20 +71,19 @@ def car_detail(car_id):
     sort_by = request.args.get("sort_by", "start_date")
     sort_order = request.args.get("sort_order", "desc")
 
-    if sort_order == "desc":
-        bookings = (
-            Booking.query.filter_by(car_id=car_id)
-            .order_by(getattr(Booking, sort_by).desc())
-            .all()
-        )
-    else:
-        bookings = (
-            Booking.query.filter_by(car_id=car_id)
-            .order_by(getattr(Booking, sort_by).asc())
-            .all()
-        )
+    car = db.session.get(Car, car_id)
+    if car is None:
+        abort(404)
 
-    car = Car.query.get_or_404(car_id)
+    stmt = select(Booking).where(Booking.car_id == car_id)
+
+    order_column = getattr(Booking, sort_by)
+    if sort_order == "desc":
+        stmt = stmt.order_by(order_column.desc())
+    else:
+        stmt = stmt.order_by(order_column.asc())
+
+    bookings = db.session.execute(stmt).scalars().all()
 
     return render_template(
         CAR_DETAIL_TEMPLATE,
@@ -98,21 +98,31 @@ def car_detail(car_id):
 @login_required
 def edit_car(car_id):
     current_app.logger.info(f"Accessed edit car page with car ID: {car_id}")
-    car = Car.query.get_or_404(car_id)
+
+    car = db.session.get(Car, car_id)
+    if not car:
+        abort(404)
+
     form = EditCarForm(obj=car)
+
     if form.validate_on_submit():
         form.populate_obj(car)
         db.session.commit()
-        current_app.logger.info(f"Edited car witn ID: {car_id}")
+        current_app.logger.info(f"Edited car with ID: {car_id}")
         return redirect(url_for(CARS_GET_ROUTE))
+
     return render_template(CAR_EDIT_TEMPLATE, form=form, car=car)
 
 
 @car_blueprint.route(CAR_DELETE_BP_ROUTE, methods=["POST"])
 @login_required
 def delete_car(car_id):
-    car = Car.query.get_or_404(car_id)
+    car = db.session.get(Car, car_id)
+    if not car:
+        abort(404)
+
     car.is_deleted = True
     db.session.commit()
+
     current_app.logger.warning(f"DELETED car with ID: {car_id}")
     return redirect(url_for(CARS_GET_ROUTE))
