@@ -20,13 +20,18 @@ from app.constants import (
     BOOKING_DETAIL_MODAL_ROUTE,
     BOOKING_DETAIL_MODAL_TEMPLATE,
     BOOKING_DETAIL_TEMPLATE,
+    BOOKING_EDIT_BOOKING_ROUTE,
     BOOKING_EDIT_BP_ROUTE,
     BOOKING_EDIT_TEMPLATE,
     BOOKING_MAIN_ROUTE,
     BOOKING_MODAL_TEMPLATE,
     BOOKING_URL_PREFIX,
+    BOOKING_VIEW_BOOKING_ROUTE,
     BOOKING_VIEW_BP_ROUTE,
+    BOOKINGS_TODAY,
+    BOOKINGS_TODAY_TEMPLATE,
 )
+from app.services.booking_service import BookingService
 from app.utils.booking_helpers import handle_successful_booking, log_form_errors, prepopulate_form_from_request
 from app.forms.forms import BookingForm, BookingUpdateForm
 from app.models import Booking
@@ -92,7 +97,7 @@ def view_booking_modal(booking_id):
     )
 
 
-@booking_blueprint.route("/bookings/today", methods=["GET"])
+@booking_blueprint.route(BOOKINGS_TODAY, methods=["GET"])
 @login_required
 def bookings_today():
     date_str = request.args.get("date")
@@ -121,7 +126,7 @@ def bookings_today():
     )
 
     return render_template(
-        "bookings_today.html",
+        BOOKINGS_TODAY_TEMPLATE,
         pick_ups=pick_ups,
         drop_offs=drop_offs,
         today=selected_date,
@@ -151,43 +156,56 @@ def add_booking():
 @booking_blueprint.route(BOOKING_EDIT_BP_ROUTE, methods=["GET", "POST"])
 @login_required
 def edit_booking(booking_id):
-    current_app.logger.info(
-        f"User {current_user.username} accessed edit booking page with ID: {booking_id}"
-    )
+    current_app.logger.info(f"User {current_user.username} editing booking ID: {booking_id}")
     booking = Booking.query.get_or_404(booking_id)
     form = BookingUpdateForm(obj=booking)
     form.status.choices = [(key, key) for key in BOOKING_STATUSES.keys()]
     cars = Car.query.filter_by(is_deleted=False).all()
 
-    if form.validate_on_submit():
-        current_app.logger.info(
-            f"User {current_user.username} validated booking form for update of booking ID: {booking_id}"
-        )
-        booking.description = form.description.data
-        booking.phone = form.phone.data
-        booking.start_date = form.start_date.data
-        booking.end_date = form.end_date.data
-        booking.status = form.status.data
+    if request.method == 'POST':
+        try:
+            form_data = {
+                'description': form.description.data,
+                'phone': form.phone.data,
+                'status': form.status.data,
+                'start_date': form.start_date.data,
+                'end_date': form.end_date.data
+            }
+            
+            move_data = {
+                'car_id': request.form.get('car'),
+                'move_start': request.form.get('move_start'),
+                'move_end': request.form.get('move_end_date')
+            }
 
-        car_id = request.form.get("car")
-        booking.car = Car.query.get(car_id)
+            result = BookingService.update_booking(booking, form_data, move_data)
+            flash(result['message'], 'success')
+            
+            db.session.commit()
+            
+            # Перенаправляем обратно на редактирование (нового бронирования, если была пересадка)
+            booking_id_to_edit = result['new_booking'].id if result['new_booking'] else booking.id
+            return redirect(url_for(BOOKING_EDIT_BOOKING_ROUTE, booking_id=booking_id_to_edit))
 
-        booking.color = BOOKING_STATUSES[booking.status]
-        if booking.color == BOOKING_STATUSES["Отказ"]:
-            booking.end_date = booking.start_date
+        except ValueError as e:
+            db.session.rollback()
+            flash(str(e), 'danger')
+            return render_template(BOOKING_EDIT_TEMPLATE, 
+                               booking=booking, 
+                               form=form,
+                               cars=cars)
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error updating booking {booking_id}: {str(e)}", exc_info=True)
+            flash(f'Произошла ошибка: {str(e)}', 'danger')
 
-        db.session.commit()
-        flash("Бронирование успешно обновлено", "success")
-        current_app.logger.info(
-            f"User {current_user.username} updated booking with ID: {booking_id}"
-        )
-        return redirect(url_for(BOOKING_MAIN_ROUTE, edited_booking_id=booking.id))
-    else:
-        current_app.logger.warning(
-            f"User {current_user.username} failed booking form validation for booking ID: {booking_id}"
-        )
+    return render_template(BOOKING_EDIT_TEMPLATE, 
+                         booking=booking, 
+                         form=form, 
+                         move_start_date=booking.start_date, 
+                         move_end_date=booking.end_date, 
+                         cars=cars)
 
-    return render_template(BOOKING_EDIT_TEMPLATE, form=form, booking=booking, cars=cars)
 
 
 @booking_blueprint.route(BOOKING_DELETE_BP_ROUTE, methods=["POST"])

@@ -1,75 +1,258 @@
-{% extends 'base.html' %}
-{% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/car_input_styles.css') }}" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" />
-
-<div class="container mt-4">
+{% extends 'base.html' %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/edit_booking.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/car_input_styles.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css"
+/>
+<div class="container mt-3">
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header text-center">
-          <i class="fa fa-pencil-square fa-lg"></i>
-        <span class="mx-2" style="font-size: 1.4rem; font-weight: 300"
-          >Редактирование бронирования</span
-        >
+        <div class="card-header bg-light py-2">
+          <h5 class="mb-0 text-center">
+            <i class="fas fa-edit text-primary"></i>
+            Редактирование бронирования № {{ booking.id }}
+          </h5>
+          <div class="text-center text-muted small">
+            {{ booking.car.brand }} {{ booking.car.car_number }}
+          </div>
         </div>
-        <div class="card-body">
+
+        <div class="card-body compact-form">
           <form method="POST">
             {{ form.hidden_tag() }}
-            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
-              <label for="start_date" class="col-sm-4 col-form-label">Дата и время начала:</label>
+
+            <!-- Основные поля -->
+            <div class="form-group row">
+              <label for="start_date" class="col-sm-4 col-form-label form-label"
+                >Начало:</label
+              >
               <div class="col-sm-8">
-                <input type="text" class="form-control datetimepicker" id="start_date" name="start_date" value="{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}" required />
+                <input
+                  type="text"
+                  class="form-control form-control-sm datetimepicker"
+                  id="start_date"
+                  name="start_date"
+                  value="{{ booking.start_date.strftime('%d.%m.%Y %H:%M') }}"
+                  required
+                />
               </div>
             </div>
-            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
-              <label for="end_date" class="col-sm-4 col-form-label">Дата и время окончания:</label>
+
+            <div class="form-group row">
+              <label for="end_date" class="col-sm-4 col-form-label form-label"
+                >Окончание:</label
+              >
               <div class="col-sm-8">
-                <input type="text" class="form-control datetimepicker" id="end_date" name="end_date" value="{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}" required />
+                <input
+                  type="text"
+                  class="form-control form-control-sm datetimepicker"
+                  id="end_date"
+                  name="end_date"
+                  value="{{ booking.end_date.strftime('%d.%m.%Y %H:%M') }}"
+                  required
+                />
               </div>
             </div>
-            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
-              <label for="car" class="col-sm-4 col-form-label">Автомобиль:</label>
+
+            <!-- Блок для смены машины (показывается всегда, кроме статусов Аренда/Ожидание) -->
+            {% if booking.status not in ['Аренда', 'Ожидание'] %}
+            <div class="form-group row">
+              <label for="car" class="col-sm-4 col-form-label form-label"
+                >Автомобиль:</label
+              >
               <div class="col-sm-8">
-                <div class="input-group">
-                  <input type="text" class="form-control" id="selectedCar" readonly />
-                  <input type="hidden" id="selectedCarId" name="car" readonly />
+                <div class="input-group input-group-sm">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="selectedCar"
+                    value="{{ booking.car.brand }} {{ booking.car.car_number }}"
+                    readonly
+                  />
                   <div class="input-group-append">
-                    <button type="button" class="btn btn-info btn-sm" onclick="openCarModal()">...</button>
+                    <button
+                      type="button"
+                      class="btn btn-info btn-sm"
+                      onclick="openCarModal()"
+                    >
+                      <i class="fas fa-ellipsis-h"></i>
+                    </button>
                   </div>
+                  <input
+                    type="hidden"
+                    id="selectedCarId"
+                    name="car"
+                    value="{{ booking.car.id }}"
+                  />
                 </div>
               </div>
             </div>
-            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
-              <label for="phone" class="col-sm-4 col-form-label">Телефон:</label>
-              <div class="col-sm-8">
-                {{ form.phone(class_="form-control") }}
-                {% if form.phone.errors %}
-                <div class="text-danger">{{ form.phone.errors[0] }}</div>
-                {% endif %}
+            {% endif %}
+
+            <!-- Блок пересадки (только для статусов Аренда/Ожидание) -->
+            {% if booking.status in ['Аренда', 'Ожидание'] %}
+            <!-- Кнопка пересадки -->
+            <button
+              type="button"
+              class="transfer-toggle collapsed"
+              data-toggle="collapse"
+              data-target="#transferFields"
+              aria-expanded="false"
+              aria-controls="transferFields"
+            >
+              <span>
+                <i class="fas fa-exchange-alt mr-2"></i>
+                Настроить пересадку
+              </span>
+              <i class="fas fa-chevron-down icon"></i>
+            </button>
+
+            <!-- В секции пересадки -->
+            <div id="transferFields" class="transfer-section collapse">
+              <div class="alert alert-info small p-2 mb-2">
+                <strong
+                  ><i class="fas fa-info-circle"></i> Как работает пересадка
+                  (для статуса "Аренда"):</strong
+                >
+                <ul class="mb-0 pl-3">
+                  <li>
+                    Установить другую машину и дату "С", отличную от исходной
+                  </li>
+                  <li>Исходная аренда разделится на две и будет завершена в дату "С"</li>
+                  <li>
+                    Создастся новая аренда с указанной даты "С" до даты "По"
+                  </li>
+                  <li>Новая машина должна быть свободна в указанный период</li>
+                  <li>Не забудьте завершить исходную аренду</li>
+                </ul>
+              </div>
+
+              <div class="form-group row">
+                <label for="car" class="col-sm-4 col-form-label form-label"
+                  >Автомобиль:</label
+                >
+                <div class="col-sm-8">
+                  <div class="input-group input-group-sm">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="selectedCar"
+                      value="{{ booking.car.brand }} {{ booking.car.car_number }}"
+                      readonly
+                    />
+                    <div class="input-group-append">
+                      <button
+                        type="button"
+                        class="btn btn-info btn-sm"
+                        onclick="openCarModal()"
+                      >
+                        <i class="fas fa-ellipsis-h"></i>
+                      </button>
+                    </div>
+                    <input
+                      type="hidden"
+                      id="selectedCarId"
+                      name="car"
+                      value="{{ booking.car.id }}"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label
+                  for="move_start_date"
+                  class="col-sm-4 col-form-label form-label"
+                  >С:</label
+                >
+                <div class="col-sm-8">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm datetimepicker"
+                    id="move_start"
+                    name="move_start"
+                    value="{{ move_start_date.strftime('%d.%m.%Y %H:%M') if move_start_date else '' }}"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label
+                  for="move_end_date"
+                  class="col-sm-4 col-form-label form-label"
+                  >По:</label
+                >
+                <div class="col-sm-8">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm datetimepicker"
+                    id="move_end_date"
+                    name="move_end_date"
+                    value="{{ move_end_date.strftime('%d.%m.%Y %H:%M') if move_end_date else '' }}"
+                  />
+                </div>
               </div>
             </div>
-            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
-              <label for="description" class="col-sm-4 col-form-label">Заметка:</label>
+            {% endif %}
+
+            <!-- Остальные поля формы -->
+            <div class="form-group row">
+              <label for="phone" class="col-sm-4 col-form-label form-label"
+                >Телефон:</label
+              >
               <div class="col-sm-8">
-                {{ form.description(class_="form-control", rows=2) }}
-                {% if form.description.errors %}
-                <div class="text-danger">{{ form.description.errors[0] }}</div>
-                {% endif %}
+                {{ form.phone(class_="form-control form-control-sm") }}
               </div>
             </div>
-            <div class="form-group row mb-3"> <!-- Добавлен класс mb-3 для отступов -->
-              <label for="status" class="col-sm-4 col-form-label">Статус:</label>
+
+            <div class="form-group row">
+              <label
+                for="description"
+                class="col-sm-4 col-form-label form-label"
+                >Заметка:</label
+              >
               <div class="col-sm-8">
-                {{ form.status(class_="form-control") }}
-                {% if form.status.errors %}
-                <div class="text-danger">{{ form.status.errors[0] }}</div>
-                {% endif %}
+                {{ form.description(class_="form-control form-control-sm",
+                rows="3") }}
               </div>
             </div>
-            <div class="d-flex">
-              <button type="submit" formmethod="POST" class="btn btn-primary btn-sm">Сохранить</button>
-              <button type="submit" formmethod="POST" formaction="{{ url_for('booking.delete_booking', booking_id=booking.id) }}" onclick="return confirm('Вы уверены, что хотите удалить это бронирование?');" class="btn btn-danger btn-sm ms-2">Удалить</button>
+
+            <div class="form-group row">
+              <label for="status" class="col-sm-4 col-form-label form-label"
+                >Статус:</label
+              >
+              <div class="col-sm-8">
+                {{ form.status(class_="form-control form-control-sm") }}
+              </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %} {% for category, message in messages %}
+            <div class="alert alert-{{ category }} py-1 px-2 mb-2 small">
+              {{ message }}
+            </div>
+            {% endfor %} {% endif %} {% endwith %}
+
+            <div class="d-flex justify-content-between mt-3">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-save mr-1"></i> Сохранить
+              </button>
+              <button
+                type="submit"
+                formaction="{{ url_for('booking.delete_booking', booking_id=booking.id) }}"
+                onclick="return confirm('Удалить это бронирование?');"
+                class="btn btn-outline-danger btn-sm"
+              >
+                <i class="fas fa-trash-alt mr-1"></i> Удалить
+              </button>
             </div>
           </form>
         </div>
@@ -80,33 +263,79 @@
 
 <!-- Модальное окно для выбора автомобиля -->
 <div id="carModal" class="modal" onclick="closeIfOutside(event)">
-  <div class="modal-content car_modal-content">
-    <span class="close" onclick="closeCarModal()">&times;</span>
-    <table id="carTable" class="table table-hover">
-      <thead>
-        <tr>
-          <th>Марка</th>
-          <th>Номер</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for car in cars %}
-        <tr onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')">
-          <td>{{ car.brand }}</td>
-          <td>{{ car.car_number }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="modal-dialog modal-dialog-centered modal">
+    <div class="modal-content">
+      <div class="modal-header py-1 px-2">
+        <h6 class="modal-title mb-0" style="font-size: 0.9rem">
+          Выберите автомобиль
+        </h6>
+        <button
+          type="button"
+          class="close p-0 m-0"
+          style="font-size: 1.2rem"
+          onclick="closeCarModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div style="max-height: 300px; overflow-y: auto">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="bg-light sticky-top" style="top: -1px">
+              <tr>
+                <th>Марка</th>
+                <th>Номер</th>
+              </tr>
+            </thead>
+            <tbody id="carTableBody">
+              {% for car in cars %}
+              <tr
+                onclick="selectCar('{{ car.id }}', '{{ car.brand }} {{ car.car_number }}')"
+                style="cursor: pointer"
+              >
+                <td>{{ car.brand }}</td>
+                <td>{{ car.car_number }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    var bookingCar = {
-        brand: "{{ booking.car.brand }}",
-        number: "{{ booking.car.car_number }}",
-        id: "{{ booking.car.id }}"
-    };
+  $(document).ready(function () {
+    // Инициализация datetimepicker
+    $(".datetimepicker").datetimepicker({
+      format: "d.m.Y H:i",
+      step: 30,
+      lang: "ru",
+      allowBlank: true,
+      validateOnBlur: false,
+    });
+
+    // При открытии секции пересадки переинициализируем datetimepicker
+    $("#transferFields").on("shown.bs.collapse", function () {
+      $(".datetimepicker").datetimepicker("destroy");
+      $(".datetimepicker").datetimepicker({
+        format: "d.m.Y H:i",
+        step: 30,
+        lang: "ru",
+        allowBlank: true,
+        validateOnBlur: false,
+      });
+    });
+  });
+</script>
+<script>
+  var bookingCar = {
+    brand: "{{ booking.car.brand }}",
+    number: "{{ booking.car.car_number }}",
+    id: "{{ booking.car.id }}",
+  };
 </script>
 <script src="{{ url_for('static', filename='js/car_input.js') }}"></script>
 {% endblock %}
