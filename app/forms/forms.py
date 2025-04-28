@@ -5,7 +5,14 @@ from app.models import Booking
 from app.models import User
 from app.models import Car
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import IntegerField, StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import (
+    IntegerField,
+    StringField,
+    PasswordField,
+    SubmitField,
+    BooleanField,
+    TextAreaField,
+)
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
@@ -97,7 +104,7 @@ class BookingForm(FlaskForm):
     status = SelectField(
         "Статус", choices=[(status, status) for status in BOOKING_STATUSES.keys()], 
         validators=[DataRequired()],
-        default="Бронь"
+        default="Бронь",
     )
     submit = SubmitField("Забронировать")
 
@@ -207,10 +214,10 @@ class HiddenForm(FlaskForm):
 
 
 class EditUserForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password')
-    confirm = PasswordField('Confirm Password')
+    username = StringField("Username", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField("Password")
+    confirm = PasswordField("Confirm Password")
     telegram_id = IntegerField("Телеграм айди при наличии")
-    is_superuser = BooleanField('Superuser')
-    submit = SubmitField('Update')
+    is_superuser = BooleanField("Superuser")
+    submit = SubmitField("Update")
