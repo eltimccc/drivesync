@@ -5,150 +5,196 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Навигационная панель</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #253456;
+            --light-color: #f8f9fa;
+            --danger-color: #ef233c;
+        }
+        
         .navbar {
-            background-color: #253456;
-            padding: 1px 0; /* Уменьшили отступы сверху и снизу */
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-            position: fixed; /* Фиксируем панель сверху */
+            background-color: var(--primary-color);
+            padding: 0.25rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            min-height: 50px;
+            position: fixed;
             top: 0;
             width: 100%;
             z-index: 1030;
         }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center; /* Центрирование по вертикали */
-        }
-
+        
         .navbar-brand img {
-            width: 130px; /* Фиксированная ширина для логотипа */
-            height: auto;
+            height: 30px;
+            width: auto;
+            transition: all 0.3s ease;
         }
-
-        .navbar-nav {
+        
+        .nav-link {
+            font-size: 13px;
+            padding: 0.5rem 0.75rem !important;
+            color: var(--light-color) !important;
             display: flex;
-            justify-content: center; /* Центрирование навигационных ссылок */
-            width: 100%; /* Занимает всю доступную ширину */
+            align-items: center;
+        }
+        
+        .nav-link i {
+            margin-right: 8px;
+            font-size: 1.1rem;
         }
 
-        .navbar-nav .nav-link {
-            font-family: "Roboto", sans-serif;
-            font-size: 12px;
-            font-weight: 305;
-            color: #fff !important;
-            padding: 10px 15px;
-            text-transform: uppercase;
+        .nav-link:hover {
+            color: var(--light-color) !important;
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
         }
-
-        .navbar-nav .nav-link:hover {
-            color: #234b75 !important;
-            background-color: #f8f9fa;
-            border-radius: 4px;
+        
+        
+        .user-menu {
+            position: relative;
         }
-
-        .navbar-text {
-            color: #555;
-            font-size: 16px;
-            font-weight: 500;
+        
+        .user-badge {
+            background-color: rgba(239, 35, 60, 0.2);
+            color: var(--light-color) !important;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 1px solid var(--danger-color);
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
         }
-
-        .navbar-toggler {
-            border: 1px solid #ddd;
-            background-color: #f8f9fa;
+        
+        .user-badge:hover {
+            background-color: var(--danger-color);
         }
-
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%280, 0, 0, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2.5' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-            width: 20px;
-            height: 20px;
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--primary-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
+        
+        .user-menu:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .dropdown-item {
+            color: var(--light-color);
+            font-size: 13px;
+            padding: 0.5rem 1rem;
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
         @media (max-width: 991.98px) {
-            .navbar-nav .nav-link {
-                margin-right: 10px;
-                padding: 8px 10px;
+            .navbar-collapse {
+                padding: 0.5rem 0;
+                background-color: var(--primary-color);
             }
-        }
-
-        @media (max-width: 767.98px) {
-            .navbar {
-                padding: 3px 0;
-            }
-
-            .navbar-nav .nav-link {
-                font-size: 12px;
-                padding: 8px 5px;
-                margin-right: 5px;
-            }
-
-            .navbar-brand img {
-                width: 120px;
+            
+            .dropdown-menu {
+                position: static;
+                box-shadow: none;
+                border: none;
             }
         }
     </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.get_bookings') }}">
+            <a class="navbar-brand" href="{{ url_for('main.get_bookings') }}" style="margin-right: 90px;">
                 <img src="{{ url_for('static', filename='logo_white.png') }}" alt="Logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('booking.calendar_view') }}">
-                            <i class="fas fa-calendar fa-lg"></i>
+                            <i class="fas fa-calendar-alt"></i> Календарь
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.get_bookings') }}">Главная</a>
+                        <a class="nav-link" href="{{ url_for('main.get_bookings') }}">
+                            <i class="fas fa-home"></i> Главная
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('booking.bookings_today') }}">Сегодня</a>
+                        <a class="nav-link" href="{{ url_for('booking.bookings_today') }}">
+                            <i class="fas fa-list"></i> Сегодня
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('booking.add_booking') }}">Забронировать</a>
+                        <a class="nav-link" href="{{ url_for('booking.add_booking') }}">
+                            <i class="fas fa-plus-circle"></i> Забронировать
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('report.search_cars') }}">Поиск</a>
+                        <a class="nav-link" href="{{ url_for('report.search_cars') }}">
+                            <i class="fas fa-search"></i> Поиск
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('car.get_cars') }}">Автомобили</a>
+                        <a class="nav-link" href="{{ url_for('car.get_cars') }}">
+                            <i class="fas fa-car"></i> Автомобили
+                        </a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <span class="navbar-text" style="color: red;">{{ current_user.username }}</span>
+                    <li class="nav-item user-menu">
+                        <span class="nav-link user-badge">
+                            <i class="fas fa-user"></i> {{ current_user.username }}
+                        </span>
+                        {% if current_user.is_superuser %}
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{{ url_for('auth.list_users') }}">
+                                <i class="fas fa-users-cog"></i> Пользователи
+                            </a>
+                            <a class="dropdown-item" href="{{ url_for('auth.register') }}">
+                                <i class="fas fa-user-plus"></i> Зарегистрировать
+                            </a>
+                        </div>
+                        {% endif %}
                     </li>
-                    {% if current_user.is_superuser %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.list_users') }}">Пользователи</a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Выйти</a>
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> Выйти
+                        </a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">Войти</a>
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.register') }}">Зарегистрироваться</a>
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">
+                            <i class="fas fa-user-plus"></i> Регистрация
+                        </a>
                     </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
-</body>
 
+    <!-- Основной контент с отступом -->
+    <div style="padding-top: 40px;">
+        <!-- Ваш контент здесь -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

@@ -103,7 +103,7 @@ select.form-select-sm:focus {
     </div>
   </div>
 
-  <div class="table-container">
+<div class="table-container">
     <table class="table table-hover">
       <thead class="table-dark">
         <tr>
@@ -116,7 +116,7 @@ select.form-select-sm:focus {
           <th data-sort="end_date" class="date-column">Дата окончания</th>
           <th data-sort="phone" class="phone-column">Телефон</th>
           <th data-sort="description" class="description-column">Заметка</th>
-          <th data-sort="user_id">Добавил</th>
+          <th><i class="fas fa-edit"></i></th>
         </tr>
       </thead>
       <tbody>
@@ -134,7 +134,11 @@ select.form-select-sm:focus {
           <td class="date-column">{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
           <td class="phone-column">{{ booking.phone }}</td>
           <td class="description-column">{{ booking.description }}</td>
-          <td>{{ booking.user.username }}</td>
+          <td>
+            <a href="{{ url_for('booking.edit_booking', booking_id=booking.id) }}" class="edit-icon">
+                <i class="fas fa-edit"></i>
+            </a>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -153,7 +157,6 @@ select.form-select-sm:focus {
   </div>
 </div>
 
-<!-- Кастомное модальное окно для удаления -->
 <div id="custom-confirm-modal" class="custom-confirm-modal d-none">
   <div class="custom-modal-content">
     <p>Вы уверены, что хотите удалить это бронирование?</p>
@@ -169,4 +172,16 @@ select.form-select-sm:focus {
 <script src="{{ url_for('static', filename='js/all_booking_filter.js') }}"></script>
 <script src="{{ url_for('static', filename='js/all_booking_modal.js') }}"></script>
 <script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const editIcons = document.querySelectorAll('.edit-icon');
+
+  editIcons.forEach(icon => {
+    icon.addEventListener('click', function(event) {
+      // Остановка модального при клике на редактирование
+      event.stopPropagation();
+    });
+  });
+});
+</script>
 {% endblock %}

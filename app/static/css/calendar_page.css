@@ -1,6 +1,6 @@
 .table-container {
     display: block;
-    height: calc(100vh - 130px);
+    height: calc(100vh - 96px);
     overflow-y: auto;
     border: 1px solid #dee2e6;
   }
@@ -67,7 +67,6 @@
     border: 1px solid #000;
   }
   
-  /* Дополнительно можно настроить всю таблицу, чтобы рамки применялись к ячейкам */
   .table td, .table th {
     border: 1px solid #000;
     box-sizing: border-box;
@@ -76,13 +75,13 @@
   /* Стили для выделения столбца автомобилей */
   .table th:first-child,  
   .table td:first-child {
-      background-color: #e9f7fe; /* Светло-голубой фон */
-      width: 200px;             /* Фиксируем ширину */
+      background-color: #e9f7fe;
+      width: 200px;
       min-width: 200px;
       max-width: 200px;
-      white-space: nowrap;      /* Отключаем перенос текста */
+      white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;  /* Троеточие для длинного текста */
-      border: 1px solid #000;   /* Черная рамка */
-      font-weight: bold;        /* Жирный шрифт для заголовков */
+      text-overflow: ellipsis;
+      border: 1px solid #000;
+      font-weight: bold;
   }
