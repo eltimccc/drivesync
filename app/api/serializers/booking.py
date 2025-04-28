@@ -8,7 +8,7 @@ def serialize_bookings(bookings):
             "booking_id": booking.id,
             "start_date": booking.start_date.strftime("%d.%m.%Y %H:%M"),
             "end_date": booking.end_date.strftime("%d.%m.%Y %H:%M"),
-            "status": booking.status
+            "status": booking.status,
         }
         for booking in bookings
     ]

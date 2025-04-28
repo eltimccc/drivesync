@@ -18,8 +18,7 @@ def get_bookings_for_date(selected_date):
         db.session.query(Booking)
         .join(Car)
         .filter(
-            db.func.date(
-                Booking.start_date) == selected_date, Booking.status != "Отказ"
+            db.func.date(Booking.start_date) == selected_date, Booking.status != "Отказ"
         )
         .all()
     )
@@ -28,8 +27,7 @@ def get_bookings_for_date(selected_date):
         db.session.query(Booking)
         .join(Car)
         .filter(
-            db.func.date(
-                Booking.end_date) == selected_date, Booking.status != "Отказ"
+            db.func.date(Booking.end_date) == selected_date, Booking.status != "Отказ"
         )
         .all()
     )
