@@ -82,7 +82,12 @@
               <td>{{ car.transmission }}</td>
               <td>{{ car.car_number }}</td>
               <td>
-                <a href="{{ url_for('car.edit_car', car_id=car.id) }}">Ред.</a>
+                <a
+                  href="{{ url_for('car.edit_car', car_id=car.id) }}"
+                  title="Редактировать"
+                >
+                  <i class="fas fa-edit"></i>
+                </a>
               </td>
             </tr>
             {% endfor %}
