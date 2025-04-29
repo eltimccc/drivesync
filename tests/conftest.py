@@ -54,6 +54,7 @@ def test_user(db_session, app):
 
     return user
 
+
 @pytest.fixture
 def authenticated_user(client, test_user):
     """

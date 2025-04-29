@@ -39,7 +39,7 @@ def test_authenticated_user_access(authenticated_user):
 def test_authenticated_session(authenticated_user):
     """Проверка, что после успешного входа пользователь аутентифицирован."""
     client = authenticated_user
-    
+
     response = client.get(url_for("main.get_bookings"))
     assert response.status_code == 200
     assert "Бронирования".encode("utf8") in response.data

@@ -2,10 +2,11 @@
 import os
 from datetime import timedelta
 
+
 class TestConfig:
     TESTING = True
     SECRET_KEY = "test_secret_key"
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = True
     WTF_CSRF_ENABLED = False
