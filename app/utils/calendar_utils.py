@@ -14,10 +14,10 @@ def get_available_cars() -> list:
 
 def get_start_date_from_request() -> datetime:
     """Получаем начальную дату из запроса или текущую дату."""
-    start_date_str = request.args.get('start_date')
+    start_date_str = request.args.get("start_date")
     if start_date_str:
         try:
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
         except ValueError:
             start_date = datetime.today()
     else:
@@ -36,12 +36,14 @@ def get_week_dates(start_date: datetime) -> list:
     dates = []
     for i in range(10):
         day = start_date + timedelta(days=i)
-        dates.append({
-            'day': day.day,
-            'weekday': RU_WEEKDAYS[day.weekday()],
-            'date': day,
-            'month_name': RU_MONTHS[day.month]
-        })
+        dates.append(
+            {
+                "day": day.day,
+                "weekday": RU_WEEKDAYS[day.weekday()],
+                "date": day,
+                "month_name": RU_MONTHS[day.month],
+            }
+        )
     return dates
 
 
@@ -50,11 +52,13 @@ def get_bookings_in_range(start_date: datetime, last_day: datetime) -> list:
     return Booking.query.filter(
         Booking.start_date < last_day,
         Booking.end_date >= start_date,
-        Booking.status != "Отказ"
+        Booking.status != "Отказ",
     ).all()
 
 
-def map_bookings_to_dates(bookings: list, start_date: datetime, last_day: datetime) -> dict:
+def map_bookings_to_dates(
+    bookings: list, start_date: datetime, last_day: datetime
+) -> dict:
     """Сопоставляем бронирования с датами в пределах указанного диапазона."""
     bookings_dict = defaultdict(dict)
     for booking in bookings:
@@ -63,9 +67,9 @@ def map_bookings_to_dates(bookings: list, start_date: datetime, last_day: dateti
             if start_date.date() <= current.date() < last_day.date():
                 if current.date() not in bookings_dict[booking.car_id]:
                     bookings_dict[booking.car_id][current.date()] = {
-                        'booking_id': booking.id,
-                        'end_date': booking.end_date,
-                        'status': booking.status
+                        "booking_id": booking.id,
+                        "end_date": booking.end_date,
+                        "status": booking.status,
                     }
             current += timedelta(days=1)
     return bookings_dict
