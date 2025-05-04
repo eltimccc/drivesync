@@ -49,6 +49,7 @@ BOOKING_ALL_ROUTE = "/all_bookings"
 BOOKING_DETAIL_MODAL_ROUTE = "/modal/view_booking/<int:booking_id>"
 BOOKING_URL_PREFIX = "/booking"
 BOOKINGS_TODAY = "/bookings/today"
+BOOKINGS_TODAY_UPDATE_STATUS = "/update_status"
 
 
 # Имена шаблонов REPORT
