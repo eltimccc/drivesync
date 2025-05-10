@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from flask import (
     Blueprint,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -30,13 +31,25 @@ from app.constants import (
     BOOKING_VIEW_BP_ROUTE,
     BOOKINGS_TODAY,
     BOOKINGS_TODAY_TEMPLATE,
+    BOOKINGS_TODAY_UPDATE_STATUS,
 )
 from app.services.booking_service import BookingService
-from app.utils.booking_helpers import handle_successful_booking, log_form_errors, prepopulate_form_from_request
+from app.utils.booking_helpers import (
+    handle_successful_booking,
+    log_form_errors,
+    prepopulate_form_from_request,
+)
 from app.forms.forms import BookingForm, BookingUpdateForm
 from app.models import Booking
 from app.models import Car
-from app.utils.calendar_utils import get_available_cars, get_bookings_in_range, get_start_date_from_request, get_week_dates, get_week_title, map_bookings_to_dates
+from app.utils.calendar_utils import (
+    get_available_cars,
+    get_bookings_in_range,
+    get_start_date_from_request,
+    get_week_dates,
+    get_week_title,
+    map_bookings_to_dates,
+)
 from app.utils.utils import BOOKING_STATUSES
 
 
@@ -79,8 +92,7 @@ def view_booking(booking_id):
 @booking_blueprint.route(BOOKING_DETAIL_MODAL_ROUTE, methods=["GET"])
 @login_required
 def view_booking_modal(booking_id):
-    current_app.logger.info(
-        f"Accessed view booking modal with ID: {booking_id}")
+    current_app.logger.info(f"Accessed view booking modal with ID: {booking_id}")
     booking = Booking.query.get_or_404(booking_id)
     status_color = BOOKING_STATUSES.get(booking.status, "#ffffff")
 
@@ -110,8 +122,7 @@ def bookings_today():
         db.session.query(Booking)
         .join(Car)
         .filter(
-            db.func.date(
-                Booking.start_date) == selected_date, Booking.status != "Отказ"
+            db.func.date(Booking.start_date) == selected_date, Booking.status != "Отказ"
         )
         .all()
     )
@@ -119,8 +130,7 @@ def bookings_today():
         db.session.query(Booking)
         .join(Car)
         .filter(
-            db.func.date(
-                Booking.end_date) == selected_date, Booking.status != "Отказ"
+            db.func.date(Booking.end_date) == selected_date, Booking.status != "Отказ"
         )
         .all()
     )
@@ -130,7 +140,25 @@ def bookings_today():
         pick_ups=pick_ups,
         drop_offs=drop_offs,
         today=selected_date,
+        BOOKING_STATUSES=BOOKING_STATUSES,
     )
+
+
+@booking_blueprint.route(BOOKINGS_TODAY_UPDATE_STATUS, methods=["POST"])
+@login_required
+def update_booking_status():
+    data = request.get_json()
+    booking_id = data.get("booking_id")
+    new_status = data.get("new_status")
+
+    booking = Booking.query.get(booking_id)
+    if not booking:
+        return jsonify({"error": "Booking not found"}), 404
+
+    booking.update_status(new_status)
+    db.session.commit()
+
+    return jsonify({"message": "Status updated"}), 200
 
 
 @booking_blueprint.route(BOOKING_ADD_BP_ROUTE, methods=["POST", "GET"])
@@ -156,56 +184,64 @@ def add_booking():
 @booking_blueprint.route(BOOKING_EDIT_BP_ROUTE, methods=["GET", "POST"])
 @login_required
 def edit_booking(booking_id):
-    current_app.logger.info(f"User {current_user.username} editing booking ID: {booking_id}")
+    current_app.logger.info(
+        f"User {current_user.username} editing booking ID: {booking_id}"
+    )
     booking = Booking.query.get_or_404(booking_id)
     form = BookingUpdateForm(obj=booking)
     form.status.choices = [(key, key) for key in BOOKING_STATUSES.keys()]
     cars = Car.query.filter_by(is_deleted=False).all()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             form_data = {
-                'description': form.description.data,
-                'phone': form.phone.data,
-                'status': form.status.data,
-                'start_date': form.start_date.data,
-                'end_date': form.end_date.data
+                "description": form.description.data,
+                "phone": form.phone.data,
+                "status": form.status.data,
+                "start_date": form.start_date.data,
+                "end_date": form.end_date.data,
             }
-            
+
             move_data = {
-                'car_id': request.form.get('car'),
-                'move_start': request.form.get('move_start'),
-                'move_end': request.form.get('move_end_date')
+                "car_id": request.form.get("car"),
+                "move_start": request.form.get("move_start"),
+                "move_end": request.form.get("move_end_date"),
             }
 
             result = BookingService.update_booking(booking, form_data, move_data)
-            flash(result['message'], 'success')
-            
+            flash(result["message"], "success")
+
             db.session.commit()
-            
+
             # Перенаправляем обратно на редактирование (нового бронирования, если была пересадка)
-            booking_id_to_edit = result['new_booking'].id if result['new_booking'] else booking.id
-            return redirect(url_for(BOOKING_EDIT_BOOKING_ROUTE, booking_id=booking_id_to_edit))
+            booking_id_to_edit = (
+                result["new_booking"].id if result["new_booking"] else booking.id
+            )
+            return redirect(
+                url_for(BOOKING_EDIT_BOOKING_ROUTE, booking_id=booking_id_to_edit)
+            )
 
         except ValueError as e:
             db.session.rollback()
-            flash(str(e), 'danger')
-            return render_template(BOOKING_EDIT_TEMPLATE, 
-                               booking=booking, 
-                               form=form,
-                               cars=cars)
+            flash(str(e), "danger")
+            return render_template(
+                BOOKING_EDIT_TEMPLATE, booking=booking, form=form, cars=cars
+            )
         except Exception as e:
             db.session.rollback()
-            current_app.logger.error(f"Error updating booking {booking_id}: {str(e)}", exc_info=True)
-            flash(f'Произошла ошибка: {str(e)}', 'danger')
+            current_app.logger.error(
+                f"Error updating booking {booking_id}: {str(e)}", exc_info=True
+            )
+            flash(f"Произошла ошибка: {str(e)}", "danger")
 
-    return render_template(BOOKING_EDIT_TEMPLATE, 
-                         booking=booking, 
-                         form=form, 
-                         move_start_date=booking.start_date, 
-                         move_end_date=booking.end_date, 
-                         cars=cars)
-
+    return render_template(
+        BOOKING_EDIT_TEMPLATE,
+        booking=booking,
+        form=form,
+        move_start_date=booking.start_date,
+        move_end_date=booking.end_date,
+        cars=cars,
+    )
 
 
 @booking_blueprint.route(BOOKING_DELETE_BP_ROUTE, methods=["POST"])
@@ -223,7 +259,7 @@ def delete_booking(booking_id):
     return redirect(url_for(BOOKING_MAIN_ROUTE))
 
 
-@booking_blueprint.route('/calendar', methods=["GET"])
+@booking_blueprint.route("/calendar", methods=["GET"])
 @login_required
 def calendar_view():
     cars = get_available_cars()
@@ -249,7 +285,7 @@ def calendar_view():
         dates=dates,
         current_week=current_week_title,
         bookings_dict=bookings_dict,
-        prev_start_date=prev_start_date.strftime('%Y-%m-%d'),
-        next_start_date=next_start_date.strftime('%Y-%m-%d'),
-        BOOKING_STATUSES=BOOKING_STATUSES  # Передаем статусы в шаблон
+        prev_start_date=prev_start_date.strftime("%Y-%m-%d"),
+        next_start_date=next_start_date.strftime("%Y-%m-%d"),
+        BOOKING_STATUSES=BOOKING_STATUSES,
     )

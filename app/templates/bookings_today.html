@@ -1,11 +1,49 @@
-{% extends 'base.html' %} {% block title %}Cегодня{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Сегодня{% endblock %}
+
 {% block additional_styles %}
-<link
-  rel="stylesheet"
-  type="text/css"
-  href="{{ url_for('static', filename='css/styles.css') }}"
-/>
-{% endblock %} {% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+<style>
+.custom-context-menu {
+  font-size: 14px;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  z-index: 10000;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 120px;
+  opacity: 0;
+  transform: scale(0.95);
+  animation: fadeInMenu 0.35s ease-out forwards;
+}
+
+/* Анимация */
+@keyframes fadeInMenu {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.custom-context-menu div {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.custom-context-menu div:hover {
+  background-color: #f5f5f5;
+}
+.table tbody tr {
+  cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block content %}
 <div class="container mt-4">
   <div class="row justify-content-between align-items-center mb-3">
     <div class="col-md-3 d-flex align-items-center">
@@ -36,155 +74,83 @@
       </form>
     </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-md-6 pick-up-section">
-    <h5 class="text-center">ВЫДАТЬ</h5>
+
+  <div class="row">
+    <div class="col-md-6 pick-up-section">
+      <h5 class="text-center">ВЫДАТЬ</h5>
     <div class="table-container">
       <table class="table table-hover">
         <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Автомобиль</th>
-            <th>КПП</th>
-            <th>Гос. номер</th>
-            <th>Дата начала</th>
-            <th>Телефон</th>
-            <th>Заметка</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for booking in pick_ups %}
-          <tr
-            id="booking-{{ booking.id }}"
-            class="status-{{ booking.status | lower }}"
-            onclick="openBookingModal({{ booking.id }})"
-          >
-            <td>{{ booking.id }}</td>
-            <td>{{ booking.car.brand }}</td>
-            <td>{{ booking.car.transmission }}</td>
-            <td>{{ booking.car.car_number }}</td>
-            <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
-            <td>{{ booking.phone }}</td>
-            <td>
-              {{ booking.description[:20] }}{% if booking.description|length >
-              20 %}...{% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            <tr>
+              <th>ID</th>
+              <th>Автомобиль</th>
+              <th>КПП</th>
+              <th>Гос. номер</th>
+              <th>Дата начала</th>
+              <th>Телефон</th>
+              <th>Заметка</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in pick_ups %}
+            <tr id="booking-{{ booking.id }}" class="status-{{ booking.status|lower }}" data-booking-id="{{ booking.id }}">
+              <td>{{ booking.id }}</td>
+              <td>{{ booking.car.brand }}</td>
+              <td>{{ booking.car.transmission }}</td>
+              <td>{{ booking.car.car_number }}</td>
+              <td>{{ booking.start_date.strftime('%d.%m.%y %H:%M') }}</td>
+              <td>{{ booking.phone }}</td>
+              <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  <div class="col-md-6 drop-off-section">
-    <h5 class="text-center">ПРИНЯТЬ</h5>
-    <div class="table-container">
-      <table class="table table-hover">
-        <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Автомобиль</th>
-            <th>КПП</th>
-            <th>Гос. номер</th>
-            <th>Дата окончания</th>
-            <th>Телефон</th>
-            <th>Заметка</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for booking in drop_offs %}
-          <tr
-            id="booking-{{ booking.id }}"
-            class="status-{{ booking.status | lower }}"
-            onclick="openBookingModal({{ booking.id }})"
-          >
-            <td>{{ booking.id }}</td>
-            <td>{{ booking.car.brand }}</td>
-            <td>{{ booking.car.transmission }}</td>
-            <td>{{ booking.car.car_number }}</td>
-            <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
-            <td>{{ booking.phone }}</td>
-            <td>
-              {{ booking.description[:20] }}{% if booking.description|length >
-              20 %}...{% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+    <div class="col-md-6 drop-off-section">
+      <h5 class="text-center">ПРИНЯТЬ</h5>
+      <div class="table-container">
+        <table class="table table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Автомобиль</th>
+              <th>КПП</th>
+              <th>Гос. номер</th>
+              <th>Дата окончания</th>
+              <th>Телефон</th>
+              <th>Заметка</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in drop_offs %}
+            <tr id="booking-{{ booking.id }}" class="status-{{ booking.status|lower }}" data-booking-id="{{ booking.id }}">
+              <td>{{ booking.id }}</td>
+              <td>{{ booking.car.brand }}</td>
+              <td>{{ booking.car.transmission }}</td>
+              <td>{{ booking.car.car_number }}</td>
+              <td>{{ booking.end_date.strftime('%d.%m.%y %H:%M') }}</td>
+              <td>{{ booking.phone }}</td>
+              <td>{{ booking.description[:20] }}{% if booking.description|length > 20 %}...{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Модальное окно для бронирования -->
+<div id="context-menu-container"></div>
+
 {% include 'includes/modal_booking_window.html' %}
 
-<!-- Кастомное модальное окно для удаления -->
-{% include 'includes/custom_delete_modal.html' %}
-
+<script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bookings_today_click.js') }}"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Модальное окно бронирования
-    window.openBookingModal = function (bookingId) {
-      const modalContentPlaceholder = document.getElementById(
-        "modal-content-placeholder"
-      );
-      modalContentPlaceholder.innerHTML = "Загрузка...";
-
-      fetch(
-        `{{ url_for('booking.view_booking_modal', booking_id=0) }}`.replace(
-          "0",
-          bookingId
-        )
-      )
-        .then((response) => response.text())
-        .then((data) => {
-          modalContentPlaceholder.innerHTML = data;
-          attachDeleteEvent(); // Привязка событий к новым элементам
-          $("#bookingModal").modal("show");
-        })
-        .catch((error) => {
-          modalContentPlaceholder.innerHTML = "Ошибка загрузки данных";
-          console.error("Ошибка:", error);
-        });
-    };
-
-    // Функция привязки событий удаления
-    function attachDeleteEvent() {
-      const deleteButton = document.getElementById("delete-button");
-      const confirmOkButton = document.getElementById("confirm-ok-button");
-      const confirmCancelButton = document.getElementById(
-        "confirm-cancel-button"
-      );
-
-      if (deleteButton) {
-        deleteButton.addEventListener("click", function (event) {
-          event.preventDefault();
-          document.getElementById("custom-confirm-modal").style.display =
-            "flex";
-        });
-      }
-
-      if (confirmOkButton) {
-        confirmOkButton.addEventListener("click", function () {
-          document.getElementById("custom-confirm-modal").style.display =
-            "none";
-          document.getElementById("delete-form").submit();
-        });
-      }
-
-      if (confirmCancelButton) {
-        confirmCancelButton.addEventListener("click", function () {
-          document.getElementById("custom-confirm-modal").style.display =
-            "none";
-        });
-      }
-    }
-
-    // Вызываем привязку событий удаления
-    attachDeleteEvent();
-  });
+  window.bookingModalUrl = "{{ url_for('booking.view_booking_modal', booking_id=0) }}";
 </script>
 
-<script src="{{ url_for('static', filename='js/table_sort_booking.js') }}"></script>
+<script src="{{ url_for('static', filename='js/booking-today-click-modal.js') }}"></script>
 {% endblock %}
