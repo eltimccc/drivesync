@@ -1,0 +1,108 @@
+:root {
+    --primary-color-start: #1f2d52;
+    --primary-color-end: #2a4e78;
+    --accent-color: #4fc3f7;
+    --light-color: #f8f9fa;
+    --danger-color: #ef233c;
+}
+
+.navbar {
+    background: linear-gradient(to right, var(--primary-color-start), var(--primary-color-end));
+    padding: 0.4rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    min-height: 54px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1030;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-brand img {
+    height: 34px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand img:hover {
+    transform: scale(1.05);
+}
+
+.nav-link {
+    font-size: 13px;
+    padding: 0.6rem 0.85rem !important;
+    color: var(--light-color) !important;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-link i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--accent-color) !important;
+    text-shadow: 0 0 0px var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.user-menu {
+    position: relative;
+}
+
+.user-badge {
+    background-color: rgba(239, 35, 60, 0.15);
+    color: var(--light-color) !important;
+    padding: 0.3rem 0.9rem;
+    border-radius: 20px;
+    font-weight: 600;
+    border: 1px solid var(--danger-color);
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.user-badge:hover {
+    background-color: var(--danger-color);
+    color: #fff !important;
+}
+
+.dropdown-menu {
+    right: 0;
+    background-color: var(--primary-color-end);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-menu:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-item {
+    color: var(--light-color) !important;
+    font-size: 13px;
+    padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f8f9fa;
+    text-shadow: 0 0 2px var(--accent-color);
+}
+
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        padding: 0.5rem 0;
+        background-color: var(--primary-color-start);
+    }
+
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border: none;
+    }
+}
