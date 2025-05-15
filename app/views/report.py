@@ -162,16 +162,15 @@ def report_booking_duration():
 
             car_duration = timedelta()
             for booking in bookings:
-                intersection_start = (
-                    booking.start_date
-                    if booking.start_date >= start_date
-                    else start_date
-                )
-                intersection_end = (
-                    booking.end_date if booking.end_date <= end_date else end_date
-                )
-                duration = intersection_end - intersection_start
-                car_duration += duration
+                # Определяем начало пересечения (максимум из начала брони и начала периода)
+                intersection_start = max(booking.start_date, start_date)
+                # Определяем конец пересечения (минимум из конца брони и конца периода)
+                intersection_end = min(booking.end_date, end_date)
+                
+                # Добавляем только если пересечение существует
+                if intersection_start < intersection_end:
+                    duration = intersection_end - intersection_start
+                    car_duration += duration
 
             cars_duration[car] = car_duration
             total_duration += car_duration
