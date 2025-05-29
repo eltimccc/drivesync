@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1f2d52" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>{% block title %}Автопрокат{% endblock %}</title>
 
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
@@ -16,11 +18,29 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
     <style>
+        :root {
+            --primary-color-start: #1f2d52;
+            --primary-color-end: #2a4e78;
+            --accent-color: #4fc3f7;
+            --light-color: #f8f9fa;
+            --danger-color: #ef233c;
+            --header-gradient: linear-gradient(to right, var(--primary-color-start), var(--primary-color-end));
+        }
+        
         body {
             font-family: 'Montserrat', 'Helvetica Neue', helvetica, arial, sans-serif;
             background-color: #f0f4fa;
             margin-top: 70px;
+            /* Для Safari */
+            padding-top: env(safe-area-inset-top);
         }
+        
+        @supports (padding-top: constant(safe-area-inset-top)) {
+            body {
+                padding-top: constant(safe-area-inset-top);
+            }
+        }
+        
         h2 {
             color: #0b1f33;
         }
@@ -43,7 +63,6 @@
             border-bottom: 1px solid #f2f8f8;
         }
         .table thead th {
-            background-color: #2c3e50;
             color: white;
             position: sticky;
             top: 0;
@@ -62,6 +81,7 @@
             top: 0;
             width: 100%;
             z-index: 1030;
+            background: var(--header-gradient);
         }
         .modal-content {
             max-width: 100%;
@@ -70,7 +90,31 @@
             margin: auto;
         }
         
-    
+        /* Для Safari на iOS */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                background: var(--header-gradient);
+            }
+            
+            .content-wrapper {
+                background-color: #f0f4fa;
+                border-radius: 10px 10px 0 0;
+                min-height: calc(100vh - 70px);
+                margin-top: -10px;
+            }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: env(safe-area-inset-top);
+                background: var(--header-gradient);
+                z-index: 1040;
+            }
+        }
     </style>
 
     {% block additional_styles %}{% endblock %}
