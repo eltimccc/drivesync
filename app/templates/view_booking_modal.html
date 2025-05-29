@@ -1,4 +1,9 @@
 <style>
+  .modal-body {
+    word-wrap: break-word;
+    white-space: normal;
+  }
+
   .modal-content {
     width: 70%;
     max-height: 60%;
@@ -13,7 +18,6 @@
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
     background-color: rgba(0, 0, 0, 0.5);
     align-items: center;
     justify-content: center;
@@ -101,7 +105,6 @@
   document
     .getElementById("delete-button")
     .addEventListener("click", function (event) {
-      console.log("Delete button clicked");
       event.preventDefault();
       document.getElementById("custom-confirm-modal").style.display = "flex";
     });
@@ -109,7 +112,6 @@
   document
     .getElementById("confirm-ok-button")
     .addEventListener("click", function () {
-      console.log("Confirm OK button clicked");
       document.getElementById("custom-confirm-modal").style.display = "none";
       document.getElementById("delete-form").submit();
     });
@@ -117,7 +119,6 @@
   document
     .getElementById("confirm-cancel-button")
     .addEventListener("click", function () {
-      console.log("Confirm Cancel button clicked");
       document.getElementById("custom-confirm-modal").style.display = "none";
     });
 </script>

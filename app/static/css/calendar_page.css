@@ -1,87 +1,148 @@
+.calendar-header {
+  width: 99vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  padding-left: 15px;
+  padding: -1px;
+}
+
+.car-brand {
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.car-number {
+  font-weight: normal;
+  font-size: 0.8rem;
+  color: #555;
+  display: inline-block;
+}
+
+.calendar-header .btn-outline-primary {
+  border-radius: 10px;
+  padding: 0.25rem 0.75rem;
+  transition: all 0.2s;
+}
+
+.calendar-header .btn-outline-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-wrapper {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+}
+
 .table-container {
-    display: block;
-    height: calc(100vh - 96px);
-    overflow-y: auto;
-    border: 1px solid #dee2e6;
-  }
-  
-  .table {
+  height: calc(100vh - 105px);
+  overflow: auto;
+  background-color: white;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  table-layout: fixed;
+}
+
+.table tbody tr td {
+  height: 48px;
+  padding: 4px 8px;
+  line-height: 1.2;
+  vertical-align: middle;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border: 1px solid #000;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #f8f9fa;
+  border: 1.9px solid #000;
+  border-bottom: 2px solid #000;
+  height: 30px;
+  padding: 2px 6px;
+  min-width: 80px;
+  color: #000;
+  line-height: 1.2;
+  vertical-align: middle;
+  font-size: 0.92rem;
+
+}
+
+.table th:first-child,
+.table td:first-child {
+  background-color: #e9f7fe;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  font-weight: bold;
+}
+
+.table tbody tr td a {
+  font-size: 0.75rem;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.status-аренда {
+  background-color: rgba(0, 123, 255, 0.5) !important;
+}
+
+.status-завершено {
+  background-color: #00d92497 !important;
+}
+
+.status-отказ {
+  background-color: #db355cd2 !important;
+}
+
+.status-ожидание {
+  background-color: #ffc107 !important;
+}
+
+.status-бронь {
+  background-color: #f7e6fa !important;
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
     width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
+    -webkit-overflow-scrolling: touch;
   }
-  
-  .table thead th {
-    position: sticky;
-    top: 0;
-    background-color: #f8f9fa;
-    z-index: 1;
-    font-size: 0.875rem;
+
+  .table {
+    width: auto;
+    min-width: 100%;
   }
-  
-  .table tbody tr td {
-    font-size: 0.875rem;
-  }
-  
-  .table tbody tr td a {
-    font-size: 0.75rem;
-  }
-  
-  .nav-item a {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100%;
-  }
-  
-  @media (max-width: 600px) {
-    td::before {
-      content: attr(data-label);
-      font-weight: bold;
-      display: block;
-    }
-  }
-  
-  .status-аренда {
-    background-color: rgba(0, 123, 255, 0.5) !important;
-    border: 1px solid #000;
-  }
-  
-  .status-завершено {
-    background-color: #00d92497 !important;
-    border: 1px solid #000;
-  }
-  
-  .status-отказ {
-    background-color: #db355cd2 !important;
-    border: 1px solid #000;
-  }
-  
-  .status-ожидание {
-    background-color: #ffc107 !important;
-    border: 1px solid #000;
-  }
-  
-  .status-бронь {
-    background-color: #f7e6fa !important;
-    border: 1px solid #000;
-  }
-  
-  .table td, .table th {
-    border: 1px solid #000;
-    box-sizing: border-box;
-  }
-  
-  /* Стили для выделения столбца автомобилей */
-  .table th:first-child,  
+
+  .table th:first-child,
   .table td:first-child {
-      background-color: #e9f7fe;
-      width: 200px;
-      min-width: 200px;
-      max-width: 200px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      border: 1px solid #000;
-      font-weight: bold;
+    width: 120px;
+    min-width: 120px;
+    max-width: none;
   }
+
+  .table th:not(:first-child),
+  .table td:not(:first-child) {
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 600px) {
+  td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    display: block;
+  }
+}
